@@ -12,7 +12,7 @@ import 'tables.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [Merchants, Receipts, LineItems])
+@DriftDatabase(tables: [Merchants, Receipts, LineItems, Warranties])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
@@ -21,21 +21,35 @@ class AppDatabase extends _$AppDatabase {
       AppDatabase(_openEncrypted(encryptionKey));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) async {
           await m.createAll();
-          // Indeksi za pretragu i sortiranje (instrukcije.md, sekcija 4).
-          await customStatement(
-              'CREATE INDEX IF NOT EXISTS idx_merchants_name ON merchants(name)');
-          await customStatement(
-              'CREATE INDEX IF NOT EXISTS idx_line_items_name ON line_items(name)');
-          await customStatement(
-              'CREATE INDEX IF NOT EXISTS idx_receipts_pfr_time ON receipts(pfr_time)');
+          await _createIndexes();
+        },
+        onUpgrade: (m, from, to) async {
+          // v2: tabela garancija (warranties).
+          if (from < 2) {
+            await m.createTable(warranties);
+            await customStatement(
+                'CREATE INDEX IF NOT EXISTS idx_warranties_expiry ON warranties(expiry_date)');
+          }
         },
       );
+
+  Future<void> _createIndexes() async {
+    // Indeksi za pretragu i sortiranje (instrukcije.md, sekcija 4).
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_merchants_name ON merchants(name)');
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_line_items_name ON line_items(name)');
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_receipts_pfr_time ON receipts(pfr_time)');
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_warranties_expiry ON warranties(expiry_date)');
+  }
 }
 
 LazyDatabase _openEncrypted(String key) {
