@@ -60,3 +60,11 @@ app.*.map.json
 *.env
 .env*
 !.env.example
+
+# Sirovi uhvaćeni fixture-i sadrže realne podatke računa — ne commit-uju se.
+# U git idu samo anonimizovani fixture-i (*.anon.*) i dokumentacija.
+test/fixtures/*.page.html
+test/fixtures/*.specifications.json
+test/fixtures/*.specifications.txt
+test/fixtures/*.meta.json
+test/fixtures/invoice-verify.js
