@@ -6,7 +6,6 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlcipher_flutter_libs/sqlcipher_flutter_libs.dart';
 import 'package:sqlite3/open.dart';
-import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 
 import 'enums.dart';
 import 'tables.dart';
@@ -43,7 +42,7 @@ LazyDatabase _openEncrypted(String key) {
   return LazyDatabase(() async {
     // Na Androidu treba ranija inicijalizacija da bi se učitao SQLCipher.
     if (Platform.isAndroid) {
-      await applyWorkaroundToOpenSqlite3OnOldAndroidVersions();
+      await applyWorkaroundToOpenSqlCipherOnOldAndroidVersions();
     }
     // Osiguraj da se koristi SQLCipher build (ne sistemski sqlite).
     open.overrideForAll(openCipherOnAndroid);
