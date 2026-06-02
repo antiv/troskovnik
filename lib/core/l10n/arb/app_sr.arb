@@ -1,0 +1,63 @@
+{
+  "@@locale": "sr",
+  "appTitle": "Troškovnik",
+  "@appTitle": {},
+
+  "navScan": "Skener",
+  "navReceipts": "Računi",
+
+  "scanTitle": "Skeniraj račun",
+  "scanHint": "Usmeri kameru na QR kod fiskalnog računa",
+  "scanManualEntry": "Ručni unos",
+  "scanBatchMode": "Skeniraj više zaredom",
+  "scanNotFiscal": "Ovo nije fiskalni račun",
+  "scanPermissionDenied": "Pristup kameri je odbijen. Omogući ga u podešavanjima.",
+
+  "resultTitle": "Rezultat skeniranja",
+  "resultSave": "Sačuvaj",
+  "resultOpen": "Otvori",
+  "resultItemsCount": "{count} stavki",
+  "@resultItemsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "resultItemsPending": "Stavke u obradi",
+  "resultDuplicateOpened": "Račun je već sačuvan — otvaram postojeći.",
+
+  "receiptsTitle": "Računi",
+  "receiptsEmpty": "Još nema sačuvanih računa.",
+  "receiptsSearchHint": "Pretraži po prodavcu ili artiklu",
+  "receiptsSortDate": "Datum",
+  "receiptsSortMerchant": "Prodavac",
+  "receiptsSortAmount": "Iznos",
+  "badgeItemsPending": "Stavke u obradi",
+  "badgeFromJournal": "Iz žurnala",
+  "badgeInvalid": "Nevažeći",
+
+  "detailTitle": "Detalj računa",
+  "detailHeader": "Zaglavlje",
+  "detailTaxBreakdown": "Obračun poreza",
+  "detailItems": "Stavke",
+  "detailNote": "Beleška",
+  "detailMarkBusiness": "Poslovni račun",
+  "detailRefreshNow": "Osveži sada",
+  "detailAttachPhoto": "Priloži fotografiju",
+  "detailPendingExplain": "Račun je sačuvan. Prodavac ga još nije proknjižio kod Poreske; stavke će se automatski dopuniti.",
+  "detailItemsRefreshed": "Stavke računa su dopunjene.",
+  "detailUnparsedRow": "Neparsiran red",
+
+  "manualTitle": "Ručni unos računa",
+  "manualTotalAmount": "Ukupan iznos",
+  "manualPfrNumber": "PFR broj",
+  "manualPfrTime": "PFR vreme",
+  "manualInvoiceCounter": "Brojač računa",
+  "manualSubmit": "Preuzmi račun",
+
+  "errNoNetwork": "Nema mreže. Račun je sačuvan i biće dopunjen automatski.",
+  "errPortalUnavailable": "Portal Poreske uprave je trenutno nedostupan. Pokušaću ponovo.",
+  "errInvalidReceipt": "Račun ne postoji ili je otkazan.",
+  "errGeneric": "Došlo je do greške.",
+  "retry": "Pokušaj ponovo",
+  "cancel": "Otkaži",
+
+  "merchantUnknown": "Nepoznat prodavac"
+}

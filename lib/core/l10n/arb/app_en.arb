@@ -1,0 +1,62 @@
+{
+  "@@locale": "en",
+  "appTitle": "Expense Tracker",
+
+  "navScan": "Scan",
+  "navReceipts": "Receipts",
+
+  "scanTitle": "Scan receipt",
+  "scanHint": "Point the camera at the fiscal receipt QR code",
+  "scanManualEntry": "Manual entry",
+  "scanBatchMode": "Scan several in a row",
+  "scanNotFiscal": "This is not a fiscal receipt",
+  "scanPermissionDenied": "Camera access denied. Enable it in settings.",
+
+  "resultTitle": "Scan result",
+  "resultSave": "Save",
+  "resultOpen": "Open",
+  "resultItemsCount": "{count} items",
+  "@resultItemsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "resultItemsPending": "Items being processed",
+  "resultDuplicateOpened": "Receipt already saved — opening the existing one.",
+
+  "receiptsTitle": "Receipts",
+  "receiptsEmpty": "No saved receipts yet.",
+  "receiptsSearchHint": "Search by merchant or item",
+  "receiptsSortDate": "Date",
+  "receiptsSortMerchant": "Merchant",
+  "receiptsSortAmount": "Amount",
+  "badgeItemsPending": "Items pending",
+  "badgeFromJournal": "From journal",
+  "badgeInvalid": "Invalid",
+
+  "detailTitle": "Receipt detail",
+  "detailHeader": "Header",
+  "detailTaxBreakdown": "Tax breakdown",
+  "detailItems": "Items",
+  "detailNote": "Note",
+  "detailMarkBusiness": "Business receipt",
+  "detailRefreshNow": "Refresh now",
+  "detailAttachPhoto": "Attach photo",
+  "detailPendingExplain": "The receipt is saved. The merchant has not posted it to the Tax Administration yet; items will be filled in automatically.",
+  "detailItemsRefreshed": "Receipt items have been filled in.",
+  "detailUnparsedRow": "Unparsed row",
+
+  "manualTitle": "Manual receipt entry",
+  "manualTotalAmount": "Total amount",
+  "manualPfrNumber": "PFR number",
+  "manualPfrTime": "PFR time",
+  "manualInvoiceCounter": "Invoice counter",
+  "manualSubmit": "Fetch receipt",
+
+  "errNoNetwork": "No network. The receipt is saved and will be completed automatically.",
+  "errPortalUnavailable": "The Tax Administration portal is currently unavailable. I will retry.",
+  "errInvalidReceipt": "The receipt does not exist or was cancelled.",
+  "errGeneric": "An error occurred.",
+  "retry": "Retry",
+  "cancel": "Cancel",
+
+  "merchantUnknown": "Unknown merchant"
+}
