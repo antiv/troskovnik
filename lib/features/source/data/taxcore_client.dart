@@ -23,9 +23,15 @@ class TaxCoreClient implements ReceiptSource {
             )),
         _parser = parser ?? const TaxCoreParser();
 
-  /// Putanja koju verifikaciona stranica koristi za izdvojene stavke.
-  /// POTVRDITI nad realnim odgovorom (sekcija 11 #1).
+  /// Putanja koju verifikaciona stranica koristi za izdvojene stavke
+  /// (potvrđeno iz /js/invoice-verify.js).
   static const specificationsPath = '/specifications';
+
+  // invoiceNumber i token (GUID) su u inline <script> stranice:
+  //   viewModel.InvoiceNumber('...'); viewModel.Token('...');
+  static final _invoiceNumberRe =
+      RegExp(r"InvoiceNumber\(\s*'([^']+)'\s*\)");
+  static final _tokenRe = RegExp(r"\.Token\(\s*'([^']+)'\s*\)");
 
   final Dio _dio;
   final TaxCoreParser _parser;
@@ -37,29 +43,38 @@ class TaxCoreClient implements ReceiptSource {
         verificationUrl,
         options: Options(responseType: ResponseType.plain),
       );
+      final pageBody = pageResp.data ?? '';
 
       String? specsBody;
-      // Best-effort: probaj specifications endpoint. Ako padne, ostaje null i
-      // parser pada na žurnal.
-      try {
-        final base = Uri.parse(verificationUrl);
-        final token = base.queryParameters['vl'];
-        final specsResp = await _dio.post<String>(
-          base.replace(path: specificationsPath, query: '').toString(),
-          data: {'invoiceNumber': token},
-          options: Options(responseType: ResponseType.plain),
-        );
-        if (specsResp.statusCode == 200) {
-          specsBody = specsResp.data;
+      // Best-effort: stavke se traže POST-om sa invoiceNumber+token iz stranice
+      // (NE sa vl tokenom). Ako padne ili vrati success:false, ostaje null i
+      // parser pada na žurnal (koji je ionako primaran izvor).
+      final invoiceNumber = _invoiceNumberRe.firstMatch(pageBody)?.group(1);
+      final token = _tokenRe.firstMatch(pageBody)?.group(1);
+      if (invoiceNumber != null && token != null) {
+        try {
+          final base = Uri.parse(verificationUrl);
+          final specsResp = await _dio.post<String>(
+            base.replace(path: specificationsPath, query: '').toString(),
+            data: {'invoiceNumber': invoiceNumber, 'token': token},
+            options: Options(
+              responseType: ResponseType.plain,
+              contentType: Headers.formUrlEncodedContentType,
+              headers: const {'X-Requested-With': 'XMLHttpRequest'},
+            ),
+          );
+          if (specsResp.statusCode == 200) {
+            specsBody = specsResp.data;
+          }
+        } catch (_) {
+          // Stavke nisu (još) dostupne — žurnal je fallback.
         }
-      } catch (_) {
-        // Stavke nisu (još) dostupne ovim putem — ignoriši, žurnal je fallback.
       }
 
       return RawPortalResponse(
         verificationUrl: verificationUrl,
         statusCode: pageResp.statusCode ?? 0,
-        body: pageResp.data ?? '',
+        body: pageBody,
         specificationsBody: specsBody,
         contentType: pageResp.headers.value('content-type'),
       );

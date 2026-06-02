@@ -54,17 +54,28 @@ Future<void> main(List<String> args) async {
   stdout.writeln('  -> $label.page.html (${(page.data ?? '').length} B, '
       'status ${page.statusCode})');
 
+  // invoiceNumber i token (GUID) su u inline <script> stranice — NE vl token.
+  final pageBody = page.data ?? '';
+  final invoiceNumber =
+      RegExp(r"InvoiceNumber\(\s*'([^']+)'\s*\)").firstMatch(pageBody)?.group(1);
+  final token =
+      RegExp(r"\.Token\(\s*'([^']+)'\s*\)").firstMatch(pageBody)?.group(1);
+
   String? specsStatus;
   try {
     final base = Uri.parse(url);
-    final token = base.queryParameters['vl'];
     final specsUrl =
         base.replace(path: _specificationsPath, query: '').toString();
-    stdout.writeln('Probam izdvojene stavke: $specsUrl');
+    stdout.writeln('Probam izdvojene stavke: $specsUrl '
+        '(invoiceNumber=$invoiceNumber)');
     final specs = await dio.post<String>(
       specsUrl,
-      data: {'invoiceNumber': token},
-      options: Options(responseType: ResponseType.plain),
+      data: {'invoiceNumber': invoiceNumber, 'token': token},
+      options: Options(
+        responseType: ResponseType.plain,
+        contentType: Headers.formUrlEncodedContentType,
+        headers: const {'X-Requested-With': 'XMLHttpRequest'},
+      ),
     );
     specsStatus = '${specs.statusCode}';
     if ((specs.data ?? '').isNotEmpty) {
