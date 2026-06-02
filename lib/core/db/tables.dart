@@ -147,3 +147,40 @@ class LineItems extends Table {
   /// Za kasnije (AI kategorizacija) — NE koristi se sada.
   IntColumn get categoryId => integer().nullable()();
 }
+
+/// Garancije / saobraznost (warranties).
+///
+/// Killer feature: prati rok garancije po stavci ILI po celom računu, podseti
+/// pre isteka, i koristi sačuvan račun (journal/URL/foto) kao dokaz.
+@DataClassName('WarrantyRow')
+class Warranties extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  /// Račun koji služi kao dokaz (uvek postoji).
+  IntColumn get receiptId =>
+      integer().references(Receipts, #id, onDelete: KeyAction.cascade)();
+
+  /// Konkretna stavka, ako je garancija za jedan artikal (nullable → ceo račun).
+  IntColumn get lineItemId =>
+      integer().nullable().references(LineItems, #id, onDelete: KeyAction.setNull)();
+
+  /// Naziv (predefinisan iz stavke/prodavca, korisnik može da izmeni).
+  TextColumn get title => text()();
+
+  /// Datum kupovine (default = pfr_time računa).
+  DateTimeColumn get purchaseDate => dateTime()();
+
+  /// Trajanje u mesecima (default 24 — zakonska saobraznost u Srbiji).
+  IntColumn get durationMonths => integer().withDefault(const Constant(24))();
+
+  /// Datum isteka (izračunat i upisan radi lakšeg upita/sortiranja).
+  DateTimeColumn get expiryDate => dateTime()();
+
+  TextColumn get note => text().nullable()();
+
+  /// Putanja do priložene fotografije računa kao dokaza (papir izbledi).
+  TextColumn get proofImagePath => text().nullable()();
+
+  DateTimeColumn get createdAt =>
+      dateTime().withDefault(currentDateAndTime)();
+}
