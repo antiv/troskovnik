@@ -7,9 +7,34 @@ import '../../../core/db/database.dart' show LineItemRow;
 import '../../../core/db/enums.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/utils/money_format.dart';
+import '../../warranties/presentation/add_warranty_sheet.dart';
 import '../data/receipt_providers.dart';
 import 'receipt_detail_controller.dart';
 import 'widgets/items_status_badge.dart';
+
+/// Otvara formular za dodavanje garancije.
+Future<void> _addWarranty(
+  BuildContext context, {
+  required int receiptId,
+  required String defaultTitle,
+  required DateTime purchaseDate,
+  int? lineItemId,
+  String? proofImagePath,
+}) async {
+  final l10n = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  final saved = await AddWarrantySheet.show(
+    context,
+    receiptId: receiptId,
+    defaultTitle: defaultTitle,
+    purchaseDate: purchaseDate,
+    lineItemId: lineItemId,
+    existingProofImagePath: proofImagePath,
+  );
+  if (saved == true) {
+    messenger.showSnackBar(SnackBar(content: Text(l10n.warrantyReminderInfo)));
+  }
+}
 
 /// Detalj računa: zaglavlje, porez, stavke ili „u obradi" + Osveži (sekcija 7, ekran 4).
 class ReceiptDetailScreen extends ConsumerWidget {
@@ -96,13 +121,40 @@ class _DetailBody extends ConsumerWidget {
         ],
 
         // Stavke
-        Text(l10n.detailItems,
-            style: Theme.of(context).textTheme.titleMedium),
+        Row(
+          children: [
+            Text(l10n.detailItems,
+                style: Theme.of(context).textTheme.titleMedium),
+            const Spacer(),
+            TextButton.icon(
+              icon: const Icon(Icons.shield_outlined, size: 18),
+              label: Text(l10n.warrantyAddForReceipt),
+              onPressed: () => _addWarranty(
+                context,
+                receiptId: r.id,
+                defaultTitle: detail.merchant.name,
+                purchaseDate: r.pfrTime ?? r.createdAt,
+                proofImagePath: r.imagePath,
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: 8),
         if (detail.items.isEmpty && !pending)
           Text(l10n.resultItemsPending)
         else
-          ...detail.items.map((it) => _ItemTile(item: it, l10n: l10n)),
+          ...detail.items.map((it) => _ItemTile(
+                item: it,
+                l10n: l10n,
+                onAddWarranty: () => _addWarranty(
+                  context,
+                  receiptId: r.id,
+                  lineItemId: it.id,
+                  defaultTitle: it.name,
+                  purchaseDate: r.pfrTime ?? r.createdAt,
+                  proofImagePath: r.imagePath,
+                ),
+              )),
 
         // Obračun poreza
         if (r.taxJson != null) ...[
@@ -173,9 +225,14 @@ class _RefreshButtonState extends ConsumerState<_RefreshButton> {
 }
 
 class _ItemTile extends StatelessWidget {
-  const _ItemTile({required this.item, required this.l10n});
+  const _ItemTile({
+    required this.item,
+    required this.l10n,
+    required this.onAddWarranty,
+  });
   final LineItemRow item;
   final AppLocalizations l10n;
+  final VoidCallback onAddWarranty;
 
   @override
   Widget build(BuildContext context) {
@@ -196,7 +253,17 @@ class _ItemTile extends StatelessWidget {
       subtitle: Text(
           '$qty × ${MoneyFormat.fromMinor(item.unitPrice)}'
           '${item.taxLabel != null ? '  (${item.taxLabel})' : ''}'),
-      trailing: Text(MoneyFormat.fromMinor(item.total)),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(MoneyFormat.fromMinor(item.total)),
+          IconButton(
+            tooltip: l10n.warrantyAddForItem,
+            icon: const Icon(Icons.shield_outlined, size: 18),
+            onPressed: onAddWarranty,
+          ),
+        ],
+      ),
     );
   }
 }

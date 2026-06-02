@@ -59,5 +59,30 @@
   "retry": "Pokušaj ponovo",
   "cancel": "Otkaži",
 
-  "merchantUnknown": "Nepoznat prodavac"
+  "merchantUnknown": "Nepoznat prodavac",
+
+  "navWarranties": "Garancije",
+  "warrantiesTitle": "Garancije",
+  "warrantiesEmpty": "Još nema praćenih garancija. Dodaj garanciju sa računa.",
+  "warrantyAdd": "Dodaj garanciju",
+  "warrantyAddForReceipt": "Garancija za ceo račun",
+  "warrantyAddForItem": "Garancija za artikal",
+  "warrantyTitle": "Naziv",
+  "warrantyPurchaseDate": "Datum kupovine",
+  "warrantyDuration": "Trajanje (meseci)",
+  "warrantyNoteLabel": "Beleška",
+  "warrantyAttachProof": "Priloži fotografiju računa",
+  "warrantyProofAttached": "Fotografija priložena",
+  "warrantySave": "Sačuvaj garanciju",
+  "warrantyDelete": "Obriši garanciju",
+  "warrantyDeleteConfirm": "Obrisati ovu garanciju i njene podsetnike?",
+  "warrantyExpiresOn": "Ističe {date}",
+  "@warrantyExpiresOn": { "placeholders": { "date": { "type": "String" } } },
+  "warrantyDaysLeft": "Još {days} dana",
+  "@warrantyDaysLeft": { "placeholders": { "days": { "type": "int" } } },
+  "warrantyStatusActive": "Važi",
+  "warrantyStatusExpiringSoon": "Ističe uskoro",
+  "warrantyStatusExpired": "Isteklo",
+  "warrantyReminderInfo": "Podsetiću te 30 i 7 dana pre isteka.",
+  "warrantyProofHint": "Račun se čuva kao dokaz (papir izbledi)."
 }
