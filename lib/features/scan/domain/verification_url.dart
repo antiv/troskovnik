@@ -1,8 +1,8 @@
 /// Validacija i parsiranje verifikacionog URL-a srpskog fiskalnog računa.
 ///
 /// QR kod sadrži URL oblika:
-///   https://suf.purs.gov.rs/v/?vl=<TOKEN>
-/// gde je <TOKEN> Base64URL-kodirani potpisani zapis (TaxCore).
+///   `https://suf.purs.gov.rs/v/?vl=<TOKEN>`
+/// gde je `<TOKEN>` Base64URL-kodirani potpisani zapis (TaxCore).
 ///
 /// Ovaj sloj NE radi mrežu — samo validira oblik i izvlači token. Mrežno
 /// preuzimanje je u ReceiptSource (sekcija 3).
