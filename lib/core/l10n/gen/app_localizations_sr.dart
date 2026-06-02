@@ -158,4 +158,76 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get merchantUnknown => 'Nepoznat prodavac';
+
+  @override
+  String get navWarranties => 'Garancije';
+
+  @override
+  String get warrantiesTitle => 'Garancije';
+
+  @override
+  String get warrantiesEmpty =>
+      'Još nema praćenih garancija. Dodaj garanciju sa računa.';
+
+  @override
+  String get warrantyAdd => 'Dodaj garanciju';
+
+  @override
+  String get warrantyAddForReceipt => 'Garancija za ceo račun';
+
+  @override
+  String get warrantyAddForItem => 'Garancija za artikal';
+
+  @override
+  String get warrantyTitle => 'Naziv';
+
+  @override
+  String get warrantyPurchaseDate => 'Datum kupovine';
+
+  @override
+  String get warrantyDuration => 'Trajanje (meseci)';
+
+  @override
+  String get warrantyNoteLabel => 'Beleška';
+
+  @override
+  String get warrantyAttachProof => 'Priloži fotografiju računa';
+
+  @override
+  String get warrantyProofAttached => 'Fotografija priložena';
+
+  @override
+  String get warrantySave => 'Sačuvaj garanciju';
+
+  @override
+  String get warrantyDelete => 'Obriši garanciju';
+
+  @override
+  String get warrantyDeleteConfirm =>
+      'Obrisati ovu garanciju i njene podsetnike?';
+
+  @override
+  String warrantyExpiresOn(String date) {
+    return 'Ističe $date';
+  }
+
+  @override
+  String warrantyDaysLeft(int days) {
+    return 'Još $days dana';
+  }
+
+  @override
+  String get warrantyStatusActive => 'Važi';
+
+  @override
+  String get warrantyStatusExpiringSoon => 'Ističe uskoro';
+
+  @override
+  String get warrantyStatusExpired => 'Isteklo';
+
+  @override
+  String get warrantyReminderInfo => 'Podsetiću te 30 i 7 dana pre isteka.';
+
+  @override
+  String get warrantyProofHint => 'Račun se čuva kao dokaz (papir izbledi).';
 }

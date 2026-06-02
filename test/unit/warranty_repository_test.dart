@@ -6,7 +6,6 @@ import 'package:troskovnik/features/receipts/data/receipt_repository.dart';
 import 'package:troskovnik/features/source/domain/receipt_source.dart';
 import 'package:troskovnik/features/warranties/data/warranty_notifier.dart';
 import 'package:troskovnik/features/warranties/data/warranty_repository.dart';
-import 'package:troskovnik/features/warranties/domain/warranty_status.dart';
 
 /// Beleži pozive umesto pravih notifikacija.
 class _FakeNotifier implements WarrantyNotifier {

@@ -159,4 +159,76 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get merchantUnknown => 'Unknown merchant';
+
+  @override
+  String get navWarranties => 'Warranties';
+
+  @override
+  String get warrantiesTitle => 'Warranties';
+
+  @override
+  String get warrantiesEmpty =>
+      'No tracked warranties yet. Add one from a receipt.';
+
+  @override
+  String get warrantyAdd => 'Add warranty';
+
+  @override
+  String get warrantyAddForReceipt => 'Warranty for whole receipt';
+
+  @override
+  String get warrantyAddForItem => 'Warranty for item';
+
+  @override
+  String get warrantyTitle => 'Title';
+
+  @override
+  String get warrantyPurchaseDate => 'Purchase date';
+
+  @override
+  String get warrantyDuration => 'Duration (months)';
+
+  @override
+  String get warrantyNoteLabel => 'Note';
+
+  @override
+  String get warrantyAttachProof => 'Attach receipt photo';
+
+  @override
+  String get warrantyProofAttached => 'Photo attached';
+
+  @override
+  String get warrantySave => 'Save warranty';
+
+  @override
+  String get warrantyDelete => 'Delete warranty';
+
+  @override
+  String get warrantyDeleteConfirm => 'Delete this warranty and its reminders?';
+
+  @override
+  String warrantyExpiresOn(String date) {
+    return 'Expires $date';
+  }
+
+  @override
+  String warrantyDaysLeft(int days) {
+    return '$days days left';
+  }
+
+  @override
+  String get warrantyStatusActive => 'Valid';
+
+  @override
+  String get warrantyStatusExpiringSoon => 'Expiring soon';
+
+  @override
+  String get warrantyStatusExpired => 'Expired';
+
+  @override
+  String get warrantyReminderInfo =>
+      'I\'ll remind you 30 and 7 days before it expires.';
+
+  @override
+  String get warrantyProofHint => 'The receipt is kept as proof (paper fades).';
 }

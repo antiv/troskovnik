@@ -58,5 +58,30 @@
   "retry": "Retry",
   "cancel": "Cancel",
 
-  "merchantUnknown": "Unknown merchant"
+  "merchantUnknown": "Unknown merchant",
+
+  "navWarranties": "Warranties",
+  "warrantiesTitle": "Warranties",
+  "warrantiesEmpty": "No tracked warranties yet. Add one from a receipt.",
+  "warrantyAdd": "Add warranty",
+  "warrantyAddForReceipt": "Warranty for whole receipt",
+  "warrantyAddForItem": "Warranty for item",
+  "warrantyTitle": "Title",
+  "warrantyPurchaseDate": "Purchase date",
+  "warrantyDuration": "Duration (months)",
+  "warrantyNoteLabel": "Note",
+  "warrantyAttachProof": "Attach receipt photo",
+  "warrantyProofAttached": "Photo attached",
+  "warrantySave": "Save warranty",
+  "warrantyDelete": "Delete warranty",
+  "warrantyDeleteConfirm": "Delete this warranty and its reminders?",
+  "warrantyExpiresOn": "Expires {date}",
+  "@warrantyExpiresOn": { "placeholders": { "date": { "type": "String" } } },
+  "warrantyDaysLeft": "{days} days left",
+  "@warrantyDaysLeft": { "placeholders": { "days": { "type": "int" } } },
+  "warrantyStatusActive": "Valid",
+  "warrantyStatusExpiringSoon": "Expiring soon",
+  "warrantyStatusExpired": "Expired",
+  "warrantyReminderInfo": "I'll remind you 30 and 7 days before it expires.",
+  "warrantyProofHint": "The receipt is kept as proof (paper fades)."
 }

@@ -385,6 +385,138 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'Nepoznat prodavac'**
   String get merchantUnknown;
+
+  /// No description provided for @navWarranties.
+  ///
+  /// In sr, this message translates to:
+  /// **'Garancije'**
+  String get navWarranties;
+
+  /// No description provided for @warrantiesTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Garancije'**
+  String get warrantiesTitle;
+
+  /// No description provided for @warrantiesEmpty.
+  ///
+  /// In sr, this message translates to:
+  /// **'Još nema praćenih garancija. Dodaj garanciju sa računa.'**
+  String get warrantiesEmpty;
+
+  /// No description provided for @warrantyAdd.
+  ///
+  /// In sr, this message translates to:
+  /// **'Dodaj garanciju'**
+  String get warrantyAdd;
+
+  /// No description provided for @warrantyAddForReceipt.
+  ///
+  /// In sr, this message translates to:
+  /// **'Garancija za ceo račun'**
+  String get warrantyAddForReceipt;
+
+  /// No description provided for @warrantyAddForItem.
+  ///
+  /// In sr, this message translates to:
+  /// **'Garancija za artikal'**
+  String get warrantyAddForItem;
+
+  /// No description provided for @warrantyTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Naziv'**
+  String get warrantyTitle;
+
+  /// No description provided for @warrantyPurchaseDate.
+  ///
+  /// In sr, this message translates to:
+  /// **'Datum kupovine'**
+  String get warrantyPurchaseDate;
+
+  /// No description provided for @warrantyDuration.
+  ///
+  /// In sr, this message translates to:
+  /// **'Trajanje (meseci)'**
+  String get warrantyDuration;
+
+  /// No description provided for @warrantyNoteLabel.
+  ///
+  /// In sr, this message translates to:
+  /// **'Beleška'**
+  String get warrantyNoteLabel;
+
+  /// No description provided for @warrantyAttachProof.
+  ///
+  /// In sr, this message translates to:
+  /// **'Priloži fotografiju računa'**
+  String get warrantyAttachProof;
+
+  /// No description provided for @warrantyProofAttached.
+  ///
+  /// In sr, this message translates to:
+  /// **'Fotografija priložena'**
+  String get warrantyProofAttached;
+
+  /// No description provided for @warrantySave.
+  ///
+  /// In sr, this message translates to:
+  /// **'Sačuvaj garanciju'**
+  String get warrantySave;
+
+  /// No description provided for @warrantyDelete.
+  ///
+  /// In sr, this message translates to:
+  /// **'Obriši garanciju'**
+  String get warrantyDelete;
+
+  /// No description provided for @warrantyDeleteConfirm.
+  ///
+  /// In sr, this message translates to:
+  /// **'Obrisati ovu garanciju i njene podsetnike?'**
+  String get warrantyDeleteConfirm;
+
+  /// No description provided for @warrantyExpiresOn.
+  ///
+  /// In sr, this message translates to:
+  /// **'Ističe {date}'**
+  String warrantyExpiresOn(String date);
+
+  /// No description provided for @warrantyDaysLeft.
+  ///
+  /// In sr, this message translates to:
+  /// **'Još {days} dana'**
+  String warrantyDaysLeft(int days);
+
+  /// No description provided for @warrantyStatusActive.
+  ///
+  /// In sr, this message translates to:
+  /// **'Važi'**
+  String get warrantyStatusActive;
+
+  /// No description provided for @warrantyStatusExpiringSoon.
+  ///
+  /// In sr, this message translates to:
+  /// **'Ističe uskoro'**
+  String get warrantyStatusExpiringSoon;
+
+  /// No description provided for @warrantyStatusExpired.
+  ///
+  /// In sr, this message translates to:
+  /// **'Isteklo'**
+  String get warrantyStatusExpired;
+
+  /// No description provided for @warrantyReminderInfo.
+  ///
+  /// In sr, this message translates to:
+  /// **'Podsetiću te 30 i 7 dana pre isteka.'**
+  String get warrantyReminderInfo;
+
+  /// No description provided for @warrantyProofHint.
+  ///
+  /// In sr, this message translates to:
+  /// **'Račun se čuva kao dokaz (papir izbledi).'**
+  String get warrantyProofHint;
 }
 
 class _AppLocalizationsDelegate
