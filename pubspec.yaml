@@ -37,9 +37,15 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   flutter_riverpod: ^3.3.1
-  drift: ^2.33.0
-  sqlcipher_flutter_libs: ^0.7.0+eol
-  sqlite3_flutter_libs: ^0.6.0+eol
+  # SQLCipher enkripcija: koristimo proven v2 stack (sqlite3 < 3.0) gde
+  # sqlcipher_flutter_libs i dalje isporučuje SQLCipher native build i
+  # open.overrideForAll(openCipherOnAndroid) radi. sqlite3 v3 prelazi na
+  # eksperimentalne native-assets hookove (sqlite3mc) — izbegavamo za MVP.
+  # Zato je drift zakucan na 2.26.x (par sa sqlite3 ^2.4.6).
+  drift: ^2.26.0
+  sqlite3: ^2.7.0
+  sqlcipher_flutter_libs: ^0.6.0
+  sqlite3_flutter_libs: ^0.5.0
   path_provider: ^2.1.5
   path: ^1.9.1
   flutter_secure_storage: ^10.3.1
@@ -63,7 +69,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   build_runner: ^2.15.0
-  drift_dev: ^2.33.0
+  drift_dev: ^2.26.0
   mocktail: ^1.0.5
 
 # For information on the generic Dart part of this file, see the
