@@ -83,5 +83,24 @@
   "warrantyStatusExpiringSoon": "Expiring soon",
   "warrantyStatusExpired": "Expired",
   "warrantyReminderInfo": "I'll remind you 30 and 7 days before it expires.",
-  "warrantyProofHint": "The receipt is kept as proof (paper fades)."
+  "warrantyProofHint": "The receipt is kept as proof (paper fades).",
+
+  "navAnalytics": "Analytics",
+  "analyticsTitle": "Spending analytics",
+  "analyticsEmpty": "Not enough data yet. Scan a few receipts.",
+  "analyticsRange3m": "3 months",
+  "analyticsRange12m": "12 months",
+  "analyticsRangeAll": "All",
+  "analyticsTotalSpent": "Total spent",
+  "analyticsReceiptCount": "{count} receipts",
+  "@analyticsReceiptCount": { "placeholders": { "count": { "type": "int" } } },
+  "analyticsByMonth": "By month",
+  "analyticsByMerchant": "Top merchants",
+  "analyticsBusinessSplit": "Business / personal",
+  "analyticsBusiness": "Business",
+  "analyticsPersonal": "Personal",
+  "analyticsTopItems": "Most frequent items",
+  "analyticsEstimatedVat": "Estimated VAT",
+  "analyticsVatHint": "Estimated from items with a tax rate; excludes receipts without itemized lines.",
+  "analyticsItemsHint": "No categories yet — by item name. To be expanded later."
 }

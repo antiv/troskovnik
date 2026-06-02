@@ -84,5 +84,24 @@
   "warrantyStatusExpiringSoon": "Ističe uskoro",
   "warrantyStatusExpired": "Isteklo",
   "warrantyReminderInfo": "Podsetiću te 30 i 7 dana pre isteka.",
-  "warrantyProofHint": "Račun se čuva kao dokaz (papir izbledi)."
+  "warrantyProofHint": "Račun se čuva kao dokaz (papir izbledi).",
+
+  "navAnalytics": "Analitika",
+  "analyticsTitle": "Analitika potrošnje",
+  "analyticsEmpty": "Nema dovoljno podataka. Skeniraj nekoliko računa.",
+  "analyticsRange3m": "3 meseca",
+  "analyticsRange12m": "12 meseci",
+  "analyticsRangeAll": "Sve",
+  "analyticsTotalSpent": "Ukupno potrošeno",
+  "analyticsReceiptCount": "{count} računa",
+  "@analyticsReceiptCount": { "placeholders": { "count": { "type": "int" } } },
+  "analyticsByMonth": "Po mesecu",
+  "analyticsByMerchant": "Najveći prodavci",
+  "analyticsBusinessSplit": "Poslovno / lično",
+  "analyticsBusiness": "Poslovno",
+  "analyticsPersonal": "Lično",
+  "analyticsTopItems": "Najčešći artikli",
+  "analyticsEstimatedVat": "Procenjen PDV",
+  "analyticsVatHint": "Procena iz stavki sa poreskom stopom; ne uključuje račune bez izdvojenih stavki.",
+  "analyticsItemsHint": "Bez kategorija — po nazivu artikla. Proširićemo kasnije."
 }

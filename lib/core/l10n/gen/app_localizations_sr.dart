@@ -230,4 +230,60 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get warrantyProofHint => 'Račun se čuva kao dokaz (papir izbledi).';
+
+  @override
+  String get navAnalytics => 'Analitika';
+
+  @override
+  String get analyticsTitle => 'Analitika potrošnje';
+
+  @override
+  String get analyticsEmpty =>
+      'Nema dovoljno podataka. Skeniraj nekoliko računa.';
+
+  @override
+  String get analyticsRange3m => '3 meseca';
+
+  @override
+  String get analyticsRange12m => '12 meseci';
+
+  @override
+  String get analyticsRangeAll => 'Sve';
+
+  @override
+  String get analyticsTotalSpent => 'Ukupno potrošeno';
+
+  @override
+  String analyticsReceiptCount(int count) {
+    return '$count računa';
+  }
+
+  @override
+  String get analyticsByMonth => 'Po mesecu';
+
+  @override
+  String get analyticsByMerchant => 'Najveći prodavci';
+
+  @override
+  String get analyticsBusinessSplit => 'Poslovno / lično';
+
+  @override
+  String get analyticsBusiness => 'Poslovno';
+
+  @override
+  String get analyticsPersonal => 'Lično';
+
+  @override
+  String get analyticsTopItems => 'Najčešći artikli';
+
+  @override
+  String get analyticsEstimatedVat => 'Procenjen PDV';
+
+  @override
+  String get analyticsVatHint =>
+      'Procena iz stavki sa poreskom stopom; ne uključuje račune bez izdvojenih stavki.';
+
+  @override
+  String get analyticsItemsHint =>
+      'Bez kategorija — po nazivu artikla. Proširićemo kasnije.';
 }

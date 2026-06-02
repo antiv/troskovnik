@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/l10n/gen/app_localizations.dart';
+import '../analytics/presentation/analytics_screen.dart';
 import '../receipts/presentation/receipt_list_screen.dart';
 import '../scan/presentation/scanner_screen.dart';
 import '../warranties/presentation/warranty_list_screen.dart';
@@ -19,7 +20,12 @@ class _HomeShellState extends State<HomeShell> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final titles = [l10n.scanTitle, l10n.receiptsTitle, l10n.warrantiesTitle];
+    final titles = [
+      l10n.scanTitle,
+      l10n.receiptsTitle,
+      l10n.warrantiesTitle,
+      l10n.analyticsTitle,
+    ];
 
     return Scaffold(
       appBar: AppBar(title: Text(titles[_index])),
@@ -29,6 +35,7 @@ class _HomeShellState extends State<HomeShell> {
           ScannerScreen(),
           ReceiptListScreen(),
           WarrantyListScreen(),
+          AnalyticsScreen(),
         ],
       ),
       bottomNavigationBar: NavigationBar(
@@ -42,6 +49,8 @@ class _HomeShellState extends State<HomeShell> {
           NavigationDestination(
               icon: const Icon(Icons.shield_outlined),
               label: l10n.navWarranties),
+          NavigationDestination(
+              icon: const Icon(Icons.bar_chart), label: l10n.navAnalytics),
         ],
       ),
     );
