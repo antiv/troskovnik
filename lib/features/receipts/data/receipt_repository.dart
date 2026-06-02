@@ -22,6 +22,25 @@ class ReceiptRepository {
   final AppDatabase _db;
   final RetryPolicy _retryPolicy;
 
+  /// Pristup bazi za jednostavna ažuriranja iz UI-ja (npr. oznaka „poslovni", beleška).
+  AppDatabase get db => _db;
+
+  /// Postavi/oslobodi oznaku „poslovni račun".
+  Future<void> setBusiness(int receiptId, bool value, {DateTime? now}) =>
+      (_db.update(_db.receipts)..where((r) => r.id.equals(receiptId)))
+          .write(ReceiptsCompanion(
+        isBusiness: Value(value),
+        updatedAt: Value(now ?? DateTime.now()),
+      ));
+
+  /// Sačuvaj belešku.
+  Future<void> setNote(int receiptId, String? note, {DateTime? now}) =>
+      (_db.update(_db.receipts)..where((r) => r.id.equals(receiptId)))
+          .write(ReceiptsCompanion(
+        note: Value(note),
+        updatedAt: Value(now ?? DateTime.now()),
+      ));
+
   /// Sačuvaj parsiran račun. Ako (invoice_number + pfr_number) već postoji,
   /// vrati postojeći zapis (otvaranje umesto novog — sekcija 8).
   Future<SaveResult> saveParsed({
