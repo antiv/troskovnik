@@ -231,4 +231,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get warrantyProofHint => 'The receipt is kept as proof (paper fades).';
+
+  @override
+  String get navAnalytics => 'Analytics';
+
+  @override
+  String get analyticsTitle => 'Spending analytics';
+
+  @override
+  String get analyticsEmpty => 'Not enough data yet. Scan a few receipts.';
+
+  @override
+  String get analyticsRange3m => '3 months';
+
+  @override
+  String get analyticsRange12m => '12 months';
+
+  @override
+  String get analyticsRangeAll => 'All';
+
+  @override
+  String get analyticsTotalSpent => 'Total spent';
+
+  @override
+  String analyticsReceiptCount(int count) {
+    return '$count receipts';
+  }
+
+  @override
+  String get analyticsByMonth => 'By month';
+
+  @override
+  String get analyticsByMerchant => 'Top merchants';
+
+  @override
+  String get analyticsBusinessSplit => 'Business / personal';
+
+  @override
+  String get analyticsBusiness => 'Business';
+
+  @override
+  String get analyticsPersonal => 'Personal';
+
+  @override
+  String get analyticsTopItems => 'Most frequent items';
+
+  @override
+  String get analyticsEstimatedVat => 'Estimated VAT';
+
+  @override
+  String get analyticsVatHint =>
+      'Estimated from items with a tax rate; excludes receipts without itemized lines.';
+
+  @override
+  String get analyticsItemsHint =>
+      'No categories yet — by item name. To be expanded later.';
 }

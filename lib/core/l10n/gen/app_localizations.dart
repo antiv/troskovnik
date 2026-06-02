@@ -517,6 +517,108 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'Račun se čuva kao dokaz (papir izbledi).'**
   String get warrantyProofHint;
+
+  /// No description provided for @navAnalytics.
+  ///
+  /// In sr, this message translates to:
+  /// **'Analitika'**
+  String get navAnalytics;
+
+  /// No description provided for @analyticsTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Analitika potrošnje'**
+  String get analyticsTitle;
+
+  /// No description provided for @analyticsEmpty.
+  ///
+  /// In sr, this message translates to:
+  /// **'Nema dovoljno podataka. Skeniraj nekoliko računa.'**
+  String get analyticsEmpty;
+
+  /// No description provided for @analyticsRange3m.
+  ///
+  /// In sr, this message translates to:
+  /// **'3 meseca'**
+  String get analyticsRange3m;
+
+  /// No description provided for @analyticsRange12m.
+  ///
+  /// In sr, this message translates to:
+  /// **'12 meseci'**
+  String get analyticsRange12m;
+
+  /// No description provided for @analyticsRangeAll.
+  ///
+  /// In sr, this message translates to:
+  /// **'Sve'**
+  String get analyticsRangeAll;
+
+  /// No description provided for @analyticsTotalSpent.
+  ///
+  /// In sr, this message translates to:
+  /// **'Ukupno potrošeno'**
+  String get analyticsTotalSpent;
+
+  /// No description provided for @analyticsReceiptCount.
+  ///
+  /// In sr, this message translates to:
+  /// **'{count} računa'**
+  String analyticsReceiptCount(int count);
+
+  /// No description provided for @analyticsByMonth.
+  ///
+  /// In sr, this message translates to:
+  /// **'Po mesecu'**
+  String get analyticsByMonth;
+
+  /// No description provided for @analyticsByMerchant.
+  ///
+  /// In sr, this message translates to:
+  /// **'Najveći prodavci'**
+  String get analyticsByMerchant;
+
+  /// No description provided for @analyticsBusinessSplit.
+  ///
+  /// In sr, this message translates to:
+  /// **'Poslovno / lično'**
+  String get analyticsBusinessSplit;
+
+  /// No description provided for @analyticsBusiness.
+  ///
+  /// In sr, this message translates to:
+  /// **'Poslovno'**
+  String get analyticsBusiness;
+
+  /// No description provided for @analyticsPersonal.
+  ///
+  /// In sr, this message translates to:
+  /// **'Lično'**
+  String get analyticsPersonal;
+
+  /// No description provided for @analyticsTopItems.
+  ///
+  /// In sr, this message translates to:
+  /// **'Najčešći artikli'**
+  String get analyticsTopItems;
+
+  /// No description provided for @analyticsEstimatedVat.
+  ///
+  /// In sr, this message translates to:
+  /// **'Procenjen PDV'**
+  String get analyticsEstimatedVat;
+
+  /// No description provided for @analyticsVatHint.
+  ///
+  /// In sr, this message translates to:
+  /// **'Procena iz stavki sa poreskom stopom; ne uključuje račune bez izdvojenih stavki.'**
+  String get analyticsVatHint;
+
+  /// No description provided for @analyticsItemsHint.
+  ///
+  /// In sr, this message translates to:
+  /// **'Bez kategorija — po nazivu artikla. Proširićemo kasnije.'**
+  String get analyticsItemsHint;
 }
 
 class _AppLocalizationsDelegate
