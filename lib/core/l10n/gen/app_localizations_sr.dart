@@ -286,4 +286,324 @@ class AppLocalizationsSr extends AppLocalizations {
   @override
   String get analyticsItemsHint =>
       'Bez kategorija — po nazivu artikla. Proširićemo kasnije.';
+
+  @override
+  String get settingsTitle => 'Podešavanja';
+
+  @override
+  String get settingsLanguage => 'Jezik';
+
+  @override
+  String get languageSystem => 'Sistemski';
+
+  @override
+  String get languageSerbianCyrillic => 'Srpski (ćirilica)';
+
+  @override
+  String get languageSerbianLatin => 'Srpski (latinica)';
+
+  @override
+  String get languageEnglish => 'English';
+}
+
+/// The translations for Serbian, using the Cyrillic script (`sr_Cyrl`).
+class AppLocalizationsSrCyrl extends AppLocalizationsSr {
+  AppLocalizationsSrCyrl() : super('sr_Cyrl');
+
+  @override
+  String get appTitle => 'Трошковник';
+
+  @override
+  String get navScan => 'Скенер';
+
+  @override
+  String get navReceipts => 'Рачуни';
+
+  @override
+  String get scanTitle => 'Скенирај рачун';
+
+  @override
+  String get scanHint => 'Усмери камеру на QR код фискалног рачуна';
+
+  @override
+  String get scanManualEntry => 'Ручни унос';
+
+  @override
+  String get scanBatchMode => 'Скенирај више заредом';
+
+  @override
+  String get scanNotFiscal => 'Ово није фискални рачун';
+
+  @override
+  String get scanPermissionDenied =>
+      'Приступ камери је одбијен. Омогући га у подешавањима.';
+
+  @override
+  String get resultTitle => 'Резултат скенирања';
+
+  @override
+  String get resultSave => 'Сачувај';
+
+  @override
+  String get resultOpen => 'Отвори';
+
+  @override
+  String resultItemsCount(int count) {
+    return '$count ставки';
+  }
+
+  @override
+  String get resultItemsPending => 'Ставке у обради';
+
+  @override
+  String get resultDuplicateOpened =>
+      'Рачун је већ сачуван — отварам постојећи.';
+
+  @override
+  String get receiptsTitle => 'Рачуни';
+
+  @override
+  String get receiptsEmpty => 'Још нема сачуваних рачуна.';
+
+  @override
+  String get receiptsSearchHint => 'Претражи по продавцу или артиклу';
+
+  @override
+  String get receiptsSortDate => 'Датум';
+
+  @override
+  String get receiptsSortMerchant => 'Продавац';
+
+  @override
+  String get receiptsSortAmount => 'Износ';
+
+  @override
+  String get badgeItemsPending => 'Ставке у обради';
+
+  @override
+  String get badgeFromJournal => 'Из журнала';
+
+  @override
+  String get badgeInvalid => 'Неважећи';
+
+  @override
+  String get detailTitle => 'Детаљ рачуна';
+
+  @override
+  String get detailHeader => 'Заглавље';
+
+  @override
+  String get detailTaxBreakdown => 'Обрачун пореза';
+
+  @override
+  String get detailItems => 'Ставке';
+
+  @override
+  String get detailNote => 'Белешка';
+
+  @override
+  String get detailMarkBusiness => 'Пословни рачун';
+
+  @override
+  String get detailRefreshNow => 'Освежи сада';
+
+  @override
+  String get detailAttachPhoto => 'Приложи фотографију';
+
+  @override
+  String get detailPendingExplain =>
+      'Рачун је сачуван. Продавац га још није прокњижио код Пореске; ставке ће се аутоматски допунити.';
+
+  @override
+  String get detailItemsRefreshed => 'Ставке рачуна су допуњене.';
+
+  @override
+  String get detailUnparsedRow => 'Непарсиран ред';
+
+  @override
+  String get manualTitle => 'Ручни унос рачуна';
+
+  @override
+  String get manualTotalAmount => 'Укупан износ';
+
+  @override
+  String get manualPfrNumber => 'ПФР број';
+
+  @override
+  String get manualPfrTime => 'ПФР време';
+
+  @override
+  String get manualInvoiceCounter => 'Бројач рачуна';
+
+  @override
+  String get manualSubmit => 'Преузми рачун';
+
+  @override
+  String get errNoNetwork =>
+      'Нема мреже. Рачун је сачуван и биће допуњен аутоматски.';
+
+  @override
+  String get errPortalUnavailable =>
+      'Портал Пореске управе је тренутно недоступан. Покушаћу поново.';
+
+  @override
+  String get errInvalidReceipt => 'Рачун не постоји или је отказан.';
+
+  @override
+  String get errGeneric => 'Дошло је до грешке.';
+
+  @override
+  String get retry => 'Покушај поново';
+
+  @override
+  String get cancel => 'Откажи';
+
+  @override
+  String get merchantUnknown => 'Непознат продавац';
+
+  @override
+  String get navWarranties => 'Гаранције';
+
+  @override
+  String get warrantiesTitle => 'Гаранције';
+
+  @override
+  String get warrantiesEmpty =>
+      'Још нема праћених гаранција. Додај гаранцију са рачуна.';
+
+  @override
+  String get warrantyAdd => 'Додај гаранцију';
+
+  @override
+  String get warrantyAddForReceipt => 'Гаранција за цео рачун';
+
+  @override
+  String get warrantyAddForItem => 'Гаранција за артикал';
+
+  @override
+  String get warrantyTitle => 'Назив';
+
+  @override
+  String get warrantyPurchaseDate => 'Датум куповине';
+
+  @override
+  String get warrantyDuration => 'Трајање (месеци)';
+
+  @override
+  String get warrantyNoteLabel => 'Белешка';
+
+  @override
+  String get warrantyAttachProof => 'Приложи фотографију рачуна';
+
+  @override
+  String get warrantyProofAttached => 'Фотографија приложена';
+
+  @override
+  String get warrantySave => 'Сачувај гаранцију';
+
+  @override
+  String get warrantyDelete => 'Обриши гаранцију';
+
+  @override
+  String get warrantyDeleteConfirm =>
+      'Обрисати ову гаранцију и њене подсетнике?';
+
+  @override
+  String warrantyExpiresOn(String date) {
+    return 'Истиче $date';
+  }
+
+  @override
+  String warrantyDaysLeft(int days) {
+    return 'Још $days дана';
+  }
+
+  @override
+  String get warrantyStatusActive => 'Важи';
+
+  @override
+  String get warrantyStatusExpiringSoon => 'Истиче ускоро';
+
+  @override
+  String get warrantyStatusExpired => 'Истекло';
+
+  @override
+  String get warrantyReminderInfo => 'Подсетићу те 30 и 7 дана пре истека.';
+
+  @override
+  String get warrantyProofHint => 'Рачун се чува као доказ (папир избледи).';
+
+  @override
+  String get navAnalytics => 'Аналитика';
+
+  @override
+  String get analyticsTitle => 'Аналитика потрошње';
+
+  @override
+  String get analyticsEmpty =>
+      'Нема довољно података. Скенирај неколико рачуна.';
+
+  @override
+  String get analyticsRange3m => '3 месеца';
+
+  @override
+  String get analyticsRange12m => '12 месеци';
+
+  @override
+  String get analyticsRangeAll => 'Све';
+
+  @override
+  String get analyticsTotalSpent => 'Укупно потрошено';
+
+  @override
+  String analyticsReceiptCount(int count) {
+    return '$count рачуна';
+  }
+
+  @override
+  String get analyticsByMonth => 'По месецу';
+
+  @override
+  String get analyticsByMerchant => 'Највећи продавци';
+
+  @override
+  String get analyticsBusinessSplit => 'Пословно / лично';
+
+  @override
+  String get analyticsBusiness => 'Пословно';
+
+  @override
+  String get analyticsPersonal => 'Лично';
+
+  @override
+  String get analyticsTopItems => 'Најчешћи артикли';
+
+  @override
+  String get analyticsEstimatedVat => 'Процењен ПДВ';
+
+  @override
+  String get analyticsVatHint =>
+      'Процена из ставки са пореском стопом; не укључује рачуне без издвојених ставки.';
+
+  @override
+  String get analyticsItemsHint =>
+      'Без категорија — по називу артикла. Проширићемо касније.';
+
+  @override
+  String get settingsTitle => 'Подешавања';
+
+  @override
+  String get settingsLanguage => 'Језик';
+
+  @override
+  String get languageSystem => 'Системски';
+
+  @override
+  String get languageSerbianCyrillic => 'Српски (ћирилица)';
+
+  @override
+  String get languageSerbianLatin => 'Српски (латиница)';
+
+  @override
+  String get languageEnglish => 'English';
 }

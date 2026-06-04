@@ -103,5 +103,12 @@
   "analyticsTopItems": "Najčešći artikli",
   "analyticsEstimatedVat": "Procenjen PDV",
   "analyticsVatHint": "Procena iz stavki sa poreskom stopom; ne uključuje račune bez izdvojenih stavki.",
-  "analyticsItemsHint": "Bez kategorija — po nazivu artikla. Proširićemo kasnije."
+  "analyticsItemsHint": "Bez kategorija — po nazivu artikla. Proširićemo kasnije.",
+
+  "settingsTitle": "Podešavanja",
+  "settingsLanguage": "Jezik",
+  "languageSystem": "Sistemski",
+  "languageSerbianCyrillic": "Srpski (ćirilica)",
+  "languageSerbianLatin": "Srpski (latinica)",
+  "languageEnglish": "English"
 }
