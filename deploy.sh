@@ -71,13 +71,19 @@ else
 fi
 
 # --- Build ---
-echo "Bildujem ${FORMAT} (release)..."
+# Dart obfuskacija + native debug simboli (čitljivi crash izveštaji na Play
+# Console; rešava upozorenje "no deobfuscation file"). NE dira R8 (ostaje isključen).
+SYMBOLS_DIR="build/debug-symbols/${new_name}"
+mkdir -p "$SYMBOLS_DIR"
+OBFUSCATE_ARGS=(--obfuscate --split-debug-info="$SYMBOLS_DIR")
+
+echo "Bildujem ${FORMAT} (release, sa debug simbolima)..."
 if [[ "$FORMAT" == "apk" ]]; then
-  $FLUTTER build apk --release
+  $FLUTTER build apk --release "${OBFUSCATE_ARGS[@]}"
   src="build/app/outputs/flutter-apk/app-release.apk"
   ext="apk"
 else
-  $FLUTTER build appbundle --release
+  $FLUTTER build appbundle --release "${OBFUSCATE_ARGS[@]}"
   src="build/app/outputs/bundle/release/app-release.aab"
   ext="aab"
 fi
@@ -95,3 +101,9 @@ size="$(du -h "$dest" | cut -f1)"
 echo ""
 echo "✓ Gotovo: ${dest} (${size})"
 echo "  Izvor:  ${src}"
+echo "  Debug simboli: ${SYMBOLS_DIR}/"
+if [[ "$FORMAT" == "aab" ]]; then
+  echo ""
+  echo "  Play Console: ako i dalje vidiš upozorenje, otpremi native debug simbole"
+  echo "  (App bundle explorer → Downloads → Upload). Sadržaj: ${SYMBOLS_DIR}"
+fi
