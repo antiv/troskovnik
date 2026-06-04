@@ -4,6 +4,7 @@ import '../../core/l10n/gen/app_localizations.dart';
 import '../analytics/presentation/analytics_screen.dart';
 import '../receipts/presentation/receipt_list_screen.dart';
 import '../scan/presentation/scanner_screen.dart';
+import '../settings/settings_screen.dart';
 import '../warranties/presentation/warranty_list_screen.dart';
 
 /// Glavni shell sa donjom navigacijom: Skener / Računi.
@@ -28,7 +29,19 @@ class _HomeShellState extends State<HomeShell> {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: Text(titles[_index])),
+      appBar: AppBar(
+        title: Text(titles[_index]),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: l10n.settingsTitle,
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                  builder: (_) => const SettingsScreen()),
+            ),
+          ),
+        ],
+      ),
       body: IndexedStack(
         index: _index,
         children: const [

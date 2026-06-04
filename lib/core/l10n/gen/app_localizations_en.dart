@@ -286,4 +286,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get analyticsItemsHint =>
       'No categories yet — by item name. To be expanded later.';
+
+  @override
+  String get settingsTitle => 'Settings';
+
+  @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get languageSystem => 'System';
+
+  @override
+  String get languageSerbianCyrillic => 'Serbian (Cyrillic)';
+
+  @override
+  String get languageSerbianLatin => 'Serbian (Latin)';
+
+  @override
+  String get languageEnglish => 'English';
 }

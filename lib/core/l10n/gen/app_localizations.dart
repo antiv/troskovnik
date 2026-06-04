@@ -95,6 +95,7 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('sr'),
+    Locale.fromSubtags(languageCode: 'sr', scriptCode: 'Cyrl'),
     Locale('en'),
   ];
 
@@ -619,6 +620,42 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'Bez kategorija — po nazivu artikla. Proširićemo kasnije.'**
   String get analyticsItemsHint;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Podešavanja'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In sr, this message translates to:
+  /// **'Jezik'**
+  String get settingsLanguage;
+
+  /// No description provided for @languageSystem.
+  ///
+  /// In sr, this message translates to:
+  /// **'Sistemski'**
+  String get languageSystem;
+
+  /// No description provided for @languageSerbianCyrillic.
+  ///
+  /// In sr, this message translates to:
+  /// **'Srpski (ćirilica)'**
+  String get languageSerbianCyrillic;
+
+  /// No description provided for @languageSerbianLatin.
+  ///
+  /// In sr, this message translates to:
+  /// **'Srpski (latinica)'**
+  String get languageSerbianLatin;
+
+  /// No description provided for @languageEnglish.
+  ///
+  /// In sr, this message translates to:
+  /// **'English'**
+  String get languageEnglish;
 }
 
 class _AppLocalizationsDelegate
@@ -639,6 +676,18 @@ class _AppLocalizationsDelegate
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when language+script codes are specified.
+  switch (locale.languageCode) {
+    case 'sr':
+      {
+        switch (locale.scriptCode) {
+          case 'Cyrl':
+            return AppLocalizationsSrCyrl();
+        }
+        break;
+      }
+  }
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
     case 'en':

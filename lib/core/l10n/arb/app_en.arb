@@ -102,5 +102,12 @@
   "analyticsTopItems": "Most frequent items",
   "analyticsEstimatedVat": "Estimated VAT",
   "analyticsVatHint": "Estimated from items with a tax rate; excludes receipts without itemized lines.",
-  "analyticsItemsHint": "No categories yet — by item name. To be expanded later."
+  "analyticsItemsHint": "No categories yet — by item name. To be expanded later.",
+
+  "settingsTitle": "Settings",
+  "settingsLanguage": "Language",
+  "languageSystem": "System",
+  "languageSerbianCyrillic": "Serbian (Cyrillic)",
+  "languageSerbianLatin": "Serbian (Latin)",
+  "languageEnglish": "English"
 }
