@@ -67,6 +67,10 @@ android/key.properties
 **/*.keystore
 !android/key.properties.example
 
+# Release artefakti iz deploy.sh (veliki binari, ne idu u git)
+/troskovnik-*.aab
+/troskovnik-*.apk
+
 # Sirovi uhvaćeni fixture-i sadrže realne podatke računa — ne commit-uju se.
 # U git idu samo anonimizovani fixture-i (*.anon.*) i dokumentacija.
 test/fixtures/*.page.html
