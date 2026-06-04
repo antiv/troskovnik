@@ -1,0 +1,17 @@
+# Konfiguracija ikonice aplikacije (flutter_launcher_icons).
+# Generiši:  fvm dart run flutter_launcher_icons
+flutter_launcher_icons:
+  image_path: "assets/icon/appstore.png"
+
+  android: true
+  ios: true
+
+  # iOS ne sme alfu/providnost — poravnaj na belu pozadinu.
+  remove_alpha_ios: true
+  background_color_ios: "#FFFFFF"
+
+  # Android adaptive icon (Android 8+). Nemamo zaseban foreground, pa koristimo
+  # ceo logo kao foreground na beloj pozadini. Zameniti kad stigne pravi foreground.
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icon/appstore.png"
+  min_sdk_android: 23
