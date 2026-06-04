@@ -58,14 +58,15 @@ LazyDatabase _openEncrypted(String key) {
     if (Platform.isAndroid) {
       await applyWorkaroundToOpenSqlCipherOnOldAndroidVersions();
     }
-    // Osiguraj da se koristi SQLCipher build (ne sistemski sqlite).
-    open.overrideForAll(openCipherOnAndroid);
 
     final dir = await getApplicationDocumentsDirectory();
     final file = File(p.join(dir.path, 'troskovnik.db.enc'));
 
     return NativeDatabase.createInBackground(
       file,
+      // VAŽNO: baza se otvara na zasebnom izolatu, pa override mora da se
+      // primeni TAMO (override sa glavnog izolata se ne propagira).
+      isolateSetup: _useSqlCipher,
       setup: (db) {
         // Postavi ključ pre bilo kakvog pristupa.
         final escaped = key.replaceAll("'", "''");
@@ -76,4 +77,12 @@ LazyDatabase _openEncrypted(String key) {
       },
     );
   });
+}
+
+/// Usmeri `package:sqlite3` na SQLCipher build (libsqlcipher.so) umesto na
+/// sistemski sqlite. Mora biti top-level da bi se mogao poslati izolatu.
+Future<void> _useSqlCipher() async {
+  if (Platform.isAndroid) {
+    open.overrideForAll(openCipherOnAndroid);
+  }
 }
