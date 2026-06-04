@@ -1,0 +1,10 @@
+# Šablon za potpisivanje release build-a (Play App Signing — upload ključ).
+# Kopiraj u `android/key.properties` i popuni STVARNIM vrednostima.
+# `android/key.properties` i sam .jks keystore NIKAD ne idu u git!
+#
+# storeFile: apsolutna putanja do keystore-a (preporuka: van repo-a), npr:
+#   /Users/ivanantonijevic/keys/troskovnik-upload.jks
+storePassword=PROMENI_ME
+keyPassword=PROMENI_ME
+keyAlias=upload
+storeFile=/PUNA/PUTANJA/DO/troskovnik-upload.jks

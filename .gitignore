@@ -61,6 +61,12 @@ app.*.map.json
 .env*
 !.env.example
 
+# Android signing — NIKAD ne commit-ovati tajne/keystore
+android/key.properties
+**/*.jks
+**/*.keystore
+!android/key.properties.example
+
 # Sirovi uhvaćeni fixture-i sadrže realne podatke računa — ne commit-uju se.
 # U git idu samo anonimizovani fixture-i (*.anon.*) i dokumentacija.
 test/fixtures/*.page.html
