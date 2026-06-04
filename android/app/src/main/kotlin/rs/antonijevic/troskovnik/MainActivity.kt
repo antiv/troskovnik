@@ -1,4 +1,4 @@
-package rs.troskovnik.troskovnik
+package rs.antonijevic.troskovnik
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "rs.troskovnik.troskovnik"
+    namespace = "rs.antonijevic.troskovnik"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -17,7 +17,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "rs.troskovnik.troskovnik"
+        applicationId = "rs.antonijevic.troskovnik"
         // minSdk 23: zahtevi SQLCipher-a i lokalnih notifikacija.
         minSdk = maxOf(flutter.minSdkVersion, 23)
         targetSdk = flutter.targetSdkVersion
