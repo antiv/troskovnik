@@ -304,6 +304,32 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get languageEnglish => 'English';
+
+  @override
+  String get detailProof => 'Dokaz';
+
+  @override
+  String get detailProofHint =>
+      'Račun je sačuvan kao dokaz (žurnal + zvanični link Poreske).';
+
+  @override
+  String get detailOpenOnSuf => 'Otvori na suf.purs.gov.rs';
+
+  @override
+  String get detailDeleteReceipt => 'Obriši račun';
+
+  @override
+  String get detailDeleteReceiptConfirm =>
+      'Obrisati ovaj račun, njegove stavke i garancije?';
+
+  @override
+  String get receiptFilterAll => 'Svi';
+
+  @override
+  String get receiptFilterBusiness => 'Poslovni';
+
+  @override
+  String get receiptFilterPersonal => 'Privatni';
 }
 
 /// The translations for Serbian, using the Cyrillic script (`sr_Cyrl`).
@@ -606,4 +632,30 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get languageEnglish => 'English';
+
+  @override
+  String get detailProof => 'Доказ';
+
+  @override
+  String get detailProofHint =>
+      'Рачун је сачуван као доказ (журнал + званични линк Пореске).';
+
+  @override
+  String get detailOpenOnSuf => 'Отвори на suf.purs.gov.rs';
+
+  @override
+  String get detailDeleteReceipt => 'Обриши рачун';
+
+  @override
+  String get detailDeleteReceiptConfirm =>
+      'Обрисати овај рачун, његове ставке и гаранције?';
+
+  @override
+  String get receiptFilterAll => 'Сви';
+
+  @override
+  String get receiptFilterBusiness => 'Пословни';
+
+  @override
+  String get receiptFilterPersonal => 'Приватни';
 }

@@ -23,6 +23,22 @@ enum AppLanguage {
   /// Stabilan ključ za čuvanje.
   String get storageKey => name;
 
+  /// Zastavica (emoji) za indikator jezika u app baru (#6).
+  String get flag => switch (this) {
+        AppLanguage.system => '🌐',
+        AppLanguage.serbianCyrillic => '🇷🇸',
+        AppLanguage.serbianLatin => '🇷🇸',
+        AppLanguage.english => '🇬🇧',
+      };
+
+  /// Kratka oznaka jezika za indikator (#6).
+  String get shortCode => switch (this) {
+        AppLanguage.system => 'AUTO',
+        AppLanguage.serbianCyrillic => 'СР',
+        AppLanguage.serbianLatin => 'SR',
+        AppLanguage.english => 'EN',
+      };
+
   static AppLanguage fromStorage(String? value) {
     return AppLanguage.values.firstWhere(
       (l) => l.name == value,

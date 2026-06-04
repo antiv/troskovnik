@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/db/providers.dart';
 import '../../source/data/taxcore_client.dart';
 import '../../source/domain/receipt_source.dart';
+import '../../warranties/data/warranty_providers.dart';
 import 'receipt_repository.dart';
 import 'refetch_service.dart';
 
@@ -22,3 +23,14 @@ final refetchServiceProvider = FutureProvider<RefetchService>((ref) async {
   final source = ref.watch(receiptSourceProvider);
   return RefetchService(source, repo);
 });
+
+/// Obriši račun i otkaži notifikacije za sve njegove (kaskadno obrisane)
+/// garancije (#7). Prima WidgetRef (poziva se iz UI-ja).
+Future<void> deleteReceipt(WidgetRef ref, int receiptId) async {
+  final repo = await ref.read(receiptRepositoryProvider.future);
+  final notifier = await ref.read(warrantyNotifierProvider.future);
+  final warrantyIds = await repo.delete(receiptId);
+  for (final id in warrantyIds) {
+    await notifier.cancelReminders(id);
+  }
+}

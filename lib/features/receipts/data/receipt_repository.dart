@@ -155,6 +155,30 @@ class ReceiptRepository {
       (_db.select(_db.receipts)..where((r) => r.id.equals(id)))
           .getSingleOrNull();
 
+  /// Obriši račun (#7) zajedno sa njegovim stavkama i garancijama, u jednoj
+  /// transakciji. (Brišemo eksplicitno jer FK kaskade nisu pouzdane na svim
+  /// konfiguracijama.) Vraća id-jeve obrisanih garancija da caller otkaže
+  /// njihove notifikacije.
+  Future<List<int>> delete(int receiptId) async {
+    return _db.transaction(() async {
+      final warrantyIds = await (_db.selectOnly(_db.warranties)
+            ..addColumns([_db.warranties.id])
+            ..where(_db.warranties.receiptId.equals(receiptId)))
+          .map((row) => row.read(_db.warranties.id)!)
+          .get();
+
+      await (_db.delete(_db.warranties)
+            ..where((w) => w.receiptId.equals(receiptId)))
+          .go();
+      await (_db.delete(_db.lineItems)
+            ..where((i) => i.receiptId.equals(receiptId)))
+          .go();
+      await (_db.delete(_db.receipts)..where((r) => r.id.equals(receiptId)))
+          .go();
+      return warrantyIds;
+    });
+  }
+
   Future<List<LineItemRow>> itemsFor(int receiptId) =>
       (_db.select(_db.lineItems)..where((i) => i.receiptId.equals(receiptId)))
           .get();

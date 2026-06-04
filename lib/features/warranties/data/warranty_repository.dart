@@ -26,8 +26,11 @@ class WarrantyRepository {
   final AppDatabase _db;
   final WarrantyNotifier _notifier;
 
-  /// Kreiraj garanciju. Istek se računa iz purchaseDate + durationMonths.
-  Future<int> create({
+  /// Kreiraj ILI ažuriraj garanciju. Najviše jedna garancija po (receipt,
+  /// lineItem); pri ponovnom čuvanju za istu metu ažurira se postojeća (#1).
+  /// Istek se računa iz purchaseDate + durationMonths.
+  Future<int> save({
+    int? id,
     required int receiptId,
     int? lineItemId,
     required String title,
@@ -38,26 +41,75 @@ class WarrantyRepository {
     DateTime? now,
   }) async {
     final expiry = WarrantyTiming.expiryFrom(purchaseDate, durationMonths);
-    final id = await _db.into(_db.warranties).insert(
-          WarrantiesCompanion.insert(
-            receiptId: receiptId,
-            lineItemId: Value(lineItemId),
-            title: title,
-            purchaseDate: purchaseDate,
-            durationMonths: Value(durationMonths),
-            expiryDate: expiry,
-            note: Value(note),
-            proofImagePath: Value(proofImagePath),
-          ),
-        );
+
+    // Pronađi postojeću za istu metu (eksplicitan id ili (receipt,lineItem)).
+    final existing = id != null
+        ? await findById(id)
+        : await findForTarget(receiptId, lineItemId);
+
+    final companion = WarrantiesCompanion(
+      receiptId: Value(receiptId),
+      lineItemId: Value(lineItemId),
+      title: Value(title),
+      purchaseDate: Value(purchaseDate),
+      durationMonths: Value(durationMonths),
+      expiryDate: Value(expiry),
+      note: Value(note),
+      proofImagePath: Value(proofImagePath),
+    );
+
+    final int warrantyId;
+    if (existing != null) {
+      warrantyId = existing.id;
+      await (_db.update(_db.warranties)
+            ..where((w) => w.id.equals(warrantyId)))
+          .write(companion);
+    } else {
+      warrantyId = await _db.into(_db.warranties).insert(
+            WarrantiesCompanion.insert(
+              receiptId: receiptId,
+              lineItemId: Value(lineItemId),
+              title: title,
+              purchaseDate: purchaseDate,
+              durationMonths: Value(durationMonths),
+              expiryDate: expiry,
+              note: Value(note),
+              proofImagePath: Value(proofImagePath),
+            ),
+          );
+    }
+
+    // Re-zakaži podsetnike (idempotentno: scheduleReminders prvo otkaže stare).
     await _notifier.scheduleReminders(
-      warrantyId: id,
+      warrantyId: warrantyId,
       title: title,
       expiryDate: expiry,
       now: now,
     );
-    return id;
+    return warrantyId;
   }
+
+  /// Pogodnost: kreira novu garanciju (ili ažurira ako za metu već postoji).
+  Future<int> create({
+    required int receiptId,
+    int? lineItemId,
+    required String title,
+    required DateTime purchaseDate,
+    int durationMonths = WarrantyTiming.defaultDurationMonths,
+    String? note,
+    String? proofImagePath,
+    DateTime? now,
+  }) =>
+      save(
+        receiptId: receiptId,
+        lineItemId: lineItemId,
+        title: title,
+        purchaseDate: purchaseDate,
+        durationMonths: durationMonths,
+        note: note,
+        proofImagePath: proofImagePath,
+        now: now,
+      );
 
   Future<void> delete(int warrantyId) async {
     await _notifier.cancelReminders(warrantyId);
@@ -68,6 +120,16 @@ class WarrantyRepository {
   Future<WarrantyRow?> findById(int id) =>
       (_db.select(_db.warranties)..where((w) => w.id.equals(id)))
           .getSingleOrNull();
+
+  /// Postojeća garancija za datu metu: konkretnu stavku, ili „ceo račun"
+  /// (lineItemId == null). Osnova za sprečavanje duplikata (#1).
+  Future<WarrantyRow?> findForTarget(int receiptId, int? lineItemId) {
+    final q = _db.select(_db.warranties)
+      ..where((w) => lineItemId == null
+          ? w.receiptId.equals(receiptId) & w.lineItemId.isNull()
+          : w.lineItemId.equals(lineItemId));
+    return q.getSingleOrNull();
+  }
 
   /// Sve garancije za jedan račun.
   Future<List<WarrantyRow>> forReceipt(int receiptId) =>

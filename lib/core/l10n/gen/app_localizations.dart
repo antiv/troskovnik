@@ -656,6 +656,54 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'English'**
   String get languageEnglish;
+
+  /// No description provided for @detailProof.
+  ///
+  /// In sr, this message translates to:
+  /// **'Dokaz'**
+  String get detailProof;
+
+  /// No description provided for @detailProofHint.
+  ///
+  /// In sr, this message translates to:
+  /// **'Račun je sačuvan kao dokaz (žurnal + zvanični link Poreske).'**
+  String get detailProofHint;
+
+  /// No description provided for @detailOpenOnSuf.
+  ///
+  /// In sr, this message translates to:
+  /// **'Otvori na suf.purs.gov.rs'**
+  String get detailOpenOnSuf;
+
+  /// No description provided for @detailDeleteReceipt.
+  ///
+  /// In sr, this message translates to:
+  /// **'Obriši račun'**
+  String get detailDeleteReceipt;
+
+  /// No description provided for @detailDeleteReceiptConfirm.
+  ///
+  /// In sr, this message translates to:
+  /// **'Obrisati ovaj račun, njegove stavke i garancije?'**
+  String get detailDeleteReceiptConfirm;
+
+  /// No description provided for @receiptFilterAll.
+  ///
+  /// In sr, this message translates to:
+  /// **'Svi'**
+  String get receiptFilterAll;
+
+  /// No description provided for @receiptFilterBusiness.
+  ///
+  /// In sr, this message translates to:
+  /// **'Poslovni'**
+  String get receiptFilterBusiness;
+
+  /// No description provided for @receiptFilterPersonal.
+  ///
+  /// In sr, this message translates to:
+  /// **'Privatni'**
+  String get receiptFilterPersonal;
 }
 
 class _AppLocalizationsDelegate

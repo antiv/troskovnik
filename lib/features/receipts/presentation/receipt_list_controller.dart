@@ -13,23 +13,37 @@ class ReceiptListItem {
   final MerchantRow merchant;
 }
 
-/// Parametri pretrage/sortiranja liste.
+/// Filter po tipu (poslovni/privatni/svi) — #8.
+enum ReceiptKindFilter { all, business, personal }
+
+/// Parametri pretrage/sortiranja/filtriranja liste.
 class ReceiptQuery {
-  const ReceiptQuery({this.search = '', this.sort = ReceiptSort.date});
+  const ReceiptQuery({
+    this.search = '',
+    this.sort = ReceiptSort.date,
+    this.kind = ReceiptKindFilter.all,
+  });
   final String search;
   final ReceiptSort sort;
+  final ReceiptKindFilter kind;
 
-  ReceiptQuery copyWith({String? search, ReceiptSort? sort}) =>
-      ReceiptQuery(search: search ?? this.search, sort: sort ?? this.sort);
+  ReceiptQuery copyWith(
+          {String? search, ReceiptSort? sort, ReceiptKindFilter? kind}) =>
+      ReceiptQuery(
+        search: search ?? this.search,
+        sort: sort ?? this.sort,
+        kind: kind ?? this.kind,
+      );
 }
 
-/// Drži parametre pretrage/sortiranja liste računa.
+/// Drži parametre pretrage/sortiranja/filtriranja liste računa.
 class ReceiptQueryNotifier extends Notifier<ReceiptQuery> {
   @override
   ReceiptQuery build() => const ReceiptQuery();
 
   void setSearch(String search) => state = state.copyWith(search: search);
   void setSort(ReceiptSort sort) => state = state.copyWith(sort: sort);
+  void setKind(ReceiptKindFilter kind) => state = state.copyWith(kind: kind);
 }
 
 final receiptQueryProvider =
@@ -46,6 +60,15 @@ final receiptListProvider =
   final select = db.select(db.receipts).join([
     innerJoin(db.merchants, db.merchants.id.equalsExp(db.receipts.merchantId)),
   ]);
+
+  switch (query.kind) {
+    case ReceiptKindFilter.business:
+      select.where(db.receipts.isBusiness.equals(true));
+    case ReceiptKindFilter.personal:
+      select.where(db.receipts.isBusiness.equals(false));
+    case ReceiptKindFilter.all:
+      break;
+  }
 
   switch (query.sort) {
     case ReceiptSort.date:

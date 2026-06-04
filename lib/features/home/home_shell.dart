@@ -1,26 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/l10n/gen/app_localizations.dart';
+import '../../core/l10n/locale_controller.dart';
 import '../analytics/presentation/analytics_screen.dart';
 import '../receipts/presentation/receipt_list_screen.dart';
 import '../scan/presentation/scanner_screen.dart';
 import '../settings/settings_screen.dart';
 import '../warranties/presentation/warranty_list_screen.dart';
 
-/// Glavni shell sa donjom navigacijom: Skener / Računi.
-class HomeShell extends StatefulWidget {
+/// Glavni shell sa donjom navigacijom: Skener / Računi / Garancije / Analitika.
+class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
 
   @override
-  State<HomeShell> createState() => _HomeShellState();
+  ConsumerState<HomeShell> createState() => _HomeShellState();
 }
 
-class _HomeShellState extends State<HomeShell> {
+class _HomeShellState extends ConsumerState<HomeShell> {
   int _index = 0;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final language =
+        ref.watch(localeControllerProvider).value ?? AppLanguage.system;
     final titles = [
       l10n.scanTitle,
       l10n.receiptsTitle,
@@ -32,12 +36,16 @@ class _HomeShellState extends State<HomeShell> {
       appBar: AppBar(
         title: Text(titles[_index]),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            tooltip: l10n.settingsTitle,
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                  builder: (_) => const SettingsScreen()),
+          // Indikator jezika (zastavica + skraćenica) → otvara podešavanja (#6).
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: TextButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                    builder: (_) => const SettingsScreen()),
+              ),
+              child: Text('${language.flag} ${language.shortCode}',
+                  style: const TextStyle(fontSize: 14)),
             ),
           ),
         ],
