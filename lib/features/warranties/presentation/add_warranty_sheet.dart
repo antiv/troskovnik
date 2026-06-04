@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../../core/db/database.dart' show WarrantyRow;
 import '../../../core/l10n/gen/app_localizations.dart';
+import '../../../core/widgets/image_viewer_screen.dart';
 import '../data/warranty_providers.dart';
 import '../domain/warranty_status.dart';
 
@@ -218,6 +219,23 @@ class _AddWarrantySheetState extends ConsumerState<AddWarrantySheet> {
                     border: const OutlineInputBorder()),
               ),
               const SizedBox(height: 12),
+              // Pregled priložene slike (tap → fullscreen sa zoom/share).
+              if (_proofPath != null && File(_proofPath!).existsSync()) ...[
+                GestureDetector(
+                  onTap: () => ImageViewerScreen.open(context,
+                      imagePath: _proofPath!, title: _title.text.trim()),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.file(
+                      File(_proofPath!),
+                      height: 140,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
               OutlinedButton.icon(
                 icon: Icon(_proofPath != null
                     ? Icons.check_circle
