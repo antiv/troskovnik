@@ -704,6 +704,18 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'Privatni'**
   String get receiptFilterPersonal;
+
+  /// No description provided for @imageShare.
+  ///
+  /// In sr, this message translates to:
+  /// **'Podeli'**
+  String get imageShare;
+
+  /// No description provided for @imageMissing.
+  ///
+  /// In sr, this message translates to:
+  /// **'Slika nije pronađena.'**
+  String get imageMissing;
 }
 
 class _AppLocalizationsDelegate

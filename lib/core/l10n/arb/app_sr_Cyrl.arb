@@ -118,5 +118,8 @@
   "detailDeleteReceiptConfirm": "Обрисати овај рачун, његове ставке и гаранције?",
   "receiptFilterAll": "Сви",
   "receiptFilterBusiness": "Пословни",
-  "receiptFilterPersonal": "Приватни"
+  "receiptFilterPersonal": "Приватни",
+
+  "imageShare": "Подели",
+  "imageMissing": "Слика није пронађена."
 }

@@ -330,4 +330,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get receiptFilterPersonal => 'Personal';
+
+  @override
+  String get imageShare => 'Share';
+
+  @override
+  String get imageMissing => 'Image not found.';
 }

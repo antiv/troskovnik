@@ -118,5 +118,8 @@
   "detailDeleteReceiptConfirm": "Delete this receipt, its items and warranties?",
   "receiptFilterAll": "All",
   "receiptFilterBusiness": "Business",
-  "receiptFilterPersonal": "Personal"
+  "receiptFilterPersonal": "Personal",
+
+  "imageShare": "Share",
+  "imageMissing": "Image not found."
 }

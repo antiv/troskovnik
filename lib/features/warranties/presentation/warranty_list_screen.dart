@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/l10n/gen/app_localizations.dart';
+import '../../../core/widgets/image_viewer_screen.dart';
 import '../data/warranty_providers.dart';
 import '../data/warranty_repository.dart';
 import '../domain/warranty_status.dart';
@@ -55,12 +56,18 @@ class _WarrantyTile extends ConsumerWidget {
     final w = view.warranty;
     final daysLeft = WarrantyTiming.daysLeft(w.expiryDate);
 
+    final hasProof =
+        w.proofImagePath != null && File(w.proofImagePath!).existsSync();
     return ListTile(
-      leading: w.proofImagePath != null && File(w.proofImagePath!).existsSync()
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: Image.file(File(w.proofImagePath!),
-                  width: 44, height: 44, fit: BoxFit.cover),
+      leading: hasProof
+          ? GestureDetector(
+              onTap: () => ImageViewerScreen.open(context,
+                  imagePath: w.proofImagePath!, title: w.title),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: Image.file(File(w.proofImagePath!),
+                    width: 44, height: 44, fit: BoxFit.cover),
+              ),
             )
           : const Icon(Icons.shield_outlined, size: 36),
       title: Text(w.title),

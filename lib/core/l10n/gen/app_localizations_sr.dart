@@ -330,6 +330,12 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get receiptFilterPersonal => 'Privatni';
+
+  @override
+  String get imageShare => 'Podeli';
+
+  @override
+  String get imageMissing => 'Slika nije pronađena.';
 }
 
 /// The translations for Serbian, using the Cyrillic script (`sr_Cyrl`).
@@ -658,4 +664,10 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get receiptFilterPersonal => 'Приватни';
+
+  @override
+  String get imageShare => 'Подели';
+
+  @override
+  String get imageMissing => 'Слика није пронађена.';
 }
