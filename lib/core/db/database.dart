@@ -20,6 +20,13 @@ class AppDatabase extends _$AppDatabase {
   factory AppDatabase.encrypted(String encryptionKey) =>
       AppDatabase(_openEncrypted(encryptionKey));
 
+  /// In-memory baza za testove, sa uključenim FK kaskadama (#7).
+  factory AppDatabase.forTesting() => AppDatabase(
+        NativeDatabase.memory(
+          setup: (db) => db.execute('PRAGMA foreign_keys = ON;'),
+        ),
+      );
+
   @override
   int get schemaVersion => 2;
 
@@ -73,6 +80,8 @@ LazyDatabase _openEncrypted(String key) {
         db.execute("PRAGMA key = '$escaped';");
         // Provera da je ključ ispravan / baza dešifrovana.
         db.execute('PRAGMA cipher_memory_security = ON;');
+        // FK kaskade (van transakcije, ovde u setup-u — ne radi u beforeOpen).
+        db.execute('PRAGMA foreign_keys = ON;');
         db.execute('SELECT count(*) FROM sqlite_master;');
       },
     );

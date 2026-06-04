@@ -109,5 +109,14 @@
   "languageSystem": "Системски",
   "languageSerbianCyrillic": "Српски (ћирилица)",
   "languageSerbianLatin": "Српски (латиница)",
-  "languageEnglish": "English"
+  "languageEnglish": "English",
+
+  "detailProof": "Доказ",
+  "detailProofHint": "Рачун је сачуван као доказ (журнал + званични линк Пореске).",
+  "detailOpenOnSuf": "Отвори на suf.purs.gov.rs",
+  "detailDeleteReceipt": "Обриши рачун",
+  "detailDeleteReceiptConfirm": "Обрисати овај рачун, његове ставке и гаранције?",
+  "receiptFilterAll": "Сви",
+  "receiptFilterBusiness": "Пословни",
+  "receiptFilterPersonal": "Приватни"
 }

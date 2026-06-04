@@ -109,5 +109,14 @@
   "languageSystem": "System",
   "languageSerbianCyrillic": "Serbian (Cyrillic)",
   "languageSerbianLatin": "Serbian (Latin)",
-  "languageEnglish": "English"
+  "languageEnglish": "English",
+
+  "detailProof": "Proof",
+  "detailProofHint": "The receipt is kept as proof (journal + official Tax Administration link).",
+  "detailOpenOnSuf": "Open on suf.purs.gov.rs",
+  "detailDeleteReceipt": "Delete receipt",
+  "detailDeleteReceiptConfirm": "Delete this receipt, its items and warranties?",
+  "receiptFilterAll": "All",
+  "receiptFilterBusiness": "Business",
+  "receiptFilterPersonal": "Personal"
 }

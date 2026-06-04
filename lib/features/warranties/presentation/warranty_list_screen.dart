@@ -8,6 +8,7 @@ import '../../../core/l10n/gen/app_localizations.dart';
 import '../data/warranty_providers.dart';
 import '../data/warranty_repository.dart';
 import '../domain/warranty_status.dart';
+import 'add_warranty_sheet.dart';
 import 'widgets/warranty_status_badge.dart';
 
 /// Lista praćenih garancija, sortirana po roku isteka, sa bedžom statusa.
@@ -74,6 +75,15 @@ class _WarrantyTile extends ConsumerWidget {
       ),
       isThreeLine: status != WarrantyStatus.expired,
       trailing: WarrantyStatusBadge(status: status),
+      // Tap → izmena u istoj formi kao unos (#4).
+      onTap: () => AddWarrantySheet.show(
+        context,
+        receiptId: w.receiptId,
+        defaultTitle: w.title,
+        purchaseDate: w.purchaseDate,
+        lineItemId: w.lineItemId,
+        existing: w,
+      ),
       onLongPress: () => _confirmDelete(context, ref, w.id),
     );
   }

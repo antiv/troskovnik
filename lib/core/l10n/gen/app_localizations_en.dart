@@ -304,4 +304,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageEnglish => 'English';
+
+  @override
+  String get detailProof => 'Proof';
+
+  @override
+  String get detailProofHint =>
+      'The receipt is kept as proof (journal + official Tax Administration link).';
+
+  @override
+  String get detailOpenOnSuf => 'Open on suf.purs.gov.rs';
+
+  @override
+  String get detailDeleteReceipt => 'Delete receipt';
+
+  @override
+  String get detailDeleteReceiptConfirm =>
+      'Delete this receipt, its items and warranties?';
+
+  @override
+  String get receiptFilterAll => 'All';
+
+  @override
+  String get receiptFilterBusiness => 'Business';
+
+  @override
+  String get receiptFilterPersonal => 'Personal';
 }

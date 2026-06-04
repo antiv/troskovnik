@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/db/database.dart' show LineItemRow;
 import '../../../core/db/enums.dart';
@@ -48,7 +49,16 @@ class ReceiptDetailScreen extends ConsumerWidget {
     final detailAsync = ref.watch(receiptDetailProvider(receiptId));
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.detailTitle)),
+      appBar: AppBar(
+        title: Text(l10n.detailTitle),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            tooltip: l10n.detailDeleteReceipt,
+            onPressed: () => _confirmDeleteReceipt(context, ref),
+          ),
+        ],
+      ),
       body: detailAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('${l10n.errGeneric}\n$e')),
@@ -60,6 +70,29 @@ class ReceiptDetailScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  Future<void> _confirmDeleteReceipt(
+      BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    final navigator = Navigator.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        content: Text(l10n.detailDeleteReceiptConfirm),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(l10n.cancel)),
+          FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(l10n.detailDeleteReceipt)),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    await deleteReceipt(ref, receiptId);
+    navigator.pop();
   }
 }
 
@@ -167,6 +200,21 @@ class _DetailBody extends ConsumerWidget {
 
         const Divider(height: 24),
 
+        // Dokaz (sačuvan žurnal + zvanični SUF link) — #5
+        Text(l10n.detailProof,
+            style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 4),
+        Text(l10n.detailProofHint,
+            style: Theme.of(context).textTheme.bodySmall),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          icon: const Icon(Icons.open_in_new, size: 18),
+          label: Text(l10n.detailOpenOnSuf),
+          onPressed: () => _openOnSuf(context, r.verificationUrl),
+        ),
+
+        const Divider(height: 24),
+
         // Poslovni račun
         SwitchListTile(
           title: Text(l10n.detailMarkBusiness),
@@ -178,6 +226,16 @@ class _DetailBody extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _openOnSuf(BuildContext context, String url) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context);
+    final uri = Uri.tryParse(url);
+    if (uri == null ||
+        !await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.errGeneric)));
+    }
   }
 }
 
