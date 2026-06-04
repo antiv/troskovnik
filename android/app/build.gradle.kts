@@ -57,12 +57,12 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
+            // R8/shrink ISKLJUČEN: minify je strip-ovao native kod plugina
+            // (SQLCipher/FFI) pa je release crashovao pri pokretanju na uređaju.
+            // Dart kod je AOT-kompajliran (R8 ga ne dira), pa je dobitak mali,
+            // a rizik veliki. proguard-rules.pro zadržan za eventualno kasnije.
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
