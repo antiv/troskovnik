@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../core/db/enums.dart';
@@ -31,13 +32,46 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     if (_processing) return;
     final raw = capture.barcodes.firstOrNull?.rawValue;
     if (raw == null || raw.isEmpty) return;
+    await _processRaw(raw);
+  }
 
+  /// Uvoz slike iz galerije: skenira ceo kadar (QR može biti bilo gde na slici).
+  Future<void> _pickFromGallery() async {
+    if (_processing) return;
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+
+    final picked =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (picked == null) return; // korisnik odustao
+
+    setState(() => _processing = true);
+    await _controller.stop();
+
+    final capture = await _controller.analyzeImage(picked.path);
+    final raw = capture?.barcodes.firstOrNull?.rawValue;
+    if (raw == null || raw.isEmpty) {
+      if (mounted) {
+        messenger
+            .showSnackBar(SnackBar(content: Text(l10n.scanNoQrInImage)));
+        setState(() => _processing = false);
+        await _controller.start();
+      }
+      return;
+    }
+
+    await _processRaw(raw, alreadyProcessing: true);
+  }
+
+  Future<void> _processRaw(String raw, {bool alreadyProcessing = false}) async {
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
 
-    setState(() => _processing = true);
-    await _controller.stop();
+    if (!alreadyProcessing) {
+      setState(() => _processing = true);
+      await _controller.stop();
+    }
 
     final outcome = await ref.read(scanControllerProvider).process(raw);
     if (!mounted) return;
@@ -101,15 +135,28 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.white)),
                 const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white),
-                  icon: const Icon(Icons.keyboard),
-                  label: Text(l10n.scanManualEntry),
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                        builder: (_) => const ManualEntryScreen()),
-                  ),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  children: [
+                    OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white),
+                      icon: const Icon(Icons.photo_library),
+                      label: Text(l10n.scanFromGallery),
+                      onPressed: _pickFromGallery,
+                    ),
+                    OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white),
+                      icon: const Icon(Icons.keyboard),
+                      label: Text(l10n.scanManualEntry),
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                            builder: (_) => const ManualEntryScreen()),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

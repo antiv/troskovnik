@@ -52,7 +52,7 @@ class AnalyticsScreen extends ConsumerWidget {
                   ),
                   _Section(
                     title: l10n.analyticsTopItems,
-                    subtitle: l10n.analyticsItemsHint,
+                    // subtitle: l10n.analyticsItemsHint,
                     child: _TopItemsList(items: s.topItems),
                   ),
                 ],

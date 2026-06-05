@@ -23,7 +23,8 @@ class SettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settingsTitle)),
-      body: RadioGroup<AppLanguage>(
+      body: SafeArea(
+        child: RadioGroup<AppLanguage>(
         groupValue: current,
         onChanged: (v) {
           if (v != null) {
@@ -43,6 +44,7 @@ class SettingsScreen extends ConsumerWidget {
                 title: Text(label(lang)),
               ),
           ],
+        ),
         ),
       ),
     );

@@ -27,6 +27,12 @@ class AppLocalizationsSr extends AppLocalizations {
   String get scanManualEntry => 'Ručni unos';
 
   @override
+  String get scanFromGallery => 'Iz galerije';
+
+  @override
+  String get scanNoQrInImage => 'Na slici nema čitljivog QR koda';
+
+  @override
   String get scanBatchMode => 'Skeniraj više zaredom';
 
   @override
@@ -192,6 +198,9 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get warrantyAttachProof => 'Priloži fotografiju računa';
+
+  @override
+  String get warrantyPickFromGallery => 'Iz galerije';
 
   @override
   String get warrantyProofAttached => 'Fotografija priložena';
@@ -361,6 +370,12 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
   String get scanManualEntry => 'Ручни унос';
 
   @override
+  String get scanFromGallery => 'Из галерије';
+
+  @override
+  String get scanNoQrInImage => 'На слици нема читљивог QR кода';
+
+  @override
   String get scanBatchMode => 'Скенирај више заредом';
 
   @override
@@ -526,6 +541,9 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get warrantyAttachProof => 'Приложи фотографију рачуна';
+
+  @override
+  String get warrantyPickFromGallery => 'Из галерије';
 
   @override
   String get warrantyProofAttached => 'Фотографија приложена';
