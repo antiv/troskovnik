@@ -97,9 +97,9 @@ class _AddWarrantySheetState extends ConsumerState<AddWarrantySheet> {
     super.dispose();
   }
 
-  Future<void> _pickProof() async {
+  Future<void> _pickProof({required ImageSource source}) async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.camera);
+    final picked = await picker.pickImage(source: source);
     if (picked == null) return;
     final dir = await getApplicationDocumentsDirectory();
     final proofs = Directory(p.join(dir.path, 'warranty_proofs'));
@@ -236,14 +236,30 @@ class _AddWarrantySheetState extends ConsumerState<AddWarrantySheet> {
                 ),
                 const SizedBox(height: 8),
               ],
-              OutlinedButton.icon(
-                icon: Icon(_proofPath != null
-                    ? Icons.check_circle
-                    : Icons.add_a_photo),
-                label: Text(_proofPath != null
-                    ? l10n.warrantyProofAttached
-                    : l10n.warrantyAttachProof),
-                onPressed: _pickProof,
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: Icon(_proofPath != null
+                          ? Icons.check_circle
+                          : Icons.add_a_photo),
+                      label: Text(_proofPath != null
+                          ? l10n.warrantyProofAttached
+                          : l10n.warrantyAttachProof),
+                      onPressed: () =>
+                          _pickProof(source: ImageSource.camera),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.photo_library),
+                      label: Text(l10n.warrantyPickFromGallery),
+                      onPressed: () =>
+                          _pickProof(source: ImageSource.gallery),
+                    ),
+                  ),
+                ],
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 4),

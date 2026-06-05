@@ -135,6 +135,18 @@ abstract class AppLocalizations {
   /// **'Ručni unos'**
   String get scanManualEntry;
 
+  /// No description provided for @scanFromGallery.
+  ///
+  /// In sr, this message translates to:
+  /// **'Iz galerije'**
+  String get scanFromGallery;
+
+  /// No description provided for @scanNoQrInImage.
+  ///
+  /// In sr, this message translates to:
+  /// **'Na slici nema čitljivog QR koda'**
+  String get scanNoQrInImage;
+
   /// No description provided for @scanBatchMode.
   ///
   /// In sr, this message translates to:
@@ -452,6 +464,12 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'Priloži fotografiju računa'**
   String get warrantyAttachProof;
+
+  /// No description provided for @warrantyPickFromGallery.
+  ///
+  /// In sr, this message translates to:
+  /// **'Iz galerije'**
+  String get warrantyPickFromGallery;
 
   /// No description provided for @warrantyProofAttached.
   ///

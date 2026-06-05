@@ -107,7 +107,10 @@ class _DetailBody extends ConsumerWidget {
     final pending = r.itemsStatus == ItemsStatus.pendingServer;
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      // Donji safe-area inset da poslednji red (poslovni račun) ne ostane
+      // ispod Android sistemske navigacije.
+      padding: EdgeInsets.fromLTRB(
+          16, 16, 16, 16 + MediaQuery.viewPaddingOf(context).bottom),
       children: [
         // Zaglavlje
         Text(detail.merchant.name,

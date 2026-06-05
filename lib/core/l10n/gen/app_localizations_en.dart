@@ -27,6 +27,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanManualEntry => 'Manual entry';
 
   @override
+  String get scanFromGallery => 'From gallery';
+
+  @override
+  String get scanNoQrInImage => 'No readable QR code in the image';
+
+  @override
   String get scanBatchMode => 'Scan several in a row';
 
   @override
@@ -193,6 +199,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get warrantyAttachProof => 'Attach receipt photo';
+
+  @override
+  String get warrantyPickFromGallery => 'From gallery';
 
   @override
   String get warrantyProofAttached => 'Photo attached';
