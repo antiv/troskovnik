@@ -24,7 +24,8 @@ class TroskovnikApp extends ConsumerWidget {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       // Kad je uređaj na srpskom bez skripta, podrazumevaj ćirilicu (tržište).
-      localeResolutionCallback: _resolveLocale,
+      localeResolutionCallback:
+          language == AppLanguage.system ? _resolveLocale : null,
       home: const HomeShell(),
     );
   }
