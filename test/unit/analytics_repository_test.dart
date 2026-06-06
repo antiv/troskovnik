@@ -215,4 +215,51 @@ void main() {
     expect(d.byMerchant, hasLength(2));
     expect(d.byMerchant.first.totalMinor, 11000); // Idea najviše, prva
   });
+
+  Future<void> payReceipt({
+    required int merchantId,
+    required int total,
+    required DateTime pfrTime,
+    String? method,
+    String? paymentsJson,
+  }) =>
+      db.into(db.receipts).insert(
+            ReceiptsCompanion.insert(
+              merchantId: merchantId,
+              verificationUrl: 'u${DateTime.now().microsecondsSinceEpoch}p',
+              pfrTime: Value(pfrTime),
+              totalAmount: Value(total),
+              paymentMethod: Value(method),
+              paymentsJson: Value(paymentsJson),
+            ),
+          );
+
+  test('byPaymentMethod splits combined payments and falls back', () async {
+    final m = await merchant('1', 'Maxi');
+    // Kombinovano: deo gotovina, deo kartica.
+    await payReceipt(
+        merchantId: m,
+        total: 53000,
+        pfrTime: DateTime(2026, 1, 5),
+        method: 'Готовина',
+        paymentsJson: '{"Готовина":20000,"Картица":33000}');
+    // Fallback: samo naziv, bez strukture → ceo iznos na Картица.
+    await payReceipt(
+        merchantId: m,
+        total: 10000,
+        pfrTime: DateTime(2026, 1, 6),
+        method: 'Картица');
+    // Bez ičega → Nepoznato.
+    await payReceipt(
+        merchantId: m, total: 5000, pfrTime: DateTime(2026, 1, 7));
+
+    final s = await repo.loadSummary(AnalyticsRange.all,
+        now: DateTime(2026, 2, 1));
+    final by = {for (final p in s.byPaymentMethod) p.method: p.totalMinor};
+    expect(by['Картица'], 43000); // 33.000 (kombinovano) + 10.000 (fallback)
+    expect(by['Готовина'], 20000);
+    expect(by[AnalyticsRepository.paymentUnknownKey], 5000);
+    // Sortirano opadajuće po iznosu.
+    expect(s.byPaymentMethod.first.method, 'Картица');
+  });
 }

@@ -100,6 +100,9 @@ class AppLocalizationsSr extends AppLocalizations {
   String get detailTaxBreakdown => 'Obračun poreza';
 
   @override
+  String get detailPaymentMethod => 'Način plaćanja';
+
+  @override
   String get detailItems => 'Stavke';
 
   @override
@@ -250,6 +253,24 @@ class AppLocalizationsSr extends AppLocalizations {
   String get analyticsTitle => 'Analitika potrošnje';
 
   @override
+  String get exportCsv => 'Izvoz u CSV';
+
+  @override
+  String get exportCurrentMonth => 'Tekući mesec';
+
+  @override
+  String get exportPreviousMonth => 'Prethodni mesec';
+
+  @override
+  String get exportCustomPeriod => 'Proizvoljan period';
+
+  @override
+  String get exportEmpty => 'Nema računa za izabrani period.';
+
+  @override
+  String get exportShareText => 'Izvoz računa (Troškovnik)';
+
+  @override
   String get analyticsEmpty =>
       'Nema dovoljno podataka. Skeniraj nekoliko računa.';
 
@@ -278,6 +299,12 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get analyticsBusinessSplit => 'Poslovno / lično';
+
+  @override
+  String get analyticsByPayment => 'Po načinu plaćanja';
+
+  @override
+  String get analyticsPaymentUnknown => 'Ostalo / nepoznato';
 
   @override
   String get analyticsBusiness => 'Poslovno';
@@ -463,6 +490,9 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
   String get detailTaxBreakdown => 'Обрачун пореза';
 
   @override
+  String get detailPaymentMethod => 'Начин плаћања';
+
+  @override
   String get detailItems => 'Ставке';
 
   @override
@@ -613,6 +643,24 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
   String get analyticsTitle => 'Аналитика потрошње';
 
   @override
+  String get exportCsv => 'Извоз у CSV';
+
+  @override
+  String get exportCurrentMonth => 'Текући месец';
+
+  @override
+  String get exportPreviousMonth => 'Претходни месец';
+
+  @override
+  String get exportCustomPeriod => 'Произвољан период';
+
+  @override
+  String get exportEmpty => 'Нема рачуна за изабрани период.';
+
+  @override
+  String get exportShareText => 'Извоз рачуна (Трошковник)';
+
+  @override
   String get analyticsEmpty =>
       'Нема довољно података. Скенирај неколико рачуна.';
 
@@ -641,6 +689,12 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get analyticsBusinessSplit => 'Пословно / лично';
+
+  @override
+  String get analyticsByPayment => 'По начину плаћања';
+
+  @override
+  String get analyticsPaymentUnknown => 'Остало / непознато';
 
   @override
   String get analyticsBusiness => 'Пословно';

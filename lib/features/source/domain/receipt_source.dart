@@ -69,6 +69,7 @@ class ReceiptHeader {
     this.transactionType = TransactionType.sale,
     this.totalAmount = 0,
     this.paymentMethod,
+    this.paymentsJson,
     this.taxJson,
   });
 
@@ -92,7 +93,14 @@ class ReceiptHeader {
 
   /// Ukupan iznos u para (1/100 RSD).
   final int totalAmount;
+
+  /// Prvi/primarni način plaćanja (naziv). Zadržan radi kompatibilnosti.
   final String? paymentMethod;
+
+  /// Svi načini plaćanja sa iznosima (kombinovano plaćanje), JSON mapa
+  /// naziv→iznos_u_para. Null kad nije parsirano.
+  final String? paymentsJson;
+
   final String? taxJson;
 }
 

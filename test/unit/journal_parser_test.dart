@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -22,6 +23,36 @@ void main() {
       expect(h.transactionType, TransactionType.sale);
       expect(h.pfrTime, DateTime(2026, 6, 2, 8, 36, 49));
       expect(h.merchantName, isNotEmpty);
+    });
+
+    test('single payment: paymentsJson holds method+amount', () {
+      final h = parser.parse(journal);
+      expect(h.paymentMethod, 'Готовина');
+      final map = jsonDecode(h.paymentsJson!) as Map<String, dynamic>;
+      expect(map, {'Готовина': 53000});
+    });
+
+    test('combined payment: all methods with amounts captured', () {
+      const combinedJournal = '''
+============ ФИСКАЛНИ РАЧУН ============
+               100000001
+        PRODAVNICA DOO
+-------------ПРОМЕТ ПРОДАЈА-------------
+========================================
+Укупан износ:                     530,00
+Готовина:                         200,00
+Картица:                          330,00
+========================================
+ПФР време:           02.06.2026. 8:36:49
+ПФР број рачуна: TESTTEST-TESTTEST-00001
+Бројач рачуна:             00001/00001ПП
+========================================
+''';
+      final h = parser.parse(combinedJournal);
+      // Prvi/primarni način ostaje radi kompatibilnosti.
+      expect(h.paymentMethod, 'Готовина');
+      final map = jsonDecode(h.paymentsJson!) as Map<String, dynamic>;
+      expect(map, {'Готовина': 20000, 'Картица': 33000});
     });
 
     test('B2C fixture has no buyer id', () {

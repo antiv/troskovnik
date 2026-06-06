@@ -194,6 +194,16 @@ class _DetailBody extends ConsumerWidget {
                 ),
               )),
 
+        // Način plaćanja (uklj. kombinovano)
+        if (r.paymentsJson != null || r.paymentMethod != null) ...[
+          const Divider(height: 24),
+          Text(l10n.detailPaymentMethod,
+              style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          _PaymentBreakdown(
+              paymentsJson: r.paymentsJson, paymentMethod: r.paymentMethod),
+        ],
+
         // Obračun poreza
         if (r.taxJson != null) ...[
           const Divider(height: 24),
@@ -328,6 +338,42 @@ class _ItemTile extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _PaymentBreakdown extends StatelessWidget {
+  const _PaymentBreakdown({required this.paymentsJson, required this.paymentMethod});
+  final String? paymentsJson;
+  final String? paymentMethod;
+
+  @override
+  Widget build(BuildContext context) {
+    // Strukturirani breakdown (uklj. kombinovano plaćanje).
+    if (paymentsJson != null) {
+      Map<String, dynamic> map;
+      try {
+        map = jsonDecode(paymentsJson!) as Map<String, dynamic>;
+      } catch (_) {
+        map = const {};
+      }
+      if (map.isNotEmpty) {
+        return Column(
+          children: map.entries
+              .map((e) => Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(e.key),
+                      Text(MoneyFormat.fromMinor((e.value as num).toInt()),
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ))
+              .toList(),
+        );
+      }
+    }
+    // Fallback: samo naziv (stari računi bez iznosa).
+    if (paymentMethod != null) return Text(paymentMethod!);
+    return const SizedBox.shrink();
   }
 }
 

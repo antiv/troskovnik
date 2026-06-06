@@ -1,10 +1,14 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/utils/money_format.dart';
+import '../../export/data/export_service.dart';
+import '../../export/domain/export_range.dart';
 import '../data/analytics_providers.dart';
+import '../data/analytics_repository.dart' show AnalyticsRepository;
 import '../domain/analytics_models.dart';
 
 /// Ekran analitike potrošnje (MVP, nad postojećim podacima — bez kategorija).
@@ -18,7 +22,12 @@ class AnalyticsScreen extends ConsumerWidget {
 
     return Column(
       children: [
-        _RangeSelector(),
+        Row(
+          children: [
+            Expanded(child: _RangeSelector()),
+            const _ExportButton(),
+          ],
+        ),
         Expanded(
           child: summaryAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
@@ -46,6 +55,11 @@ class AnalyticsScreen extends ConsumerWidget {
                     title: l10n.analyticsBusinessSplit,
                     child: _BusinessSplitBar(split: s.businessSplit),
                   ),
+                  if (s.byPaymentMethod.isNotEmpty)
+                    _Section(
+                      title: l10n.analyticsByPayment,
+                      child: _PaymentSplitBar(items: s.byPaymentMethod),
+                    ),
                   _Section(
                     title: l10n.analyticsByMerchant,
                     child: _MerchantList(
@@ -95,6 +109,99 @@ class _RangeSelector extends ConsumerWidget {
             ref.read(analyticsRangeProvider.notifier).set(s.first),
       ),
     );
+  }
+}
+
+/// Dugme za izvoz računa u CSV — otvara izbor perioda u bottom sheet-u.
+class _ExportButton extends ConsumerWidget {
+  const _ExportButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(right: 4),
+      child: IconButton(
+        icon: const Icon(Icons.file_download_outlined),
+        tooltip: l10n.exportCsv,
+        onPressed: () => _showExportSheet(context, ref),
+      ),
+    );
+  }
+}
+
+void _showExportSheet(BuildContext context, WidgetRef ref) {
+  final l10n = AppLocalizations.of(context);
+  showModalBottomSheet<void>(
+    context: context,
+    showDragHandle: true,
+    builder: (sheetCtx) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.today),
+            title: Text(l10n.exportCurrentMonth),
+            onTap: () {
+              Navigator.pop(sheetCtx);
+              _runExport(context, ref, ExportRange.currentMonth);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.history),
+            title: Text(l10n.exportPreviousMonth),
+            onTap: () {
+              Navigator.pop(sheetCtx);
+              _runExport(context, ref, ExportRange.previousMonth);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.date_range),
+            title: Text(l10n.exportCustomPeriod),
+            onTap: () async {
+              Navigator.pop(sheetCtx);
+              final now = DateTime.now();
+              final picked = await showDateRangePicker(
+                context: context,
+                firstDate: DateTime(2021, 1, 1),
+                lastDate: DateTime(now.year + 1, 12, 31),
+              );
+              if (picked == null || !context.mounted) return;
+              _runExport(context, ref, ExportRange.custom,
+                  from: picked.start, to: picked.end);
+            },
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Future<void> _runExport(
+  BuildContext context,
+  WidgetRef ref,
+  ExportRange range, {
+  DateTime? from,
+  DateTime? to,
+}) async {
+  final l10n = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  try {
+    final service = await ref.read(exportServiceProvider.future);
+    final result = await service.exportToFile(range,
+        customFrom: from, customTo: to);
+    if (result == null) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.exportEmpty)));
+      return;
+    }
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile(result.filePath)],
+        text: l10n.exportShareText,
+      ),
+    );
+  } catch (_) {
+    messenger.showSnackBar(SnackBar(content: Text(l10n.errGeneric)));
   }
 }
 
@@ -299,6 +406,75 @@ class _LegendDot extends StatelessWidget {
           Text(label, style: Theme.of(context).textTheme.bodySmall),
         ],
       );
+}
+
+class _PaymentSplitBar extends StatelessWidget {
+  const _PaymentSplitBar({required this.items});
+  final List<PaymentMethodSpending> items;
+
+  static const _palette = <int>[0, 1, 2, 3, 4, 5];
+
+  Color _color(ColorScheme s, int i) {
+    switch (_palette[i % _palette.length]) {
+      case 0:
+        return s.primary;
+      case 1:
+        return s.tertiary;
+      case 2:
+        return s.secondary;
+      case 3:
+        return s.error;
+      case 4:
+        return s.primaryContainer;
+      default:
+        return s.tertiaryContainer;
+    }
+  }
+
+  String _label(BuildContext context, String method) =>
+      method == AnalyticsRepository.paymentUnknownKey
+          ? AppLocalizations.of(context).analyticsPaymentUnknown
+          : method;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final total = items.fold<int>(0, (a, e) => a + e.totalMinor);
+    if (total <= 0) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: Row(
+            children: [
+              for (var i = 0; i < items.length; i++)
+                Expanded(
+                  flex: (items[i].totalMinor / total * 1000)
+                      .round()
+                      .clamp(1, 1000000),
+                  child: Container(height: 20, color: _color(scheme, i)),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 12,
+          runSpacing: 4,
+          children: [
+            for (var i = 0; i < items.length; i++)
+              _LegendDot(
+                color: _color(scheme, i),
+                label:
+                    '${_label(context, items[i].method)}: ${MoneyFormat.fromMinor(items[i].totalMinor)}',
+              ),
+          ],
+        ),
+      ],
+    );
+  }
 }
 
 class _MerchantList extends StatelessWidget {

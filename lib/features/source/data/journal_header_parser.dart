@@ -36,8 +36,9 @@ class JournalHeaderParser {
   );
 
   // Oblik plaćanja: red posle "Укупан износ" do bloka poreza, npr "Готовина: 530,00".
+  // Grupa 1 = naziv, grupa 2 = iznos (može biti više linija — kombinovano plaćanje).
   static final _payment = RegExp(
-    r'^\s*(Готовина|Картица|Чек|Пренос на рачун|Инстант плаћање|Ваучер|Друго безготовинско)\s*:',
+    r'^\s*(Готовина|Картица|Чек|Пренос на рачун|Инстант плаћање|Ваучер|Друго безготовинско)\s*:\s*([\d.]+,\d+)?',
     unicode: true,
   );
 
@@ -54,6 +55,7 @@ class JournalHeaderParser {
     String? invoiceCounter;
     int totalAmount = 0;
     String? paymentMethod;
+    final payments = <String, int>{};
     var transactionType = TransactionType.sale;
 
     final taxRates = parseTaxRates(journalText);
@@ -93,8 +95,13 @@ class JournalHeaderParser {
       }
 
       final pay = _payment.firstMatch(line);
-      if (pay != null && paymentMethod == null) {
-        paymentMethod = pay.group(1);
+      if (pay != null) {
+        final method = pay.group(1)!;
+        paymentMethod ??= method; // prvi/primarni način (granica za nameParts)
+        final amount = SrNumber.tryParseToMinor(pay.group(2) ?? '');
+        if (amount != null) {
+          payments[method] = (payments[method] ?? 0) + amount;
+        }
       }
 
       final buyer = _buyerId.firstMatch(line);
@@ -140,6 +147,7 @@ class JournalHeaderParser {
       transactionType: transactionType,
       totalAmount: totalAmount,
       paymentMethod: paymentMethod,
+      paymentsJson: payments.isEmpty ? null : jsonEncode(payments),
       taxJson: taxRates.isEmpty
           ? null
           : jsonEncode(taxRates.map((k, v) => MapEntry(k, v))),

@@ -273,6 +273,12 @@ abstract class AppLocalizations {
   /// **'Obračun poreza'**
   String get detailTaxBreakdown;
 
+  /// No description provided for @detailPaymentMethod.
+  ///
+  /// In sr, this message translates to:
+  /// **'Način plaćanja'**
+  String get detailPaymentMethod;
+
   /// No description provided for @detailItems.
   ///
   /// In sr, this message translates to:
@@ -555,6 +561,42 @@ abstract class AppLocalizations {
   /// **'Analitika potrošnje'**
   String get analyticsTitle;
 
+  /// No description provided for @exportCsv.
+  ///
+  /// In sr, this message translates to:
+  /// **'Izvoz u CSV'**
+  String get exportCsv;
+
+  /// No description provided for @exportCurrentMonth.
+  ///
+  /// In sr, this message translates to:
+  /// **'Tekući mesec'**
+  String get exportCurrentMonth;
+
+  /// No description provided for @exportPreviousMonth.
+  ///
+  /// In sr, this message translates to:
+  /// **'Prethodni mesec'**
+  String get exportPreviousMonth;
+
+  /// No description provided for @exportCustomPeriod.
+  ///
+  /// In sr, this message translates to:
+  /// **'Proizvoljan period'**
+  String get exportCustomPeriod;
+
+  /// No description provided for @exportEmpty.
+  ///
+  /// In sr, this message translates to:
+  /// **'Nema računa za izabrani period.'**
+  String get exportEmpty;
+
+  /// No description provided for @exportShareText.
+  ///
+  /// In sr, this message translates to:
+  /// **'Izvoz računa (Troškovnik)'**
+  String get exportShareText;
+
   /// No description provided for @analyticsEmpty.
   ///
   /// In sr, this message translates to:
@@ -608,6 +650,18 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'Poslovno / lično'**
   String get analyticsBusinessSplit;
+
+  /// No description provided for @analyticsByPayment.
+  ///
+  /// In sr, this message translates to:
+  /// **'Po načinu plaćanja'**
+  String get analyticsByPayment;
+
+  /// No description provided for @analyticsPaymentUnknown.
+  ///
+  /// In sr, this message translates to:
+  /// **'Ostalo / nepoznato'**
+  String get analyticsPaymentUnknown;
 
   /// No description provided for @analyticsBusiness.
   ///
