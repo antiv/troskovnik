@@ -64,8 +64,12 @@ class Receipts extends Table {
   /// Ukupan iznos u para (1/100 RSD).
   IntColumn get totalAmount => integer().withDefault(const Constant(0))();
 
-  /// Oblik plaćanja (gotovina, kartica, ...).
+  /// Oblik plaćanja (gotovina, kartica, ...) — prvi/primarni način.
   TextColumn get paymentMethod => text().nullable()();
+
+  /// Svi načini plaćanja sa iznosima (kombinovano plaćanje), JSON mapa
+  /// naziv→para (npr. {"Готовина":20000,"Картица":33000}). Null kad nije parsirano.
+  TextColumn get paymentsJson => text().nullable()();
 
   /// Obračun poreza po stopama, serijalizovan kao JSON.
   TextColumn get taxJson => text().nullable()();

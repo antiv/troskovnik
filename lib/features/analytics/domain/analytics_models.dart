@@ -33,6 +33,20 @@ class MerchantSpending {
   final int receiptCount;
 }
 
+/// Potrošnja po jednom načinu plaćanja (uklj. kombinovano — iznos je deo
+/// pripisan baš tom načinu).
+class PaymentMethodSpending {
+  const PaymentMethodSpending({
+    required this.method,
+    required this.totalMinor,
+    required this.receiptCount,
+  });
+
+  final String method;
+  final int totalMinor;
+  final int receiptCount;
+}
+
 /// Podela poslovno vs. lično.
 class BusinessSplit {
   const BusinessSplit({
@@ -68,6 +82,7 @@ class AnalyticsSummary {
     required this.monthly,
     required this.byMerchant,
     required this.businessSplit,
+    required this.byPaymentMethod,
     required this.topItems,
   });
 
@@ -81,6 +96,7 @@ class AnalyticsSummary {
   final List<MonthlySpending> monthly;
   final List<MerchantSpending> byMerchant;
   final BusinessSplit businessSplit;
+  final List<PaymentMethodSpending> byPaymentMethod;
   final List<TopItem> topItems;
 
   bool get isEmpty => receiptCount == 0;

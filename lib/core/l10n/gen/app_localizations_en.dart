@@ -100,6 +100,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get detailTaxBreakdown => 'Tax breakdown';
 
   @override
+  String get detailPaymentMethod => 'Payment method';
+
+  @override
   String get detailItems => 'Items';
 
   @override
@@ -251,6 +254,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get analyticsTitle => 'Spending analytics';
 
   @override
+  String get exportCsv => 'Export to CSV';
+
+  @override
+  String get exportCurrentMonth => 'Current month';
+
+  @override
+  String get exportPreviousMonth => 'Previous month';
+
+  @override
+  String get exportCustomPeriod => 'Custom period';
+
+  @override
+  String get exportEmpty => 'No receipts for the selected period.';
+
+  @override
+  String get exportShareText => 'Receipts export (Troškovnik)';
+
+  @override
   String get analyticsEmpty => 'Not enough data yet. Scan a few receipts.';
 
   @override
@@ -278,6 +299,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get analyticsBusinessSplit => 'Business / personal';
+
+  @override
+  String get analyticsByPayment => 'By payment method';
+
+  @override
+  String get analyticsPaymentUnknown => 'Other / unknown';
 
   @override
   String get analyticsBusiness => 'Business';

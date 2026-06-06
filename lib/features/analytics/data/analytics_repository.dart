@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 
 import '../../../core/db/database.dart';
@@ -52,6 +54,7 @@ class AnalyticsRepository {
     final monthly = await _monthly(since);
     final byMerchant = await _byMerchant(since);
     final split = await _businessSplit(since);
+    final byPayment = await _byPaymentMethod(since);
     final topItems = await _topItems(since);
     final vat = await _estimatedVat(since);
 
@@ -66,6 +69,7 @@ class AnalyticsRepository {
       monthly: monthly,
       byMerchant: byMerchant,
       businessSplit: split,
+      byPaymentMethod: byPayment,
       topItems: topItems,
     );
   }
@@ -259,6 +263,60 @@ class AnalyticsRepository {
     }
     return BusinessSplit(businessMinor: business, personalMinor: personal);
   }
+
+  /// Potrošnja po načinu plaćanja. Agregacija u Dart-u jer su iznosi u JSON-u
+  /// (`payments_json`); kombinovano plaćanje se deli po načinima. Fallback:
+  /// ako nema strukture, ceo iznos ide na `payment_method`, pa na „Nepoznato".
+  Future<List<PaymentMethodSpending>> _byPaymentMethod(DateTime? since) async {
+    final r = _db.receipts;
+    final q = _db.selectOnly(r)
+      ..addColumns([r.paymentsJson, r.paymentMethod, r.totalAmount])
+      ..where(_validAnd(since));
+
+    final totals = <String, int>{};
+    final counts = <String, int>{};
+    void add(String method, int amount) {
+      totals[method] = (totals[method] ?? 0) + amount;
+      counts[method] = (counts[method] ?? 0) + 1;
+    }
+
+    for (final row in await q.get()) {
+      final json = row.read(r.paymentsJson);
+      final method = row.read(r.paymentMethod);
+      final total = row.read(r.totalAmount) ?? 0;
+
+      Map<String, dynamic>? map;
+      if (json != null) {
+        try {
+          map = jsonDecode(json) as Map<String, dynamic>;
+        } catch (_) {
+          map = null;
+        }
+      }
+
+      if (map != null && map.isNotEmpty) {
+        map.forEach((k, v) => add(k, (v as num).toInt()));
+      } else if (method != null && method.isNotEmpty) {
+        add(method, total);
+      } else {
+        add(_paymentUnknownKey, total);
+      }
+    }
+
+    final list = totals.entries
+        .map((e) => PaymentMethodSpending(
+              method: e.key,
+              totalMinor: e.value,
+              receiptCount: counts[e.key] ?? 0,
+            ))
+        .toList()
+      ..sort((a, b) => b.totalMinor.compareTo(a.totalMinor));
+    return list;
+  }
+
+  /// Sentinel za nepoznat način plaćanja; UI ga mapira na lokalizovan tekst.
+  static const paymentUnknownKey = _paymentUnknownKey;
+  static const _paymentUnknownKey = '__unknown__';
 
   Future<List<TopItem>> _topItems(DateTime? since,
       {int limit = 10, int? merchantId}) async {

@@ -94,6 +94,7 @@ class ReceiptRepository {
                   Value(header?.transactionType ?? TransactionType.sale),
               totalAmount: Value(header?.totalAmount ?? 0),
               paymentMethod: Value(header?.paymentMethod),
+              paymentsJson: Value(header?.paymentsJson),
               taxJson: Value(header?.taxJson),
               journalText: Value(parsed.journalText),
               fetchStatus: Value(parsed.fetchStatus),
@@ -139,6 +140,10 @@ class ReceiptRepository {
       // je još prazan. NE diramo isBusiness — auto-postavka važi samo pri prvom
       // upisu, da se poštuje eventualni ručni izbor korisnika.
       final newBuyerId = current.buyerId ?? parsed.header?.buyerId;
+      final newPaymentMethod =
+          current.paymentMethod ?? parsed.header?.paymentMethod;
+      final newPaymentsJson =
+          current.paymentsJson ?? parsed.header?.paymentsJson;
 
       await (_db.update(_db.receipts)..where((r) => r.id.equals(receiptId)))
           .write(ReceiptsCompanion(
@@ -146,6 +151,8 @@ class ReceiptRepository {
         itemsStatus: Value(parsed.itemsStatus),
         itemsSource: Value(parsed.itemsSource),
         buyerId: Value(newBuyerId),
+        paymentMethod: Value(newPaymentMethod),
+        paymentsJson: Value(newPaymentsJson),
         journalText: Value(parsed.journalText ?? current.journalText),
         retryCount: Value(newRetryCount),
         nextRetryAt: Value(nextRetry),
