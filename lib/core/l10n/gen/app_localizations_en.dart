@@ -109,6 +109,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get detailMarkBusiness => 'Business receipt';
 
   @override
+  String get detailBuyerId => 'Buyer ID';
+
+  @override
   String get detailRefreshNow => 'Refresh now';
 
   @override
@@ -295,6 +298,23 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get analyticsItemsHint =>
       'No categories yet — by item name. To be expanded later.';
+
+  @override
+  String get analyticsAverage => 'Average receipt';
+
+  @override
+  String get analyticsPriceHistory => 'Price history';
+
+  @override
+  String get analyticsWhereBought => 'Where you buy it';
+
+  @override
+  String get analyticsQuantity => 'Total quantity';
+
+  @override
+  String analyticsPurchaseCount(int count) {
+    return '$count purchases';
+  }
 
   @override
   String get settingsTitle => 'Settings';

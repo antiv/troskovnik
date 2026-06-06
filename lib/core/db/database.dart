@@ -28,7 +28,7 @@ class AppDatabase extends _$AppDatabase {
       );
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -42,6 +42,10 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(warranties);
             await customStatement(
                 'CREATE INDEX IF NOT EXISTS idx_warranties_expiry ON warranties(expiry_date)');
+          }
+          // v3: PIB/ID kupca na računu (auto-„poslovni").
+          if (from < 3) {
+            await m.addColumn(receipts, receipts.buyerId);
           }
         },
       );

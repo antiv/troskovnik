@@ -7,10 +7,15 @@ import 'package:troskovnik/features/receipts/data/refetch_service.dart';
 import 'package:troskovnik/features/receipts/domain/retry_policy.dart';
 import 'package:troskovnik/features/source/domain/receipt_source.dart';
 
-ReceiptHeader _header({String tin = '123', String? inv = 'INV-1', String? pfr = 'PFR-1'}) =>
+ReceiptHeader _header(
+        {String tin = '123',
+        String? inv = 'INV-1',
+        String? pfr = 'PFR-1',
+        String? buyerId}) =>
     ReceiptHeader(
       merchantName: 'Test DOO',
       merchantTin: tin,
+      buyerId: buyerId,
       invoiceNumber: inv,
       pfrNumber: pfr,
       totalAmount: 53000,
@@ -97,6 +102,57 @@ void main() {
       expect(second.receiptId, first.receiptId);
       final count = await db.select(db.receipts).get();
       expect(count, hasLength(1));
+    });
+
+    test('buyer PIB (type 10) auto-marks receipt as business', () async {
+      final res = await repo.saveParsed(
+        verificationUrl: 'u-biz',
+        token: 't',
+        parsed: ParsedReceipt(
+          fetchStatus: FetchStatus.complete,
+          itemsStatus: ItemsStatus.fromJournal,
+          itemsSource: ItemsSource.journal,
+          header: _header(buyerId: '10:104318304'),
+        ),
+        now: t0,
+      );
+      final row = await repo.findById(res.receiptId);
+      expect(row!.buyerId, '10:104318304');
+      expect(row.isBusiness, isTrue);
+    });
+
+    test('buyer JMBG (type 11) does NOT auto-mark business', () async {
+      final res = await repo.saveParsed(
+        verificationUrl: 'u-jmbg',
+        token: 't',
+        parsed: ParsedReceipt(
+          fetchStatus: FetchStatus.complete,
+          itemsStatus: ItemsStatus.fromJournal,
+          itemsSource: ItemsSource.journal,
+          header: _header(buyerId: '11:0101990800000'),
+        ),
+        now: t0,
+      );
+      final row = await repo.findById(res.receiptId);
+      expect(row!.buyerId, '11:0101990800000');
+      expect(row.isBusiness, isFalse);
+    });
+
+    test('no buyer id -> not business', () async {
+      final res = await repo.saveParsed(
+        verificationUrl: 'u-none',
+        token: 't',
+        parsed: ParsedReceipt(
+          fetchStatus: FetchStatus.complete,
+          itemsStatus: ItemsStatus.fromJournal,
+          itemsSource: ItemsSource.journal,
+          header: _header(),
+        ),
+        now: t0,
+      );
+      final row = await repo.findById(res.receiptId);
+      expect(row!.buyerId, isNull);
+      expect(row.isBusiness, isFalse);
     });
 
     test('record never lost: saves even with null header', () async {

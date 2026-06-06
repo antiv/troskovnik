@@ -25,6 +25,11 @@ class ReceiptRepository {
   /// Pristup bazi za jednostavna ažuriranja iz UI-ja (npr. oznaka „poslovni", beleška).
   AppDatabase get db => _db;
 
+  /// Račun je „poslovni" ako je kupac identifikovan PIB-om firme (tip „10").
+  /// JMBG/lična dokumenta (drugi tipovi) se ne računaju kao poslovni.
+  static bool isBusinessFromBuyer(String? buyerId) =>
+      buyerId?.startsWith('10:') ?? false;
+
   /// Postavi/oslobodi oznaku „poslovni račun".
   Future<void> setBusiness(int receiptId, bool value, {DateTime? now}) =>
       (_db.update(_db.receipts)..where((r) => r.id.equals(receiptId)))
@@ -81,6 +86,8 @@ class ReceiptRepository {
               token: Value(token),
               invoiceNumber: Value(header?.invoiceNumber),
               pfrNumber: Value(header?.pfrNumber),
+              buyerId: Value(header?.buyerId),
+              isBusiness: Value(isBusinessFromBuyer(header?.buyerId)),
               pfrTime: Value(header?.pfrTime),
               invoiceCounter: Value(header?.invoiceCounter),
               transactionType:
@@ -128,11 +135,17 @@ class ReceiptRepository {
           ? _retryPolicy.nextRetryAt(newRetryCount, from: ts)
           : null;
 
+      // Žurnal (sa PIB-om kupca) stiže tek na refetch-u: popuni buyerId ako
+      // je još prazan. NE diramo isBusiness — auto-postavka važi samo pri prvom
+      // upisu, da se poštuje eventualni ručni izbor korisnika.
+      final newBuyerId = current.buyerId ?? parsed.header?.buyerId;
+
       await (_db.update(_db.receipts)..where((r) => r.id.equals(receiptId)))
           .write(ReceiptsCompanion(
         fetchStatus: Value(parsed.fetchStatus),
         itemsStatus: Value(parsed.itemsStatus),
         itemsSource: Value(parsed.itemsSource),
+        buyerId: Value(newBuyerId),
         journalText: Value(parsed.journalText ?? current.journalText),
         retryCount: Value(newRetryCount),
         nextRetryAt: Value(nextRetry),

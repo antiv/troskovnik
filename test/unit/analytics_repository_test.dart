@@ -154,4 +154,65 @@ void main() {
         now: DateTime(2026, 6, 1));
     expect(s.totalMinor, 2000); // stari (2024) izbačen
   });
+
+  Future<void> itemFull(int receiptId, String name,
+          {required int unitPrice, required int total, double qty = 1.0}) =>
+      db.into(db.lineItems).insert(
+            LineItemsCompanion.insert(
+              receiptId: receiptId,
+              name: name,
+              quantity: Value(qty),
+              unitPrice: Value(unitPrice),
+              total: Value(total),
+            ),
+          );
+
+  test('merchantDetail aggregates total/count, monthly and top items',
+      () async {
+    final maxi = await merchant('1', 'Maxi');
+    final idea = await merchant('2', 'Idea');
+    final r1 = await receipt(
+        merchantId: maxi, total: 10000, pfrTime: DateTime(2026, 1, 5));
+    final r2 = await receipt(
+        merchantId: maxi, total: 6000, pfrTime: DateTime(2026, 2, 5));
+    final rOther = await receipt(
+        merchantId: idea, total: 9000, pfrTime: DateTime(2026, 2, 7));
+    await item(r1, 'Mleko', 4000);
+    await item(r2, 'Mleko', 2000);
+    await item(rOther, 'Mleko', 9000); // drugi prodavac — ne sme da uđe
+
+    final d = await repo.merchantDetail(maxi, AnalyticsRange.all,
+        now: DateTime(2026, 3, 1));
+    expect(d.merchantName, 'Maxi');
+    expect(d.totalMinor, 16000);
+    expect(d.receiptCount, 2);
+    expect(d.averageMinor, 8000);
+    expect(d.monthly, hasLength(2));
+    final mleko = d.topItems.firstWhere((t) => t.name == 'Mleko');
+    expect(mleko.totalMinor, 6000); // samo kod Maxi-ja
+  });
+
+  test('itemDetail returns qty/count/total, price history and by merchant',
+      () async {
+    final maxi = await merchant('1', 'Maxi');
+    final idea = await merchant('2', 'Idea');
+    final r1 = await receipt(
+        merchantId: maxi, total: 5000, pfrTime: DateTime(2026, 1, 10));
+    final r2 = await receipt(
+        merchantId: idea, total: 5500, pfrTime: DateTime(2026, 2, 10));
+    await itemFull(r1, 'Hleb', unitPrice: 5000, total: 5000, qty: 1);
+    await itemFull(r2, 'Hleb', unitPrice: 5500, total: 11000, qty: 2);
+    await itemFull(r1, 'Mleko', unitPrice: 2000, total: 2000);
+
+    final d = await repo.itemDetail('Hleb', AnalyticsRange.all,
+        now: DateTime(2026, 3, 1));
+    expect(d.totalMinor, 16000);
+    expect(d.purchaseCount, 2);
+    expect(d.totalQuantity, 3.0);
+    // Istorija cene sortirana po vremenu: 50,00 → 55,00.
+    expect(d.priceHistory.map((p) => p.unitPriceMinor).toList(),
+        [5000, 5500]);
+    expect(d.byMerchant, hasLength(2));
+    expect(d.byMerchant.first.totalMinor, 11000); // Idea najviše, prva
+  });
 }

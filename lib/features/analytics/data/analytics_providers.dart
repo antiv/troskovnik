@@ -29,3 +29,19 @@ final analyticsSummaryProvider =
   final range = ref.watch(analyticsRangeProvider);
   yield* repo.watchSummary(range);
 });
+
+/// Detalji za jednog prodavca (drill-down), za trenutno izabrani period.
+final merchantDetailProvider =
+    FutureProvider.family<MerchantDetail, int>((ref, merchantId) async {
+  final repo = await ref.watch(analyticsRepositoryProvider.future);
+  final range = ref.watch(analyticsRangeProvider);
+  return repo.merchantDetail(merchantId, range);
+});
+
+/// Detalji za jedan artikal (po nazivu) (drill-down), za izabrani period.
+final itemDetailProvider =
+    FutureProvider.family<ItemDetail, String>((ref, name) async {
+  final repo = await ref.watch(analyticsRepositoryProvider.future);
+  final range = ref.watch(analyticsRangeProvider);
+  return repo.itemDetail(name, range);
+});

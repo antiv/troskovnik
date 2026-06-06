@@ -41,6 +41,10 @@ class Receipts extends Table {
   /// PFR broj.
   TextColumn get pfrNumber => text().nullable()();
 
+  /// PIB/ID kupca sa fiskalnog računa ("ИД купца"), sirovo `tip:broj`
+  /// (npr. "10:104318304", gde "10" = PIB firme). Null kad nije upisan.
+  TextColumn get buyerId => text().nullable()();
+
   /// PFR vreme.
   DateTimeColumn get pfrTime => dateTime().nullable()();
 

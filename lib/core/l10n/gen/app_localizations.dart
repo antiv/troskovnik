@@ -291,6 +291,12 @@ abstract class AppLocalizations {
   /// **'Poslovni račun'**
   String get detailMarkBusiness;
 
+  /// No description provided for @detailBuyerId.
+  ///
+  /// In sr, this message translates to:
+  /// **'ID kupca'**
+  String get detailBuyerId;
+
   /// No description provided for @detailRefreshNow.
   ///
   /// In sr, this message translates to:
@@ -638,6 +644,36 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'Bez kategorija — po nazivu artikla. Proširićemo kasnije.'**
   String get analyticsItemsHint;
+
+  /// No description provided for @analyticsAverage.
+  ///
+  /// In sr, this message translates to:
+  /// **'Prosečan račun'**
+  String get analyticsAverage;
+
+  /// No description provided for @analyticsPriceHistory.
+  ///
+  /// In sr, this message translates to:
+  /// **'Istorija cene'**
+  String get analyticsPriceHistory;
+
+  /// No description provided for @analyticsWhereBought.
+  ///
+  /// In sr, this message translates to:
+  /// **'Gde kupuješ'**
+  String get analyticsWhereBought;
+
+  /// No description provided for @analyticsQuantity.
+  ///
+  /// In sr, this message translates to:
+  /// **'Ukupna količina'**
+  String get analyticsQuantity;
+
+  /// No description provided for @analyticsPurchaseCount.
+  ///
+  /// In sr, this message translates to:
+  /// **'{count} kupovina'**
+  String analyticsPurchaseCount(int count);
 
   /// No description provided for @settingsTitle.
   ///

@@ -48,12 +48,19 @@ class AnalyticsScreen extends ConsumerWidget {
                   ),
                   _Section(
                     title: l10n.analyticsByMerchant,
-                    child: _MerchantList(merchants: s.byMerchant),
+                    child: _MerchantList(
+                      merchants: s.byMerchant,
+                      onTap: (m) => _showMerchantSheet(
+                          context, m.merchantId, m.merchantName),
+                    ),
                   ),
                   _Section(
                     title: l10n.analyticsTopItems,
                     // subtitle: l10n.analyticsItemsHint,
-                    child: _TopItemsList(items: s.topItems),
+                    child: _TopItemsList(
+                      items: s.topItems,
+                      onTap: (it) => _showItemSheet(context, it.name),
+                    ),
                   ),
                 ],
               );
@@ -295,8 +302,11 @@ class _LegendDot extends StatelessWidget {
 }
 
 class _MerchantList extends StatelessWidget {
-  const _MerchantList({required this.merchants});
+  const _MerchantList({required this.merchants, this.onTap});
   final List<MerchantSpending> merchants;
+
+  /// Klik na prodavca (drill-down). Null → red nije interaktivan.
+  final void Function(MerchantSpending)? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -309,29 +319,32 @@ class _MerchantList extends StatelessWidget {
     return Column(
       children: [
         for (final m in top)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(child: Text(m.merchantName)),
-                    Text(MoneyFormat.fromMinor(m.totalMinor),
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    value: maxV == 0 ? 0 : m.totalMinor / maxV,
-                    minHeight: 6,
-                    backgroundColor: scheme.surfaceContainerHighest,
+          InkWell(
+            onTap: onTap == null ? null : () => onTap!(m),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(child: Text(m.merchantName)),
+                      Text(MoneyFormat.fromMinor(m.totalMinor),
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 2),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: maxV == 0 ? 0 : m.totalMinor / maxV,
+                      minHeight: 6,
+                      backgroundColor: scheme.surfaceContainerHighest,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
       ],
@@ -340,8 +353,11 @@ class _MerchantList extends StatelessWidget {
 }
 
 class _TopItemsList extends StatelessWidget {
-  const _TopItemsList({required this.items});
+  const _TopItemsList({required this.items, this.onTap});
   final List<TopItem> items;
+
+  /// Klik na artikal (drill-down). Null → red nije interaktivan.
+  final void Function(TopItem)? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -352,12 +368,229 @@ class _TopItemsList extends StatelessWidget {
           ListTile(
             dense: true,
             contentPadding: EdgeInsets.zero,
+            onTap: onTap == null ? null : () => onTap!(it),
             title: Text(it.name),
             subtitle: Text('×${it.count}'),
             trailing: Text(MoneyFormat.fromMinor(it.totalMinor),
                 style: const TextStyle(fontWeight: FontWeight.bold)),
           ),
       ],
+    );
+  }
+}
+
+// --- Drill-down (bottom sheet) ---
+
+void _showMerchantSheet(BuildContext context, int merchantId, String name) {
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder: (_) => _MerchantDetailSheet(merchantId: merchantId, name: name),
+  );
+}
+
+void _showItemSheet(BuildContext context, String name) {
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder: (_) => _ItemDetailSheet(name: name),
+  );
+}
+
+/// Zajednički okvir za drill-down sheet: naslov + skrolabilan sadržaj,
+/// ograničen na 85% visine ekrana.
+class _SheetScaffold extends StatelessWidget {
+  const _SheetScaffold({required this.title, required this.child});
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: ConstrainedBox(
+        constraints:
+            BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.85),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 12),
+              child,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatTile extends StatelessWidget {
+  const _StatTile({required this.label, required this.value});
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(value,
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.bold)),
+        Text(label, style: Theme.of(context).textTheme.bodySmall),
+      ],
+    );
+  }
+}
+
+class _MerchantDetailSheet extends ConsumerWidget {
+  const _MerchantDetailSheet({required this.merchantId, required this.name});
+  final int merchantId;
+  final String name;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final async = ref.watch(merchantDetailProvider(merchantId));
+    return _SheetScaffold(
+      title: name,
+      child: async.when(
+        loading: () => const Padding(
+            padding: EdgeInsets.all(24),
+            child: Center(child: CircularProgressIndicator())),
+        error: (e, _) => Text('${l10n.errGeneric}\n$e'),
+        data: (d) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                    child: _StatTile(
+                        label: l10n.analyticsTotalSpent,
+                        value: MoneyFormat.fromMinor(d.totalMinor))),
+                Expanded(
+                    child: _StatTile(
+                        label: l10n.analyticsAverage,
+                        value: MoneyFormat.fromMinor(d.averageMinor))),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(l10n.analyticsReceiptCount(d.receiptCount),
+                style: Theme.of(context).textTheme.bodySmall),
+            const SizedBox(height: 16),
+            if (d.monthly.isNotEmpty) ...[
+              _Section(
+                title: l10n.analyticsByMonth,
+                child: _MonthlyChart(monthly: d.monthly),
+              ),
+            ],
+            if (d.topItems.isNotEmpty)
+              _Section(
+                title: l10n.analyticsTopItems,
+                child: _TopItemsList(
+                  items: d.topItems,
+                  onTap: (it) => _showItemSheet(context, it.name),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ItemDetailSheet extends ConsumerWidget {
+  const _ItemDetailSheet({required this.name});
+  final String name;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final async = ref.watch(itemDetailProvider(name));
+    return _SheetScaffold(
+      title: name,
+      child: async.when(
+        loading: () => const Padding(
+            padding: EdgeInsets.all(24),
+            child: Center(child: CircularProgressIndicator())),
+        error: (e, _) => Text('${l10n.errGeneric}\n$e'),
+        data: (d) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                    child: _StatTile(
+                        label: l10n.analyticsQuantity,
+                        value: _formatQty(d.totalQuantity))),
+                Expanded(
+                    child: _StatTile(
+                        label: l10n.analyticsTotalSpent,
+                        value: MoneyFormat.fromMinor(d.totalMinor))),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(l10n.analyticsPurchaseCount(d.purchaseCount),
+                style: Theme.of(context).textTheme.bodySmall),
+            const SizedBox(height: 16),
+            if (d.priceHistory.length >= 2)
+              _Section(
+                title: l10n.analyticsPriceHistory,
+                child: _PriceHistoryChart(points: d.priceHistory),
+              ),
+            if (d.byMerchant.isNotEmpty)
+              _Section(
+                title: l10n.analyticsWhereBought,
+                child: _MerchantList(
+                  merchants: d.byMerchant,
+                  onTap: (m) =>
+                      _showMerchantSheet(context, m.merchantId, m.merchantName),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static String _formatQty(double q) =>
+      q == q.roundToDouble() ? q.toInt().toString() : q.toStringAsFixed(2);
+}
+
+class _PriceHistoryChart extends StatelessWidget {
+  const _PriceHistoryChart({required this.points});
+  final List<PricePoint> points;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return SizedBox(
+      height: 160,
+      child: LineChart(
+        LineChartData(
+          lineBarsData: [
+            LineChartBarData(
+              spots: [
+                for (var i = 0; i < points.length; i++)
+                  FlSpot(i.toDouble(), points[i].unitPriceMinor / 100.0),
+              ],
+              isCurved: false,
+              color: scheme.primary,
+              barWidth: 2,
+              dotData: const FlDotData(show: true),
+            ),
+          ],
+          titlesData: const FlTitlesData(show: false),
+          gridData: const FlGridData(show: false),
+          borderData: FlBorderData(show: false),
+        ),
+      ),
     );
   }
 }

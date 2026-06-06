@@ -70,6 +70,106 @@ class AnalyticsRepository {
     );
   }
 
+  /// Detalji za jednog prodavca: zbir/broj računa, mesečni trend i top artikli.
+  Future<MerchantDetail> merchantDetail(
+    int merchantId,
+    AnalyticsRange range, {
+    DateTime? now,
+  }) async {
+    final since = _since(range, now ?? DateTime.now());
+    final r = _db.receipts;
+    final m = _db.merchants;
+    final byMerchantFilter = _validAnd(since) & r.merchantId.equals(merchantId);
+
+    // Naziv + zbir + broj računa.
+    final total = r.totalAmount.sum();
+    final cnt = r.id.count();
+    final aggQ = _db.selectOnly(r).join([
+      innerJoin(m, m.id.equalsExp(r.merchantId)),
+    ])
+      ..addColumns([m.name, total, cnt])
+      ..where(byMerchantFilter)
+      ..groupBy([m.id]);
+    final aggRow = await aggQ.getSingleOrNull();
+
+    return MerchantDetail(
+      merchantName: aggRow?.read(m.name) ?? '',
+      totalMinor: aggRow?.read(total) ?? 0,
+      receiptCount: aggRow?.read(cnt) ?? 0,
+      monthly: await _monthly(since, merchantId: merchantId),
+      topItems: await _topItems(since, merchantId: merchantId),
+    );
+  }
+
+  /// Detalji za jedan artikal (po nazivu): zbir/količina/broj, istorija cene i
+  /// raspodela po prodavcima.
+  Future<ItemDetail> itemDetail(
+    String name,
+    AnalyticsRange range, {
+    DateTime? now,
+  }) async {
+    final since = _since(range, now ?? DateTime.now());
+    final r = _db.receipts;
+    final li = _db.lineItems;
+    final m = _db.merchants;
+    final itemFilter =
+        _validAnd(since) & li.isUnparsed.equals(false) & li.name.equals(name);
+
+    // Agregat: ukupan iznos, broj kupovina (stavki), ukupna količina.
+    final total = li.total.sum();
+    final cnt = li.id.count();
+    final qty = li.quantity.sum();
+    final aggQ = _db.selectOnly(li).join([
+      innerJoin(r, r.id.equalsExp(li.receiptId)),
+    ])
+      ..addColumns([total, cnt, qty])
+      ..where(itemFilter);
+    final aggRow = await aggQ.getSingleOrNull();
+
+    // Istorija jedinične cene po vremenu računa.
+    final historyQ = _db.selectOnly(li).join([
+      innerJoin(r, r.id.equalsExp(li.receiptId)),
+    ])
+      ..addColumns([r.pfrTime, li.unitPrice])
+      ..where(itemFilter & r.pfrTime.isNotNull())
+      ..orderBy([OrderingTerm(expression: r.pfrTime)]);
+    final history = (await historyQ.get())
+        .map((row) => PricePoint(
+              date: row.read(r.pfrTime)!,
+              unitPriceMinor: row.read(li.unitPrice) ?? 0,
+            ))
+        .toList();
+
+    // Raspodela po prodavcima.
+    final mTotal = li.total.sum();
+    final mCnt = li.id.count();
+    final byMerchantQ = _db.selectOnly(li).join([
+      innerJoin(r, r.id.equalsExp(li.receiptId)),
+      innerJoin(m, m.id.equalsExp(r.merchantId)),
+    ])
+      ..addColumns([m.id, m.name, mTotal, mCnt])
+      ..where(itemFilter)
+      ..groupBy([m.id])
+      ..orderBy([OrderingTerm(expression: mTotal, mode: OrderingMode.desc)]);
+    final byMerchant = (await byMerchantQ.get())
+        .map((row) => MerchantSpending(
+              merchantId: row.read(m.id) ?? 0,
+              merchantName: row.read(m.name) ?? '',
+              totalMinor: row.read(mTotal) ?? 0,
+              receiptCount: row.read(mCnt) ?? 0,
+            ))
+        .toList();
+
+    return ItemDetail(
+      name: name,
+      totalMinor: aggRow?.read(total) ?? 0,
+      purchaseCount: aggRow?.read(cnt) ?? 0,
+      totalQuantity: aggRow?.read(qty) ?? 0,
+      priceHistory: history,
+      byMerchant: byMerchant,
+    );
+  }
+
   /// Zajednički filter: validni računi (+ opciono period po pfr_time/created_at).
   Expression<bool> _validAnd(DateTime? since) {
     final r = _db.receipts;
@@ -82,15 +182,19 @@ class AnalyticsRepository {
     return notInvalid & inPeriod;
   }
 
-  Future<List<MonthlySpending>> _monthly(DateTime? since) async {
+  Future<List<MonthlySpending>> _monthly(DateTime? since,
+      {int? merchantId}) async {
     final r = _db.receipts;
     final ym = r.pfrTime.strftime('%Y-%m');
     final total = r.totalAmount.sum();
     final cnt = r.id.count();
 
+    var filter = _validAnd(since) & r.pfrTime.isNotNull();
+    if (merchantId != null) filter = filter & r.merchantId.equals(merchantId);
+
     final q = _db.selectOnly(r)
       ..addColumns([ym, total, cnt])
-      ..where(_validAnd(since) & r.pfrTime.isNotNull())
+      ..where(filter)
       ..groupBy([ym])
       ..orderBy([OrderingTerm(expression: ym)]);
 
@@ -156,17 +260,21 @@ class AnalyticsRepository {
     return BusinessSplit(businessMinor: business, personalMinor: personal);
   }
 
-  Future<List<TopItem>> _topItems(DateTime? since, {int limit = 10}) async {
+  Future<List<TopItem>> _topItems(DateTime? since,
+      {int limit = 10, int? merchantId}) async {
     final r = _db.receipts;
     final li = _db.lineItems;
     final total = li.total.sum();
     final cnt = li.id.count();
 
+    var filter = _validAnd(since) & li.isUnparsed.equals(false);
+    if (merchantId != null) filter = filter & r.merchantId.equals(merchantId);
+
     final q = _db.selectOnly(li).join([
       innerJoin(r, r.id.equalsExp(li.receiptId)),
     ])
       ..addColumns([li.name, total, cnt])
-      ..where(_validAnd(since) & li.isUnparsed.equals(false))
+      ..where(filter)
       ..groupBy([li.name])
       ..orderBy([OrderingTerm(expression: total, mode: OrderingMode.desc)])
       ..limit(limit);
