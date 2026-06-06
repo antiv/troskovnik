@@ -24,6 +24,41 @@ void main() {
       expect(h.merchantName, isNotEmpty);
     });
 
+    test('B2C fixture has no buyer id', () {
+      final h = parser.parse(journal);
+      expect(h.buyerId, isNull);
+    });
+
+    test('extracts buyer id (ИД купца) and keeps it out of merchant fields',
+        () {
+      const b2bJournal = '''
+============ ФИСКАЛНИ РАЧУН ============
+               100833134
+        OLIVA 1286772-Restoran OLIVA
+        "Омладинских бригада 86ј" 3"
+          БЕОГРАД (НОВИ БЕОГРАД)
+ИД купца:                    10:104318304
+Касир:                          Milica
+ЕСИР број:                       1060/1.2
+-------------ПРОМЕТ ПРОДАЈА-------------
+========================================
+Укупан износ:                  31.520,00
+Пренос на рачун:               31.520,00
+========================================
+ПФР време:          04.06.2026. 14:52:31
+ПФР број рачуна: 28AEXETL-28AEXETL-46977
+Бројач рачуна:             46929/46977ПП
+========================================
+''';
+      final h = parser.parse(b2bJournal);
+      expect(h.merchantTin, '100833134');
+      expect(h.buyerId, '10:104318304');
+      // PIB kupca ne sme da iscuri u naziv/adresu/lokaciju prodavca.
+      expect(h.merchantName, isNot(contains('купца')));
+      expect(h.address ?? '', isNot(contains('купца')));
+      expect(h.locationName ?? '', isNot(contains('купца')));
+    });
+
     test('maps tax labels to rates', () {
       final rates = parser.parseTaxRates(journal);
       expect(rates['Ђ'], 20.0);

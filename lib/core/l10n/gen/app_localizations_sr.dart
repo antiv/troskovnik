@@ -109,6 +109,9 @@ class AppLocalizationsSr extends AppLocalizations {
   String get detailMarkBusiness => 'Poslovni račun';
 
   @override
+  String get detailBuyerId => 'ID kupca';
+
+  @override
   String get detailRefreshNow => 'Osveži sada';
 
   @override
@@ -297,6 +300,23 @@ class AppLocalizationsSr extends AppLocalizations {
       'Bez kategorija — po nazivu artikla. Proširićemo kasnije.';
 
   @override
+  String get analyticsAverage => 'Prosečan račun';
+
+  @override
+  String get analyticsPriceHistory => 'Istorija cene';
+
+  @override
+  String get analyticsWhereBought => 'Gde kupuješ';
+
+  @override
+  String get analyticsQuantity => 'Ukupna količina';
+
+  @override
+  String analyticsPurchaseCount(int count) {
+    return '$count kupovina';
+  }
+
+  @override
   String get settingsTitle => 'Podešavanja';
 
   @override
@@ -450,6 +470,9 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get detailMarkBusiness => 'Пословни рачун';
+
+  @override
+  String get detailBuyerId => 'ИД купца';
 
   @override
   String get detailRefreshNow => 'Освежи сада';
@@ -638,6 +661,23 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
   @override
   String get analyticsItemsHint =>
       'Без категорија — по називу артикла. Проширићемо касније.';
+
+  @override
+  String get analyticsAverage => 'Просечан рачун';
+
+  @override
+  String get analyticsPriceHistory => 'Историја цене';
+
+  @override
+  String get analyticsWhereBought => 'Где купујеш';
+
+  @override
+  String get analyticsQuantity => 'Укупна количина';
+
+  @override
+  String analyticsPurchaseCount(int count) {
+    return '$count куповина';
+  }
 
   @override
   String get settingsTitle => 'Подешавања';

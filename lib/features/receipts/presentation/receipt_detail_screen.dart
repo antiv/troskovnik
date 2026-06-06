@@ -119,6 +119,8 @@ class _DetailBody extends ConsumerWidget {
           Text(detail.merchant.address!),
         const SizedBox(height: 4),
         Text('PIB: ${detail.merchant.tin}'),
+        if (r.buyerId != null)
+          Text('${l10n.detailBuyerId}: ${r.buyerId}'),
         if (r.pfrNumber != null) Text('${l10n.manualPfrNumber}: ${r.pfrNumber}'),
         if (r.pfrTime != null)
           Text('${l10n.manualPfrTime}: ${r.pfrTime}'),

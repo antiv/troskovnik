@@ -57,6 +57,7 @@ class ReceiptHeader {
   const ReceiptHeader({
     required this.merchantName,
     required this.merchantTin,
+    this.buyerId,
     this.locationName,
     this.address,
     this.invoiceNumber,
@@ -73,6 +74,11 @@ class ReceiptHeader {
 
   final String merchantName;
   final String merchantTin;
+
+  /// PIB/ID kupca sa fiskalnog računa ("ИД купца"), sirovo `tip:broj`
+  /// (npr. "10:104318304", gde "10" = PIB firme). Null kad nije upisan.
+  final String? buyerId;
+
   final String? locationName;
   final String? address;
 

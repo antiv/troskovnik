@@ -86,6 +86,54 @@ class AnalyticsSummary {
   bool get isEmpty => receiptCount == 0;
 }
 
+/// Detalji za jednog prodavca (drill-down iz analitike).
+class MerchantDetail {
+  const MerchantDetail({
+    required this.merchantName,
+    required this.totalMinor,
+    required this.receiptCount,
+    required this.monthly,
+    required this.topItems,
+  });
+
+  final String merchantName;
+  final int totalMinor;
+  final int receiptCount;
+  final List<MonthlySpending> monthly;
+  final List<TopItem> topItems;
+
+  /// Prosečan iznos po računu (u para).
+  int get averageMinor =>
+      receiptCount == 0 ? 0 : (totalMinor / receiptCount).round();
+}
+
+/// Jedna tačka u istoriji jedinične cene artikla.
+class PricePoint {
+  const PricePoint({required this.date, required this.unitPriceMinor});
+
+  final DateTime date;
+  final int unitPriceMinor;
+}
+
+/// Detalji za jedan artikal (po nazivu) — drill-down iz analitike.
+class ItemDetail {
+  const ItemDetail({
+    required this.name,
+    required this.totalMinor,
+    required this.purchaseCount,
+    required this.totalQuantity,
+    required this.priceHistory,
+    required this.byMerchant,
+  });
+
+  final String name;
+  final int totalMinor;
+  final int purchaseCount;
+  final double totalQuantity;
+  final List<PricePoint> priceHistory;
+  final List<MerchantSpending> byMerchant;
+}
+
 /// Opseg perioda za filtriranje analitike.
 enum AnalyticsRange {
   last3Months,

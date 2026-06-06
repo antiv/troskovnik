@@ -12,6 +12,10 @@ class JournalHeaderParser {
   const JournalHeaderParser();
 
   static final _pibLine = RegExp(r'^\s*(\d{8,9})\s*$');
+  // ИД купца (PIB/ID kupca): npr. "ИД купца:        10:104318304".
+  // Grupa 1 = tip ("10" = PIB firme), grupa 2 = broj.
+  static final _buyerId =
+      RegExp(r'ИД\s+купца\s*:?\s*(\d{1,2})\s*:\s*(\d{6,})', unicode: true);
   static final _cashier = RegExp(r'Касир\s*:?\s*(.*)$', unicode: true);
   static final _esir = RegExp(r'ЕСИР\s+број\s*:?\s*(.*)$', unicode: true);
   static final _pfrTime =
@@ -41,6 +45,7 @@ class JournalHeaderParser {
     final lines = const LineSplitter().convert(journalText);
 
     String tin = '';
+    String? buyerId;
     final nameParts = <String>[];
     String? locationName;
     String? address;
@@ -92,11 +97,17 @@ class JournalHeaderParser {
         paymentMethod = pay.group(1);
       }
 
+      final buyer = _buyerId.firstMatch(line);
+      if (buyer != null && buyerId == null) {
+        buyerId = '${buyer.group(1)}:${buyer.group(2)}';
+      }
+
       // Naziv/adresa: linije između PIB-a i "Касир", koje nisu separatori.
       if (pibIndex >= 0 &&
           i > pibIndex &&
           !_cashier.hasMatch(line) &&
           !_esir.hasMatch(line) &&
+          !_buyerId.hasMatch(line) &&
           trimmed.isNotEmpty &&
           !_isSeparator(trimmed) &&
           nameParts.length < 6 &&
@@ -120,6 +131,7 @@ class JournalHeaderParser {
     return ReceiptHeader(
       merchantName: merchantName,
       merchantTin: tin,
+      buyerId: buyerId,
       locationName: locationName,
       address: address,
       pfrNumber: pfrNumber,
