@@ -55,6 +55,86 @@ void main() {
       expect(map, {'Готовина': 20000, 'Картица': 33000});
     });
 
+    test('en-US number format + Платна картица payment', () {
+      const usJournal = '''
+============ ФИСКАЛНИ РАЧУН ============
+               100000001
+        PRODAVNICA DOO
+-------------ПРОМЕТ ПРОДАЈА-------------
+Артикли
+========================================
+Назив   Цена         Кол.         Укупно
+Banana /KG (Е)
+       189.99          1.21          229.89
+Usluga dostave /KOM (Ђ)
+       199.00          1          199.00
+----------------------------------------
+Укупан износ:                   4,600.74
+Платна картица:                 4,600.74
+========================================
+Ознака       Име      Стопа        Порез
+Е           П-ПДВ   10.00%         159.76
+Ђ           О-ПДВ   20.00%         473.90
+----------------------------------------
+Укупан износ пореза:               633.66
+========================================
+ПФР време:           04.06.2026. 01:10:23
+ПФР број рачуна: 8JS84EVT-8JS84EVT-188792
+Бројач рачуна:             183155/188792ПП
+========================================
+''';
+      final h = parser.parse(usJournal);
+      expect(h.totalAmount, 460074); // 4.600,74 RSD u para
+      expect(h.paymentMethod, 'Платна картица');
+      final pay = jsonDecode(h.paymentsJson!) as Map<String, dynamic>;
+      expect(pay, {'Платна картица': 460074});
+      // Poreske stope iz en-US formata.
+      final rates = parser.parseTaxRates(usJournal);
+      expect(rates['Е'], 10.0);
+      expect(rates['Ђ'], 20.0);
+
+      // Stavke iz en-US žurnala.
+      final items = const JournalItemParser().parse(usJournal, taxRatesByLabel: rates);
+      final banana = items.firstWhere((it) => it.name.contains('Banana'));
+      expect(banana.quantity, closeTo(1.21, 0.001));
+      expect(banana.total, 22989); // 229,89
+      expect(banana.unitPrice, 18999); // 189,99
+    });
+
+    test('all 7 official payment methods are recognized', () {
+      String journalWith(String paymentLine) => '''
+============ ФИСКАЛНИ РАЧУН ============
+               100000001
+        PRODAVNICA DOO
+-------------ПРОМЕТ ПРОДАЈА-------------
+========================================
+Укупан износ:                     100,00
+$paymentLine
+========================================
+ПФР време:           02.06.2026. 8:36:49
+ПФР број рачуна: T-T-1
+Бројач рачуна:             1/1ПП
+========================================
+''';
+      // Zvanični nazivi (Pravilnik, član 6) kako stoje u žurnalu (ćirilica).
+      final methods = <String, String>{
+        'Готовина': 'Готовина:                         100,00',
+        'Платна картица': 'Платна картица:                   100,00',
+        'Чек': 'Чек:                              100,00',
+        'Пренос на рачун': 'Пренос на рачун:                  100,00',
+        'Ваучер': 'Ваучер:                           100,00',
+        'Инстант плаћање': 'Инстант плаћање:                  100,00',
+        'Друго безготовинско плаћање':
+            'Друго безготовинско плаћање:      100,00',
+      };
+      methods.forEach((expected, line) {
+        final h = parser.parse(journalWith(line));
+        expect(h.paymentMethod, expected, reason: 'naziv: $expected');
+        final map = jsonDecode(h.paymentsJson!) as Map<String, dynamic>;
+        expect(map[expected], 10000, reason: 'iznos za: $expected');
+      });
+    });
+
     test('B2C fixture has no buyer id', () {
       final h = parser.parse(journal);
       expect(h.buyerId, isNull);

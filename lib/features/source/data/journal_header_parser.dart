@@ -25,20 +25,21 @@ class JournalHeaderParser {
   static final _counter =
       RegExp(r'Бројач\s+рачуна\s*:?\s*(\S+)', unicode: true);
   static final _totalAmount =
-      RegExp(r'Укупан\s+износ\s*:?\s*([\d.]+,\d+)', unicode: true);
+      RegExp(r'Укупан\s+износ\s*:?\s*([\d][\d.,]*)', unicode: true);
   static final _saleType = RegExp(r'ПРОМЕТ\s+ПРОДАЈА', unicode: true);
   static final _refundType = RegExp(r'ПРОМЕТ\s+РЕФУНДАЦИЈА', unicode: true);
 
-  // Red obračuna poreza: "Ђ  О-ПДВ  20,00%  21,67"
+  // Red obračuna poreza: "Ђ  О-ПДВ  20,00%  21,67" (ili en-US "20.00%  21.67").
   static final _taxRow = RegExp(
-    r'^\s*(\S{1,3})\s+(\S+)\s+([\d.]+,\d+)\s*%\s+([\d.]+,\d+)\s*$',
+    r'^\s*(\S{1,3})\s+(\S+)\s+([\d][\d.,]*)\s*%\s+([\d][\d.,]*)\s*$',
     unicode: true,
   );
 
   // Oblik plaćanja: red posle "Укупан износ" do bloka poreza, npr "Готовина: 530,00".
-  // Grupa 1 = naziv, grupa 2 = iznos (može biti više linija — kombinovano plaćanje).
+  // Grupa 1 = naziv (zvanične oznake fiskalizacije), grupa 2 = iznos (može biti
+  // više linija — kombinovano plaćanje).
   static final _payment = RegExp(
-    r'^\s*(Готовина|Картица|Чек|Пренос на рачун|Инстант плаћање|Ваучер|Друго безготовинско)\s*:\s*([\d.]+,\d+)?',
+    r'^\s*(Готовина|Платна картица|Картица|Чек|Пренос на рачун|Инстант плаћање|Ваучер|Друго безготовинско плаћање|Друго безготовинско|Друго)\s*:\s*([\d][\d.,]*)?',
     unicode: true,
   );
 
