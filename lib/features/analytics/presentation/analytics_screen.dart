@@ -276,6 +276,41 @@ class _Section extends StatelessWidget {
   }
 }
 
+/// Distinktne boje za podeljene trake i legende grafova.
+///
+/// Tema je seedovana iz jedne zelene boje, pa se `primary`/`secondary`/
+/// `tertiary` u svetloj temi stope u skoro iste zelene tonove i teško se
+/// razlikuju. Ove fiksne nijanse ostaju razdvojive u obe teme — u tamnoj se
+/// koriste svetlije nijanse radi kontrasta sa pozadinom.
+List<Color> _categoryColors(Brightness brightness) {
+  final shade = brightness == Brightness.dark ? 300 : 600;
+  return <Color>[
+    Colors.green[shade]!,
+    Colors.blue[shade]!,
+    Colors.orange[shade]!,
+    Colors.purple[shade]!,
+    Colors.teal[shade]!,
+    Colors.red[shade]!,
+  ];
+}
+
+/// Pozadina + stil teksta za tooltipove na grafovima. Default fl_chart
+/// tooltip ima slab kontrast u svetloj temi; `inverseSurface` par je čitljiv
+/// u obe teme.
+BarTouchData _barTooltip(ColorScheme scheme) => BarTouchData(
+      touchTooltipData: BarTouchTooltipData(
+        getTooltipColor: (_) => scheme.inverseSurface,
+        getTooltipItem: (group, _, rod, _) => BarTooltipItem(
+          MoneyFormat.fromDouble(rod.toY),
+          TextStyle(
+            color: scheme.onInverseSurface,
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+          ),
+        ),
+      ),
+    );
+
 class _MonthlyChart extends StatelessWidget {
   const _MonthlyChart({required this.monthly});
   final List<MonthlySpending> monthly;
@@ -296,6 +331,7 @@ class _MonthlyChart extends StatelessWidget {
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
           maxY: maxY * 1.2,
+          barTouchData: _barTooltip(scheme),
           barGroups: [
             for (var i = 0; i < monthly.length; i++)
               BarChartGroupData(x: i, barRods: [
@@ -347,7 +383,9 @@ class _BusinessSplitBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final scheme = Theme.of(context).colorScheme;
+    final palette = _categoryColors(Theme.of(context).brightness);
+    final personalColor = palette[0]; // zelena (brend)
+    final businessColor = palette[1]; // plava
     final total = split.totalMinor;
     final bizFraction = total == 0 ? 0.0 : split.businessMinor / total;
 
@@ -361,14 +399,12 @@ class _BusinessSplitBar extends StatelessWidget {
               if (bizFraction > 0)
                 Expanded(
                   flex: (bizFraction * 1000).round(),
-                  child:
-                      Container(height: 20, color: scheme.tertiary),
+                  child: Container(height: 20, color: businessColor),
                 ),
               if (bizFraction < 1)
                 Expanded(
                   flex: ((1 - bizFraction) * 1000).round(),
-                  child:
-                      Container(height: 20, color: scheme.primary),
+                  child: Container(height: 20, color: personalColor),
                 ),
             ],
           ),
@@ -378,11 +414,11 @@ class _BusinessSplitBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _LegendDot(
-                color: scheme.tertiary,
+                color: businessColor,
                 label:
                     '${l10n.analyticsBusiness}: ${MoneyFormat.fromMinor(split.businessMinor)}'),
             _LegendDot(
-                color: scheme.primary,
+                color: personalColor,
                 label:
                     '${l10n.analyticsPersonal}: ${MoneyFormat.fromMinor(split.personalMinor)}'),
           ],
@@ -412,25 +448,6 @@ class _PaymentSplitBar extends StatelessWidget {
   const _PaymentSplitBar({required this.items});
   final List<PaymentMethodSpending> items;
 
-  static const _palette = <int>[0, 1, 2, 3, 4, 5];
-
-  Color _color(ColorScheme s, int i) {
-    switch (_palette[i % _palette.length]) {
-      case 0:
-        return s.primary;
-      case 1:
-        return s.tertiary;
-      case 2:
-        return s.secondary;
-      case 3:
-        return s.error;
-      case 4:
-        return s.primaryContainer;
-      default:
-        return s.tertiaryContainer;
-    }
-  }
-
   String _label(BuildContext context, String method) =>
       method == AnalyticsRepository.paymentUnknownKey
           ? AppLocalizations.of(context).analyticsPaymentUnknown
@@ -438,7 +455,8 @@ class _PaymentSplitBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final palette = _categoryColors(Theme.of(context).brightness);
+    Color colorFor(int i) => palette[i % palette.length];
     final total = items.fold<int>(0, (a, e) => a + e.totalMinor);
     if (total <= 0) return const SizedBox.shrink();
 
@@ -454,7 +472,7 @@ class _PaymentSplitBar extends StatelessWidget {
                   flex: (items[i].totalMinor / total * 1000)
                       .round()
                       .clamp(1, 1000000),
-                  child: Container(height: 20, color: _color(scheme, i)),
+                  child: Container(height: 20, color: colorFor(i)),
                 ),
             ],
           ),
@@ -466,7 +484,7 @@ class _PaymentSplitBar extends StatelessWidget {
           children: [
             for (var i = 0; i < items.length; i++)
               _LegendDot(
-                color: _color(scheme, i),
+                color: colorFor(i),
                 label:
                     '${_label(context, items[i].method)}: ${MoneyFormat.fromMinor(items[i].totalMinor)}',
               ),
@@ -750,6 +768,22 @@ class _PriceHistoryChart extends StatelessWidget {
       height: 160,
       child: LineChart(
         LineChartData(
+          lineTouchData: LineTouchData(
+            touchTooltipData: LineTouchTooltipData(
+              getTooltipColor: (_) => scheme.inverseSurface,
+              getTooltipItems: (spots) => [
+                for (final s in spots)
+                  LineTooltipItem(
+                    MoneyFormat.fromDouble(s.y),
+                    TextStyle(
+                      color: scheme.onInverseSurface,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+              ],
+            ),
+          ),
           lineBarsData: [
             LineChartBarData(
               spots: [
