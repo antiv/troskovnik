@@ -24,9 +24,10 @@ class JournalItemParser {
   static final _trailingParen =
       RegExp(r'\(([^()]*)\)\s*$', unicode: true);
 
-  // Red sa vrednostima: tri srpska broja razdvojena razmacima.
+  // Red sa vrednostima: tri broja razdvojena razmacima (srpski ili en-US
+  // format — SrNumber sam prepoznaje decimalni separator).
   static final _valuesLine = RegExp(
-    r'^\s*([\d.]+,\d+)\s+([\d.,]+)\s+([\d.]+,\d+)\s*$',
+    r'^\s*([\d][\d.,]*)\s+([\d][\d.,]*)\s+([\d][\d.,]*)\s*$',
     unicode: true,
   );
 
