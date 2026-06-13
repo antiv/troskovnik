@@ -182,6 +182,12 @@ class AppLocalizationsSr extends AppLocalizations {
       'Još nema praćenih garancija. Dodaj garanciju sa računa.';
 
   @override
+  String get warrantiesSearchHint => 'Pretraži po nazivu, prodavcu ili artiklu';
+
+  @override
+  String get searchNoResults => 'Nema rezultata.';
+
+  @override
   String get warrantyAdd => 'Dodaj garanciju';
 
   @override
@@ -213,6 +219,9 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get warrantySave => 'Sačuvaj garanciju';
+
+  @override
+  String get warrantyOpenReceipt => 'Prikaži račun';
 
   @override
   String get warrantyDelete => 'Obriši garanciju';
@@ -606,6 +615,12 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
       'Још нема праћених гаранција. Додај гаранцију са рачуна.';
 
   @override
+  String get warrantiesSearchHint => 'Претражи по називу, продавцу или артиклу';
+
+  @override
+  String get searchNoResults => 'Нема резултата.';
+
+  @override
   String get warrantyAdd => 'Додај гаранцију';
 
   @override
@@ -637,6 +652,9 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get warrantySave => 'Сачувај гаранцију';
+
+  @override
+  String get warrantyOpenReceipt => 'Прикажи рачун';
 
   @override
   String get warrantyDelete => 'Обриши гаранцију';

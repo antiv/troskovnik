@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/l10n/gen/app_localizations.dart';
+import '../../../core/widgets/clearable_search_field.dart';
 import '../../../core/widgets/image_viewer_screen.dart';
+import '../../receipts/presentation/receipt_detail_screen.dart';
 import '../data/warranty_providers.dart';
 import '../data/warranty_repository.dart';
 import '../domain/warranty_status.dart';
@@ -19,27 +21,47 @@ class WarrantyListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final listAsync = ref.watch(warrantyListProvider);
+    final listAsync = ref.watch(filteredWarrantyListProvider);
+    final search = ref.watch(warrantySearchProvider);
 
-    return listAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('${l10n.errGeneric}\n$e')),
-      data: (items) {
-        if (items.isEmpty) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Text(l10n.warrantiesEmpty, textAlign: TextAlign.center),
-            ),
-          );
-        }
-        return ListView.separated(
-          itemCount: items.length,
-          separatorBuilder: (_, _) => const Divider(height: 1),
-          itemBuilder: (context, i) =>
-              _WarrantyTile(view: items[i]),
-        );
-      },
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: ClearableSearchField(
+            hintText: l10n.warrantiesSearchHint,
+            initialText: search,
+            onChanged: (v) =>
+                ref.read(warrantySearchProvider.notifier).set(v),
+          ),
+        ),
+        Expanded(
+          child: listAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Center(child: Text('${l10n.errGeneric}\n$e')),
+            data: (items) {
+              if (items.isEmpty) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      search.trim().isEmpty
+                          ? l10n.warrantiesEmpty
+                          : l10n.searchNoResults,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              }
+              return ListView.separated(
+                itemCount: items.length,
+                separatorBuilder: (_, _) => const Divider(height: 1),
+                itemBuilder: (context, i) => _WarrantyTile(view: items[i]),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
@@ -51,6 +73,7 @@ class _WarrantyTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
     final df = DateFormat.yMMMd('sr');
     final status = view.status();
     final w = view.warranty;
@@ -81,7 +104,36 @@ class _WarrantyTile extends ConsumerWidget {
         ],
       ),
       isThreeLine: status != WarrantyStatus.expired,
-      trailing: WarrantyStatusBadge(status: status),
+      trailing: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          WarrantyStatusBadge(status: status),
+          const SizedBox(height: 2),
+          // Ulaz za prikaz povezanog računa — samo ikona, vizuelno usklađen
+          // sa bedžom statusa iznad.
+          Tooltip(
+            message: l10n.warrantyOpenReceipt,
+            child: InkWell(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => ReceiptDetailScreen(receiptId: w.receiptId),
+                ),
+              ),
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: scheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.receipt_long_outlined,
+                    size: 16, color: scheme.onSurfaceVariant),
+              ),
+            ),
+          ),
+        ],
+      ),
       // Tap → izmena u istoj formi kao unos (#4).
       onTap: () => AddWarrantySheet.show(
         context,
