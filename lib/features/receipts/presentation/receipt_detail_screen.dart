@@ -1,13 +1,17 @@
 import 'dart:convert';
 
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/db/database.dart' show LineItemRow;
+import '../../../core/db/database.dart' show LineItemRow, LineItemsCompanion;
 import '../../../core/db/enums.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/utils/money_format.dart';
+import '../../categories/data/category_providers.dart';
+import '../../categories/presentation/category_picker_sheet.dart';
+import '../../categories/presentation/category_tag.dart';
 import '../../warranties/presentation/add_warranty_sheet.dart';
 import '../data/receipt_providers.dart';
 import 'receipt_detail_controller.dart';
@@ -35,6 +39,35 @@ Future<void> _addWarranty(
   if (saved == true) {
     messenger.showSnackBar(SnackBar(content: Text(l10n.warrantyReminderInfo)));
   }
+}
+
+/// Otvara picker za dodeljivanje kategorije stavci.
+Future<void> _pickCategory(
+  BuildContext context,
+  WidgetRef ref,
+  LineItemRow item,
+) async {
+  final categoryId = await CategoryPickerSheet.show(
+    context,
+    currentCategoryId: item.categoryId,
+  );
+  final repo = await ref.read(receiptRepositoryProvider.future);
+  await (repo.db.update(repo.db.lineItems)..where((i) => i.id.equals(item.id)))
+      .write(LineItemsCompanion(
+    categoryId: Value(categoryId),
+  ));
+}
+
+/// Dodeljuje jednu kategoriju svim stavkama računa.
+Future<void> _categorizeAll(
+  BuildContext context,
+  WidgetRef ref,
+  int receiptId,
+) async {
+  final categoryId = await CategoryPickerSheet.show(context);
+  if (categoryId == null) return;
+  final catRepo = await ref.read(categoryRepositoryProvider.future);
+  await catRepo.assignToReceipt(receiptId, categoryId);
 }
 
 /// Detalj računa: zaglavlje, porez, stavke ili „u obradi" + Osveži (sekcija 7, ekran 4).
@@ -110,7 +143,7 @@ class _DetailBody extends ConsumerWidget {
       // Donji safe-area inset da poslednji red (poslovni račun) ne ostane
       // ispod Android sistemske navigacije.
       padding: EdgeInsets.fromLTRB(
-          16, 16, 16, 16 + MediaQuery.viewPaddingOf(context).bottom),
+          12, 16, 8, 16 + MediaQuery.viewPaddingOf(context).bottom),
       children: [
         // Zaglavlje
         Text(detail.merchant.name,
@@ -159,11 +192,20 @@ class _DetailBody extends ConsumerWidget {
         ],
 
         // Stavke
-        Row(
+        Text(l10n.detailItems,
+            style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 4),
+        // Akcije u Wrap-u da se preliju u novi red na uskim ekranima.
+        Wrap(
+          spacing: 8,
+          runSpacing: 4,
           children: [
-            Text(l10n.detailItems,
-                style: Theme.of(context).textTheme.titleMedium),
-            const Spacer(),
+            if (!pending && detail.items.isNotEmpty)
+              TextButton.icon(
+                icon: const Icon(Icons.local_offer_outlined, size: 18),
+                label: Text(l10n.categoryAssignAll),
+                onPressed: () => _categorizeAll(context, ref, r.id),
+              ),
             TextButton.icon(
               icon: const Icon(Icons.shield_outlined, size: 18),
               label: Text(l10n.warrantyAddForReceipt),
@@ -192,6 +234,7 @@ class _DetailBody extends ConsumerWidget {
                   purchaseDate: r.pfrTime ?? r.createdAt,
                   proofImagePath: r.imagePath,
                 ),
+                onCategoryTap: () => _pickCategory(context, ref, it),
               )),
 
         // Način plaćanja (uklj. kombinovano)
@@ -297,18 +340,20 @@ class _RefreshButtonState extends ConsumerState<_RefreshButton> {
   }
 }
 
-class _ItemTile extends StatelessWidget {
+class _ItemTile extends ConsumerWidget {
   const _ItemTile({
     required this.item,
     required this.l10n,
     required this.onAddWarranty,
+    required this.onCategoryTap,
   });
   final LineItemRow item;
   final AppLocalizations l10n;
   final VoidCallback onAddWarranty;
+  final VoidCallback onCategoryTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (item.isUnparsed) {
       return ListTile(
         dense: true,
@@ -320,12 +365,48 @@ class _ItemTile extends StatelessWidget {
     final qty = item.quantity == item.quantity.roundToDouble()
         ? item.quantity.toInt().toString()
         : item.quantity.toString();
+
+    Color? categoryColor;
+    if (item.categoryId != null) {
+      final cats = ref.watch(categoriesProvider).value;
+      final match = cats?.where((c) => c.id == item.categoryId);
+      if (match != null && match.isNotEmpty) {
+        categoryColor = parseCategoryColor(match.first.color);
+      }
+    }
+
     return ListTile(
       dense: true,
-      title: Text(item.name),
-      subtitle: Text(
-          '$qty × ${MoneyFormat.fromMinor(item.unitPrice)}'
-          '${item.taxLabel != null ? '  (${item.taxLabel})' : ''}'),
+      title: Tooltip(
+        message: item.name,
+        child: Text(item.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+      ),
+      subtitle: Row(
+        children: [
+          Flexible(
+            child: Text(
+                '$qty × ${MoneyFormat.fromMinor(item.unitPrice)}'
+                '${item.taxLabel != null ? '  (${item.taxLabel})' : ''}',
+                overflow: TextOverflow.ellipsis),
+          ),
+          const SizedBox(width: 4),
+          IconButton(
+            tooltip: l10n.categoryAssign,
+            visualDensity: VisualDensity.compact,
+            constraints: const BoxConstraints(),
+            padding: const EdgeInsets.all(4),
+            onPressed: onCategoryTap,
+            icon: Icon(
+              item.categoryId != null
+                  ? Icons.local_offer
+                  : Icons.local_offer_outlined,
+              size: 18,
+              color: categoryColor ??
+                  Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

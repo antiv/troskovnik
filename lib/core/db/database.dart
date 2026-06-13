@@ -12,7 +12,8 @@ import 'tables.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [Merchants, Receipts, LineItems, Warranties])
+@DriftDatabase(
+    tables: [Merchants, Receipts, LineItems, Warranties, Categories])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
@@ -28,13 +29,14 @@ class AppDatabase extends _$AppDatabase {
       );
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) async {
           await m.createAll();
           await _createIndexes();
+          await _seedDefaultCategories();
         },
         onUpgrade: (m, from, to) async {
           // v2: tabela garancija (warranties).
@@ -51,6 +53,11 @@ class AppDatabase extends _$AppDatabase {
           if (from < 4) {
             await m.addColumn(receipts, receipts.paymentsJson);
           }
+          // v5: kategorije stavki.
+          if (from < 5) {
+            await m.createTable(categories);
+            await _seedDefaultCategories();
+          }
         },
       );
 
@@ -64,6 +71,32 @@ class AppDatabase extends _$AppDatabase {
         'CREATE INDEX IF NOT EXISTS idx_receipts_pfr_time ON receipts(pfr_time)');
     await customStatement(
         'CREATE INDEX IF NOT EXISTS idx_warranties_expiry ON warranties(expiry_date)');
+  }
+
+  Future<void> _seedDefaultCategories() async {
+    final defaults = [
+      (name: 'Hrana', color: '#4CAF50', sort: 0),
+      (name: 'Piće', color: '#2196F3', sort: 1),
+      (name: 'Transport', color: '#FF9800', sort: 2),
+      (name: 'Stanovanje', color: '#9C27B0', sort: 3),
+      (name: 'Zdravlje', color: '#E91E63', sort: 4),
+      (name: 'Odeća', color: '#00BCD4', sort: 5),
+      (name: 'Elektronika', color: '#607D8B', sort: 6),
+      (name: 'Ostalo', color: '#795548', sort: 7),
+    ];
+    await batch((b) {
+      for (final d in defaults) {
+        b.insert(
+          categories,
+          CategoriesCompanion.insert(
+            name: d.name,
+            color: Value(d.color),
+            sortOrder: Value(d.sort),
+            isDefault: const Value(true),
+          ),
+        );
+      }
+    });
   }
 }
 

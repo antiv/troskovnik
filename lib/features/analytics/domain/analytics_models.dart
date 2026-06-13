@@ -3,6 +3,8 @@
 /// Svi iznosi su u para (1/100 RSD), kao i u ostatku baze.
 library;
 
+import '../../categories/domain/category_models.dart';
+
 /// Potrošnja u jednom kalendarskom mesecu.
 class MonthlySpending {
   const MonthlySpending({
@@ -84,6 +86,7 @@ class AnalyticsSummary {
     required this.businessSplit,
     required this.byPaymentMethod,
     required this.topItems,
+    required this.byCategory,
   });
 
   final int totalMinor;
@@ -98,6 +101,7 @@ class AnalyticsSummary {
   final BusinessSplit businessSplit;
   final List<PaymentMethodSpending> byPaymentMethod;
   final List<TopItem> topItems;
+  final List<CategorySpending> byCategory;
 
   bool get isEmpty => receiptCount == 0;
 }

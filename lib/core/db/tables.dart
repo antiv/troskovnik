@@ -152,8 +152,20 @@ class LineItems extends Table {
   BoolColumn get isUnparsed =>
       boolean().withDefault(const Constant(false))();
 
-  /// Za kasnije (AI kategorizacija) — NE koristi se sada.
-  IntColumn get categoryId => integer().nullable()();
+  /// Kategorija stavke (nullable — nepoznata kategorija).
+  IntColumn get categoryId => integer().nullable()
+      .references(Categories, #id, onDelete: KeyAction.setNull)();
+}
+
+/// Kategorije stavki (categories).
+@DataClassName('CategoryRow')
+class Categories extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text()();
+  TextColumn get color => text().nullable()();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  BoolColumn get isDefault => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 
 /// Garancije / saobraznost (warranties).

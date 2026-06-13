@@ -5,6 +5,9 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/utils/money_format.dart';
+import '../../categories/domain/category_models.dart';
+import '../../categories/presentation/categories_screen.dart';
+import '../../categories/presentation/category_tag.dart';
 import '../../export/data/export_service.dart';
 import '../../export/domain/export_range.dart';
 import '../data/analytics_providers.dart';
@@ -68,6 +71,19 @@ class AnalyticsScreen extends ConsumerWidget {
                           context, m.merchantId, m.merchantName),
                     ),
                   ),
+                  if (s.byCategory.isNotEmpty)
+                    _Section(
+                      title: l10n.analyticsByCategory,
+                      trailing: IconButton(
+                        icon: const Icon(Icons.settings_outlined, size: 20),
+                        tooltip: l10n.categoriesTitle,
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                              builder: (_) => const CategoriesScreen()),
+                        ),
+                      ),
+                      child: _CategoryList(items: s.byCategory),
+                    ),
                   _Section(
                     title: l10n.analyticsTopItems,
                     // subtitle: l10n.analyticsItemsHint,
@@ -255,19 +271,23 @@ class _TotalCard extends StatelessWidget {
 }
 
 class _Section extends StatelessWidget {
-  const _Section({required this.title, this.subtitle, required this.child});
+  const _Section({required this.title, required this.child, this.trailing});
   final String title;
-  final String? subtitle;
   final Widget child;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: Theme.of(context).textTheme.titleMedium),
-        if (subtitle != null)
-          Text(subtitle!, style: Theme.of(context).textTheme.bodySmall),
+        Row(
+          children: [
+            Text(title, style: Theme.of(context).textTheme.titleMedium),
+            const Spacer(),
+            ?trailing,
+          ],
+        ),
         const SizedBox(height: 8),
         child,
         const SizedBox(height: 20),
@@ -567,6 +587,57 @@ class _TopItemsList extends StatelessWidget {
             subtitle: Text('×${it.count}'),
             trailing: Text(MoneyFormat.fromMinor(it.totalMinor),
                 style: const TextStyle(fontWeight: FontWeight.bold)),
+          ),
+      ],
+    );
+  }
+}
+
+class _CategoryList extends StatelessWidget {
+  const _CategoryList({required this.items});
+  final List<CategorySpending> items;
+
+  @override
+  Widget build(BuildContext context) {
+    final top = items.take(8).toList();
+    final maxV = top.isEmpty
+        ? 1
+        : top.map((c) => c.totalMinor).reduce((a, b) => a > b ? a : b);
+    final scheme = Theme.of(context).colorScheme;
+
+    return Column(
+      children: [
+        for (final c in top)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        CategoryTag(color: c.color, size: 16),
+                        const SizedBox(width: 8),
+                        Text(c.categoryName),
+                      ],
+                    ),
+                    Text(MoneyFormat.fromMinor(c.totalMinor),
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: maxV == 0 ? 0 : c.totalMinor / maxV,
+                    minHeight: 6,
+                    backgroundColor: scheme.surfaceContainerHighest,
+                  ),
+                ),
+              ],
+            ),
           ),
       ],
     );

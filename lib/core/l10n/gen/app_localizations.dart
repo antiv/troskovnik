@@ -681,6 +681,12 @@ abstract class AppLocalizations {
   /// **'Najčešći artikli'**
   String get analyticsTopItems;
 
+  /// No description provided for @analyticsByCategory.
+  ///
+  /// In sr, this message translates to:
+  /// **'Po kategorijama'**
+  String get analyticsByCategory;
+
   /// No description provided for @analyticsEstimatedVat.
   ///
   /// In sr, this message translates to:
@@ -812,6 +818,66 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'Privatni'**
   String get receiptFilterPersonal;
+
+  /// No description provided for @categoriesTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Kategorije'**
+  String get categoriesTitle;
+
+  /// No description provided for @categoriesEmpty.
+  ///
+  /// In sr, this message translates to:
+  /// **'Još nema kategorija.'**
+  String get categoriesEmpty;
+
+  /// No description provided for @categoriesAdd.
+  ///
+  /// In sr, this message translates to:
+  /// **'Dodaj kategoriju'**
+  String get categoriesAdd;
+
+  /// No description provided for @categoriesEdit.
+  ///
+  /// In sr, this message translates to:
+  /// **'Izmeni kategoriju'**
+  String get categoriesEdit;
+
+  /// No description provided for @categoriesDelete.
+  ///
+  /// In sr, this message translates to:
+  /// **'Obriši'**
+  String get categoriesDelete;
+
+  /// No description provided for @categoriesDeleteConfirm.
+  ///
+  /// In sr, this message translates to:
+  /// **'Obrisati ovu kategoriju? Stavke će ostati bez kategorije.'**
+  String get categoriesDeleteConfirm;
+
+  /// No description provided for @categoryNone.
+  ///
+  /// In sr, this message translates to:
+  /// **'Bez kategorije'**
+  String get categoryNone;
+
+  /// No description provided for @categoryAssignAll.
+  ///
+  /// In sr, this message translates to:
+  /// **'Označi sve'**
+  String get categoryAssignAll;
+
+  /// No description provided for @categoryAssign.
+  ///
+  /// In sr, this message translates to:
+  /// **'Kategorija'**
+  String get categoryAssign;
+
+  /// No description provided for @ok.
+  ///
+  /// In sr, this message translates to:
+  /// **'U redu'**
+  String get ok;
 
   /// No description provided for @imageShare.
   ///
