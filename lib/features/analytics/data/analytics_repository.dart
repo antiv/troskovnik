@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 
 import '../../../core/db/database.dart';
 import '../../../core/db/enums.dart';
+import '../../categories/domain/category_models.dart';
 import '../domain/analytics_models.dart';
 
 /// Agregacije potrošnje nad postojećim podacima (bez kategorija — MVP).
@@ -57,6 +58,7 @@ class AnalyticsRepository {
     final byPayment = await _byPaymentMethod(since);
     final topItems = await _topItems(since);
     final vat = await _estimatedVat(since);
+    final byCategory = await _byCategory(since);
 
     final total = byMerchant.fold<int>(0, (a, m) => a + m.totalMinor);
     final receiptCount =
@@ -71,6 +73,7 @@ class AnalyticsRepository {
       businessSplit: split,
       byPaymentMethod: byPayment,
       topItems: topItems,
+      byCategory: byCategory,
     );
   }
 
@@ -345,6 +348,34 @@ class AnalyticsRepository {
               count: row.read(cnt) ?? 0,
             ))
         .toList();
+  }
+
+  Future<List<CategorySpending>> _byCategory(DateTime? since) async {
+    final li = _db.lineItems;
+    final c = _db.categories;
+    final r = _db.receipts;
+    final total = li.total.sum();
+    final cnt = li.id.count();
+
+    final q = _db.selectOnly(li).join([
+      innerJoin(r, r.id.equalsExp(li.receiptId)),
+      leftOuterJoin(c, c.id.equalsExp(li.categoryId)),
+    ])
+      ..addColumns([c.id, c.name, c.color, total, cnt])
+      ..where(_validAnd(since) & li.isUnparsed.equals(false))
+      ..groupBy([c.id]);
+
+    final rows = await q.get();
+    return rows
+        .map((row) => CategorySpending(
+              categoryId: row.read(c.id) ?? 0,
+              categoryName: row.read(c.name) ?? 'Nepoznato',
+              color: row.read(c.color),
+              totalMinor: row.read(total) ?? 0,
+              itemCount: row.read(cnt) ?? 0,
+            ))
+        .toList()
+      ..sort((a, b) => b.totalMinor.compareTo(a.totalMinor));
   }
 
   /// Procenjen PDV iz stavki koje imaju poresku stopu:

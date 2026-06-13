@@ -316,6 +316,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get analyticsTopItems => 'Most frequent items';
 
   @override
+  String get analyticsByCategory => 'By category';
+
+  @override
   String get analyticsEstimatedVat => 'Estimated VAT';
 
   @override
@@ -386,6 +389,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get receiptFilterPersonal => 'Personal';
+
+  @override
+  String get categoriesTitle => 'Categories';
+
+  @override
+  String get categoriesEmpty => 'No categories yet.';
+
+  @override
+  String get categoriesAdd => 'Add category';
+
+  @override
+  String get categoriesEdit => 'Edit category';
+
+  @override
+  String get categoriesDelete => 'Delete';
+
+  @override
+  String get categoriesDeleteConfirm =>
+      'Delete this category? Items will become uncategorized.';
+
+  @override
+  String get categoryNone => 'Uncategorized';
+
+  @override
+  String get categoryAssignAll => 'Categorize all';
+
+  @override
+  String get categoryAssign => 'Category';
+
+  @override
+  String get ok => 'OK';
 
   @override
   String get imageShare => 'Share';

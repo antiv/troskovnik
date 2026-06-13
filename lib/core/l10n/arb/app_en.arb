@@ -113,6 +113,7 @@
   "analyticsBusiness": "Business",
   "analyticsPersonal": "Personal",
   "analyticsTopItems": "Most frequent items",
+  "analyticsByCategory": "By category",
   "analyticsEstimatedVat": "Estimated VAT",
   "analyticsVatHint": "Estimated from items with a tax rate; excludes receipts without itemized lines.",
   "analyticsItemsHint": "No categories yet — by item name. To be expanded later.",
@@ -138,6 +139,18 @@
   "receiptFilterAll": "All",
   "receiptFilterBusiness": "Business",
   "receiptFilterPersonal": "Personal",
+
+  "categoriesTitle": "Categories",
+  "categoriesEmpty": "No categories yet.",
+  "categoriesAdd": "Add category",
+  "categoriesEdit": "Edit category",
+  "categoriesDelete": "Delete",
+  "categoriesDeleteConfirm": "Delete this category? Items will become uncategorized.",
+  "categoryNone": "Uncategorized",
+  "categoryAssignAll": "Categorize all",
+  "categoryAssign": "Category",
+
+  "ok": "OK",
 
   "imageShare": "Share",
   "imageMissing": "Image not found."

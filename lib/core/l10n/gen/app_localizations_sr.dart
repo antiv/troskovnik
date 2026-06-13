@@ -316,6 +316,9 @@ class AppLocalizationsSr extends AppLocalizations {
   String get analyticsTopItems => 'Najčešći artikli';
 
   @override
+  String get analyticsByCategory => 'Po kategorijama';
+
+  @override
   String get analyticsEstimatedVat => 'Procenjen PDV';
 
   @override
@@ -386,6 +389,37 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get receiptFilterPersonal => 'Privatni';
+
+  @override
+  String get categoriesTitle => 'Kategorije';
+
+  @override
+  String get categoriesEmpty => 'Još nema kategorija.';
+
+  @override
+  String get categoriesAdd => 'Dodaj kategoriju';
+
+  @override
+  String get categoriesEdit => 'Izmeni kategoriju';
+
+  @override
+  String get categoriesDelete => 'Obriši';
+
+  @override
+  String get categoriesDeleteConfirm =>
+      'Obrisati ovu kategoriju? Stavke će ostati bez kategorije.';
+
+  @override
+  String get categoryNone => 'Bez kategorije';
+
+  @override
+  String get categoryAssignAll => 'Označi sve';
+
+  @override
+  String get categoryAssign => 'Kategorija';
+
+  @override
+  String get ok => 'U redu';
 
   @override
   String get imageShare => 'Podeli';
@@ -706,6 +740,9 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
   String get analyticsTopItems => 'Најчешћи артикли';
 
   @override
+  String get analyticsByCategory => 'По категоријама';
+
+  @override
   String get analyticsEstimatedVat => 'Процењен ПДВ';
 
   @override
@@ -776,6 +813,37 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get receiptFilterPersonal => 'Приватни';
+
+  @override
+  String get categoriesTitle => 'Категорије';
+
+  @override
+  String get categoriesEmpty => 'Још нема категорија.';
+
+  @override
+  String get categoriesAdd => 'Додај категорију';
+
+  @override
+  String get categoriesEdit => 'Измени категорију';
+
+  @override
+  String get categoriesDelete => 'Обриши';
+
+  @override
+  String get categoriesDeleteConfirm =>
+      'Обрисати ову категорију? Савке ће остати без категорије.';
+
+  @override
+  String get categoryNone => 'Без категорије';
+
+  @override
+  String get categoryAssignAll => 'Означи све';
+
+  @override
+  String get categoryAssign => 'Категорија';
+
+  @override
+  String get ok => 'У реду';
 
   @override
   String get imageShare => 'Подели';

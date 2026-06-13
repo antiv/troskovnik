@@ -113,6 +113,7 @@
   "analyticsBusiness": "Пословно",
   "analyticsPersonal": "Лично",
   "analyticsTopItems": "Најчешћи артикли",
+  "analyticsByCategory": "По категоријама",
   "analyticsEstimatedVat": "Процењен ПДВ",
   "analyticsVatHint": "Процена из ставки са пореском стопом; не укључује рачуне без издвојених ставки.",
   "analyticsItemsHint": "Без категорија — по називу артикла. Проширићемо касније.",
@@ -138,6 +139,18 @@
   "receiptFilterAll": "Сви",
   "receiptFilterBusiness": "Пословни",
   "receiptFilterPersonal": "Приватни",
+
+  "categoriesTitle": "Категорије",
+  "categoriesEmpty": "Још нема категорија.",
+  "categoriesAdd": "Додај категорију",
+  "categoriesEdit": "Измени категорију",
+  "categoriesDelete": "Обриши",
+  "categoriesDeleteConfirm": "Обрисати ову категорију? Савке ће остати без категорије.",
+  "categoryNone": "Без категорије",
+  "categoryAssignAll": "Означи све",
+  "categoryAssign": "Категорија",
+
+  "ok": "У реду",
 
   "imageShare": "Подели",
   "imageMissing": "Слика није пронађена."
