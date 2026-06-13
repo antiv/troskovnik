@@ -429,6 +429,18 @@ abstract class AppLocalizations {
   /// **'Još nema praćenih garancija. Dodaj garanciju sa računa.'**
   String get warrantiesEmpty;
 
+  /// No description provided for @warrantiesSearchHint.
+  ///
+  /// In sr, this message translates to:
+  /// **'Pretraži po nazivu, prodavcu ili artiklu'**
+  String get warrantiesSearchHint;
+
+  /// No description provided for @searchNoResults.
+  ///
+  /// In sr, this message translates to:
+  /// **'Nema rezultata.'**
+  String get searchNoResults;
+
   /// No description provided for @warrantyAdd.
   ///
   /// In sr, this message translates to:
@@ -494,6 +506,12 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'Sačuvaj garanciju'**
   String get warrantySave;
+
+  /// No description provided for @warrantyOpenReceipt.
+  ///
+  /// In sr, this message translates to:
+  /// **'Prikaži račun'**
+  String get warrantyOpenReceipt;
 
   /// No description provided for @warrantyDelete.
   ///

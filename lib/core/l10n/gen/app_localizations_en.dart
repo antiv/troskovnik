@@ -183,6 +183,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'No tracked warranties yet. Add one from a receipt.';
 
   @override
+  String get warrantiesSearchHint => 'Search by name, merchant or item';
+
+  @override
+  String get searchNoResults => 'No results.';
+
+  @override
   String get warrantyAdd => 'Add warranty';
 
   @override
@@ -214,6 +220,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get warrantySave => 'Save warranty';
+
+  @override
+  String get warrantyOpenReceipt => 'Open receipt';
 
   @override
   String get warrantyDelete => 'Delete warranty';

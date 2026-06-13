@@ -24,3 +24,31 @@ final warrantyListProvider =
   final repo = await ref.watch(warrantyRepositoryProvider.future);
   yield* repo.watchAll();
 });
+
+/// Pojam pretrage garancija (po nazivu, prodavcu ili artiklu).
+class WarrantySearchNotifier extends Notifier<String> {
+  @override
+  String build() => '';
+
+  void set(String search) => state = search;
+}
+
+final warrantySearchProvider =
+    NotifierProvider<WarrantySearchNotifier, String>(WarrantySearchNotifier.new);
+
+/// Lista garancija filtrirana po [warrantySearchProvider]. Filtrira se u Dart-u
+/// nad već učitanom listom (mali broj garancija po korisniku).
+final filteredWarrantyListProvider =
+    Provider<AsyncValue<List<WarrantyView>>>((ref) {
+  final listAsync = ref.watch(warrantyListProvider);
+  final term = ref.watch(warrantySearchProvider).trim().toLowerCase();
+  return listAsync.whenData((items) {
+    if (term.isEmpty) return items;
+    return items
+        .where((v) =>
+            v.warranty.title.toLowerCase().contains(term) ||
+            v.merchantName.toLowerCase().contains(term) ||
+            (v.lineItemName?.toLowerCase().contains(term) ?? false))
+        .toList();
+  });
+});

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/utils/money_format.dart';
+import '../../../core/widgets/clearable_search_field.dart';
 import '../data/receipt_providers.dart';
 import 'receipt_detail_screen.dart';
 import 'receipt_list_controller.dart';
@@ -25,13 +26,9 @@ class ReceiptListScreen extends ConsumerWidget {
           child: Row(
             children: [
               Expanded(
-                child: TextField(
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.search),
-                    hintText: l10n.receiptsSearchHint,
-                    isDense: true,
-                    border: const OutlineInputBorder(),
-                  ),
+                child: ClearableSearchField(
+                  hintText: l10n.receiptsSearchHint,
+                  initialText: query.search,
                   onChanged: (v) =>
                       ref.read(receiptQueryProvider.notifier).setSearch(v),
                 ),
