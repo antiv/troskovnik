@@ -63,6 +63,11 @@ android {
             // a rizik veliki. proguard-rules.pro zadržan za eventualno kasnije.
             isMinifyEnabled = false
             isShrinkResources = false
+            // Upakuj native debug simbole (libflutter.so, libapp.so, SQLCipher…)
+            // u AAB radi čitljivih native crash-eva u Play Console-u.
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
         }
     }
 }
