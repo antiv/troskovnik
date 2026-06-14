@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "Expense Tracker",
+  "appTitle": "Troškovnik",
 
   "navScan": "Scan",
   "navReceipts": "Receipts",
@@ -133,6 +133,11 @@
   "languageSerbianCyrillic": "Serbian (Cyrillic)",
   "languageSerbianLatin": "Serbian (Latin)",
   "languageEnglish": "English",
+
+  "aboutTitle": "About",
+  "aboutVersionLabel": "VERSION",
+  "aboutPoweredBy": "POWERED BY",
+  "aboutClose": "Close",
 
   "detailProof": "Proof",
   "detailProofHint": "The receipt is kept as proof (journal + official Tax Administration link).",

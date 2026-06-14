@@ -374,6 +374,18 @@ class AppLocalizationsSr extends AppLocalizations {
   String get languageEnglish => 'English';
 
   @override
+  String get aboutTitle => 'O aplikaciji';
+
+  @override
+  String get aboutVersionLabel => 'VERZIJA';
+
+  @override
+  String get aboutPoweredBy => 'POWERED BY';
+
+  @override
+  String get aboutClose => 'Zatvori';
+
+  @override
   String get detailProof => 'Dokaz';
 
   @override
@@ -805,6 +817,18 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get languageEnglish => 'English';
+
+  @override
+  String get aboutTitle => 'О апликацији';
+
+  @override
+  String get aboutVersionLabel => 'ВЕРЗИЈА';
+
+  @override
+  String get aboutPoweredBy => 'POWERED BY';
+
+  @override
+  String get aboutClose => 'Затвори';
 
   @override
   String get detailProof => 'Доказ';
