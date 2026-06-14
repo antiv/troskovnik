@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/l10n/gen/app_localizations.dart';
 import '../../core/l10n/locale_controller.dart';
+import '../about/about_app_dialog.dart';
 import '../analytics/presentation/analytics_screen.dart';
 import '../receipts/presentation/receipt_list_screen.dart';
 import '../scan/presentation/scanner_screen.dart';
-import '../settings/settings_screen.dart';
 import '../warranties/presentation/warranty_list_screen.dart';
 
 /// Glavni shell sa donjom navigacijom: Skener / Računi / Garancije / Analitika.
@@ -32,21 +32,59 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       l10n.analyticsTitle,
     ];
 
+    String label(AppLanguage lang) => switch (lang) {
+          AppLanguage.system => l10n.languageSystem,
+          AppLanguage.serbianCyrillic => l10n.languageSerbianCyrillic,
+          AppLanguage.serbianLatin => l10n.languageSerbianLatin,
+          AppLanguage.english => l10n.languageEnglish,
+        };
+
     return Scaffold(
       appBar: AppBar(
         title: Text(titles[_index]),
         actions: [
-          // Indikator jezika (zastavica + skraćenica) → otvara podešavanja (#6).
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: TextButton(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                    builder: (_) => const SettingsScreen()),
+          // Izbor jezika (zastavica + skraćenica) → dropdown sa svim jezicima.
+          PopupMenuButton<AppLanguage>(
+            tooltip: l10n.languageSystem,
+            onSelected: (v) =>
+                ref.read(localeControllerProvider.notifier).setLanguage(v),
+            itemBuilder: (context) => [
+              for (final lang in AppLanguage.values)
+                PopupMenuItem<AppLanguage>(
+                  value: lang,
+                  child: Row(
+                    children: [
+                      Text(lang.flag),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(label(lang))),
+                      if (lang == language)
+                        const Icon(Icons.check, size: 18),
+                    ],
+                  ),
+                ),
+            ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Center(
+                child: Text('${language.flag} ${language.shortCode}',
+                    style: const TextStyle(fontSize: 14)),
               ),
-              child: Text('${language.flag} ${language.shortCode}',
-                  style: const TextStyle(fontSize: 14)),
             ),
+          ),
+          // Overflow meni: O aplikaciji.
+          PopupMenuButton<void>(
+            itemBuilder: (context) => [
+              PopupMenuItem<void>(
+                onTap: () => AboutAppDialog.show(context),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, size: 20),
+                    const SizedBox(width: 12),
+                    Text(l10n.aboutTitle),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),

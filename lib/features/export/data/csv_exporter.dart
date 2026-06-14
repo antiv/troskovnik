@@ -18,6 +18,7 @@ class CsvExporter {
     'tip',
     'nacin_placanja',
     'artikal',
+    'kategorija',
     'kolicina',
     'jedinica',
     'jedinicna_cena',

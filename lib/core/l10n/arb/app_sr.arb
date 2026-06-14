@@ -135,6 +135,11 @@
   "languageSerbianLatin": "Srpski (latinica)",
   "languageEnglish": "English",
 
+  "aboutTitle": "O aplikaciji",
+  "aboutVersionLabel": "VERZIJA",
+  "aboutPoweredBy": "POWERED BY",
+  "aboutClose": "Zatvori",
+
   "detailProof": "Dokaz",
   "detailProofHint": "Račun je sačuvan kao dokaz (žurnal + zvanični link Poreske).",
   "detailOpenOnSuf": "Otvori na suf.purs.gov.rs",

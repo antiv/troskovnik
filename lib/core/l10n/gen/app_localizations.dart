@@ -789,6 +789,30 @@ abstract class AppLocalizations {
   /// **'English'**
   String get languageEnglish;
 
+  /// No description provided for @aboutTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'O aplikaciji'**
+  String get aboutTitle;
+
+  /// No description provided for @aboutVersionLabel.
+  ///
+  /// In sr, this message translates to:
+  /// **'VERZIJA'**
+  String get aboutVersionLabel;
+
+  /// No description provided for @aboutPoweredBy.
+  ///
+  /// In sr, this message translates to:
+  /// **'POWERED BY'**
+  String get aboutPoweredBy;
+
+  /// No description provided for @aboutClose.
+  ///
+  /// In sr, this message translates to:
+  /// **'Zatvori'**
+  String get aboutClose;
+
   /// No description provided for @detailProof.
   ///
   /// In sr, this message translates to:

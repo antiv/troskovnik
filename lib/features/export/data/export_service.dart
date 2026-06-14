@@ -77,6 +77,10 @@ class ExportService {
       (itemsByReceipt[it.receiptId] ??= []).add(it);
     }
 
+    // Nazivi kategorija po id-u (za kolonu kategorija u izvozu).
+    final categories = await _db.select(_db.categories).get();
+    final categoryNameById = {for (final c in categories) c.id: c.name};
+
     final rows = <List<String>>[];
     for (final rec in receipts) {
       final merchant = merchantsById[rec.id];
@@ -84,11 +88,11 @@ class ExportService {
       final recItems = itemsByReceipt[rec.id] ?? const [];
       if (recItems.isEmpty) {
         // Račun bez stavki: jedan red sa praznim kolonama stavke
-        // (artikal, kolicina, jedinica, jedinicna_cena, ukupno_stavka,
-        // poreska_oznaka, poreska_stopa = 7 praznih).
+        // (artikal, kategorija, kolicina, jedinica, jedinicna_cena,
+        // ukupno_stavka, poreska_oznaka, poreska_stopa = 8 praznih).
         rows.add([
           ...base,
-          '', '', '', '', '', '', '',
+          '', '', '', '', '', '', '', '',
           _money(rec.totalAmount),
           rec.verificationUrl,
         ]);
@@ -97,6 +101,7 @@ class ExportService {
           rows.add([
             ...base,
             it.name,
+            it.categoryId == null ? '' : categoryNameById[it.categoryId] ?? '',
             _qty(it.quantity),
             it.unit ?? '',
             _money(it.unitPrice),
