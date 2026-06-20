@@ -1,3 +1,9 @@
 {
-  "dart.flutterSdkPath": ".fvm/versions/3.44.2"
+  "dart.flutterSdkPath": ".fvm/flutter_sdk",
+  "search.exclude": {
+    "**/.fvm": true
+  },
+  "files.watcherExclude": {
+    "**/.fvm": true
+  }
 }

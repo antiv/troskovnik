@@ -10,6 +10,7 @@
   "scanManualEntry": "Manual entry",
   "scanFromGallery": "From gallery",
   "scanNoQrInImage": "No readable QR code in the image",
+  "scanImageFailed": "Could not analyze the image. Try again or scan with the camera.",
   "scanBatchMode": "Scan several in a row",
   "scanNotFiscal": "This is not a fiscal receipt",
   "scanPermissionDenied": "Camera access denied. Enable it in settings.",
