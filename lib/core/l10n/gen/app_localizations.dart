@@ -147,6 +147,12 @@ abstract class AppLocalizations {
   /// **'Na slici nema čitljivog QR koda'**
   String get scanNoQrInImage;
 
+  /// No description provided for @scanImageFailed.
+  ///
+  /// In sr, this message translates to:
+  /// **'Nije moguće analizirati sliku. Pokušaj ponovo ili skeniraj kamerom.'**
+  String get scanImageFailed;
+
   /// No description provided for @scanBatchMode.
   ///
   /// In sr, this message translates to:

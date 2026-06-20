@@ -66,5 +66,27 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!-- Dozvole (mobile_scanner + image_picker). Tekst se prikazuje korisniku
+	     u sistemskom dijalogu, pa mora biti jasan i na srpskom. -->
+	<key>NSCameraUsageDescription</key>
+	<string>Kamera se koristi za skeniranje QR koda sa fiskalnog računa i fotografisanje računa.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Pristup galeriji je potreban da biste izabrali sliku računa iz svojih fotografija.</string>
+	<!-- Background re-fetch (workmanager). Identifikator MORA biti identičan
+	     BackgroundRefetch.taskName u Dart-u i registraciji u AppDelegate.swift. -->
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>troskovnik.refetch.pending</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+	</array>
+	<!-- Export compliance: aplikacija koristi samo standardnu enkripciju
+	     (SQLCipher/AES) za zaštitu lokalnih podataka korisnika, što potpada
+	     pod izuzeće, pa preskačemo upitnik na svakom uploadu. Vidi napomenu. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

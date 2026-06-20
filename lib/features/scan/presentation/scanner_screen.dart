@@ -48,7 +48,20 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     setState(() => _processing = true);
     await _controller.stop();
 
-    final capture = await _controller.analyzeImage(picked.path);
+    // analyzeImage ume da baci (npr. nije podržano na iOS simulatoru, ili
+    // neispravna slika) — bez catch-a bi UI ostao zaglavljen u _processing.
+    BarcodeCapture? capture;
+    try {
+      capture = await _controller.analyzeImage(picked.path);
+    } catch (_) {
+      if (mounted) {
+        messenger.showSnackBar(SnackBar(content: Text(l10n.scanImageFailed)));
+        setState(() => _processing = false);
+        await _controller.start();
+      }
+      return;
+    }
+
     final raw = capture?.barcodes.firstOrNull?.rawValue;
     if (raw == null || raw.isEmpty) {
       if (mounted) {

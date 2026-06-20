@@ -33,6 +33,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanNoQrInImage => 'No readable QR code in the image';
 
   @override
+  String get scanImageFailed =>
+      'Could not analyze the image. Try again or scan with the camera.';
+
+  @override
   String get scanBatchMode => 'Scan several in a row';
 
   @override

@@ -33,6 +33,10 @@ class AppLocalizationsSr extends AppLocalizations {
   String get scanNoQrInImage => 'Na slici nema čitljivog QR koda';
 
   @override
+  String get scanImageFailed =>
+      'Nije moguće analizirati sliku. Pokušaj ponovo ili skeniraj kamerom.';
+
+  @override
   String get scanBatchMode => 'Skeniraj više zaredom';
 
   @override
@@ -476,6 +480,10 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get scanNoQrInImage => 'На слици нема читљивог QR кода';
+
+  @override
+  String get scanImageFailed =>
+      'Није могуће анализирати слику. Покушај поново или скенирај камером.';
 
   @override
   String get scanBatchMode => 'Скенирај више заредом';

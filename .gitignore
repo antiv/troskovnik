@@ -67,6 +67,11 @@ android/key.properties
 **/*.keystore
 !android/key.properties.example
 
+# iOS deploy tajne (App Store Connect API ključ) — NIKAD ne commit-ovati
+ios/deploy.env
+**/*.p8
+!ios/deploy.env.example
+
 # Release artefakti iz deploy.sh (veliki binari, ne idu u git)
 /troskovnik-*.aab
 /troskovnik-*.apk

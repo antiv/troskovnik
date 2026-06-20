@@ -10,6 +10,7 @@
   "scanManualEntry": "Ручни унос",
   "scanFromGallery": "Из галерије",
   "scanNoQrInImage": "На слици нема читљивог QR кода",
+  "scanImageFailed": "Није могуће анализирати слику. Покушај поново или скенирај камером.",
   "scanBatchMode": "Скенирај више заредом",
   "scanNotFiscal": "Ово није фискални рачун",
   "scanPermissionDenied": "Приступ камери је одбијен. Омогући га у подешавањима.",
