@@ -265,10 +265,20 @@ class _DetailBody extends ConsumerWidget {
         Text(l10n.detailProofHint,
             style: Theme.of(context).textTheme.bodySmall),
         const SizedBox(height: 8),
-        OutlinedButton.icon(
-          icon: const Icon(Icons.open_in_new, size: 18),
-          label: Text(l10n.detailOpenOnSuf),
-          onPressed: () => _openOnSuf(context, r.verificationUrl),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.open_in_new, size: 18),
+                label: Text(l10n.detailOpenOnSuf),
+                onPressed: () => _openOnSuf(context, r.verificationUrl),
+              ),
+            ),
+            const SizedBox(width: 8),
+            // Ručni refresh dostupan i za već učitan račun (uz potvrdu) —
+            // ponovo povuče zaglavlje/stavke, a kategorije/garancije se čuvaju.
+            _RefreshButton(receiptId: r.id, iconOnly: true, confirm: true),
+          ],
         ),
 
         const Divider(height: 24),
@@ -298,8 +308,18 @@ class _DetailBody extends ConsumerWidget {
 }
 
 class _RefreshButton extends ConsumerStatefulWidget {
-  const _RefreshButton({required this.receiptId});
+  const _RefreshButton({
+    required this.receiptId,
+    this.iconOnly = false,
+    this.confirm = false,
+  });
   final int receiptId;
+
+  /// Prikaži kao ikonicu (za Proof sekciju) umesto punog dugmeta.
+  final bool iconOnly;
+
+  /// Traži potvrdu pre osvežavanja (za već učitan račun).
+  final bool confirm;
 
   @override
   ConsumerState<_RefreshButton> createState() => _RefreshButtonState();
@@ -311,6 +331,18 @@ class _RefreshButtonState extends ConsumerState<_RefreshButton> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    if (widget.iconOnly) {
+      return IconButton(
+        tooltip: l10n.detailRefreshTooltip,
+        onPressed: _busy ? null : _refresh,
+        icon: _busy
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2))
+            : const Icon(Icons.refresh),
+      );
+    }
     return FilledButton.icon(
       onPressed: _busy ? null : _refresh,
       icon: _busy
@@ -324,6 +356,24 @@ class _RefreshButtonState extends ConsumerState<_RefreshButton> {
   }
 
   Future<void> _refresh() async {
+    final l10nConfirm = AppLocalizations.of(context);
+    if (widget.confirm) {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          content: Text(l10nConfirm.detailRefreshConfirmBody),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text(l10nConfirm.cancel)),
+            FilledButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text(l10nConfirm.detailRefreshNow)),
+          ],
+        ),
+      );
+      if (ok != true || !mounted) return;
+    }
     setState(() => _busy = true);
     final messenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context);
