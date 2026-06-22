@@ -107,7 +107,11 @@ cat > "$EXPORT_PLIST" <<PLIST
 <dict>
   <key>method</key><string>app-store-connect</string>
   <key>teamID</key><string>${APP_STORE_TEAM_ID}</string>
-  <key>signingStyle</key><string>automatic</string>
+  <key>signingStyle</key><string>manual</string>
+  <key>provisioningProfiles</key>
+  <dict>
+    <key>rs.antonijevic.troskovnik</key><string>Troskovnik AppStore</string>
+  </dict>
   <key>destination</key><string>export</string>
   <key>uploadSymbols</key><true/>
   <key>manageAppVersionAndBuildNumber</key><false/>
@@ -131,6 +135,8 @@ xcodebuild \
   -destination 'generic/platform=iOS' \
   -archivePath "$ARCHIVE" \
   DEVELOPMENT_TEAM="$APP_STORE_TEAM_ID" \
+  CODE_SIGN_STYLE=Manual \
+  CODE_SIGN_IDENTITY="Apple Distribution" \
   "${AUTH[@]}" \
   archive
 

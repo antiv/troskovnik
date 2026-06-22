@@ -132,6 +132,13 @@ class AppLocalizationsSr extends AppLocalizations {
   String get detailItemsRefreshed => 'Stavke računa su dopunjene.';
 
   @override
+  String get detailRefreshTooltip => 'Osveži sa Poreske uprave';
+
+  @override
+  String get detailRefreshConfirmBody =>
+      'Ponovo preuzeti račun sa Poreske uprave? Postojeće kategorije i garancije se zadržavaju.';
+
+  @override
   String get detailUnparsedRow => 'Neparsiran red';
 
   @override
@@ -579,6 +586,13 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get detailItemsRefreshed => 'Ставке рачуна су допуњене.';
+
+  @override
+  String get detailRefreshTooltip => 'Освежи са Пореске управе';
+
+  @override
+  String get detailRefreshConfirmBody =>
+      'Поново преузети рачун са Пореске управе? Постојеће категорије и гаранције се задржавају.';
 
   @override
   String get detailUnparsedRow => 'Непарсиран ред';

@@ -132,6 +132,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get detailItemsRefreshed => 'Receipt items have been filled in.';
 
   @override
+  String get detailRefreshTooltip => 'Refresh from Tax Administration';
+
+  @override
+  String get detailRefreshConfirmBody =>
+      'Re-fetch this receipt from the Tax Administration? Existing categories and warranties are kept.';
+
+  @override
   String get detailUnparsedRow => 'Unparsed row';
 
   @override

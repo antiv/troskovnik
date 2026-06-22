@@ -137,11 +137,11 @@ void main() {
           now: DateTime(2026, 6, 15));
       final lines = dataLines(csv!);
       expect(lines, hasLength(1));
-      // 18 kolona; kolone stavke (9..15) prazne, iznos_racuna popunjen.
+      // 19 kolona; kolone stavke (9..16, uklj. kategorija) prazne, iznos popunjen.
       final cells = lines.first.split(',');
-      expect(cells, hasLength(18));
-      expect(cells.sublist(9, 16), everyElement(''));
-      expect(cells[16], '50.00'); // iznos_racuna
+      expect(cells, hasLength(19));
+      expect(cells.sublist(9, 17), everyElement(''));
+      expect(cells[17], '50.00'); // iznos_racuna
     });
 
     test('excludes invalid receipts and out-of-range', () async {

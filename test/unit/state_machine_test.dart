@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:troskovnik/core/db/database.dart';
@@ -256,6 +257,125 @@ void main() {
       final ok = await svc.refetchOne(id, now: t0);
       expect(ok, isFalse);
       expect(await repo.findById(id), isNotNull);
+    });
+
+    test('refetch backfills header when first saved without one (UNKNOWN)',
+        () async {
+      // Prvi upis bez žurnala: UNKNOWN prodavac, iznos 0, bez pfrTime.
+      final saved = await repo.saveParsed(
+        verificationUrl: 'https://suf.purs.gov.rs/v/?vl=U',
+        token: 'U',
+        parsed: const ParsedReceipt(
+          fetchStatus: FetchStatus.pending,
+          itemsStatus: ItemsStatus.pendingServer,
+          itemsSource: ItemsSource.none,
+        ),
+        now: t0,
+      );
+      final before = await repo.findById(saved.receiptId);
+      final unknownMerchant = await (db.select(db.merchants)
+            ..where((m) => m.id.equals(before!.merchantId)))
+          .getSingle();
+      expect(unknownMerchant.tin, 'UNKNOWN');
+      expect(before!.totalAmount, 0);
+      expect(before.pfrTime, isNull);
+
+      // Refetch dovuče žurnal sa punim zaglavljem.
+      final pfrTime = DateTime(2026, 6, 1, 18, 51);
+      final source = _FakeSource(ParsedReceipt(
+        fetchStatus: FetchStatus.complete,
+        itemsStatus: ItemsStatus.fromJournal,
+        itemsSource: ItemsSource.journal,
+        header: ReceiptHeader(
+          merchantName: 'OMV',
+          merchantTin: '999',
+          totalAmount: 550844,
+          pfrTime: pfrTime,
+          invoiceNumber: 'INV-9',
+          pfrNumber: 'PFR-9',
+        ),
+        items: const [
+          ParsedLineItem(
+              name: 'OMV EP BMB 95',
+              quantity: 28.84,
+              unitPrice: 19100,
+              total: 550844,
+              source: ItemsSource.journal),
+        ],
+      ));
+      await RefetchService(source, repo).refetchOne(saved.receiptId, now: t0);
+
+      final after = await repo.findById(saved.receiptId);
+      final merchant = await (db.select(db.merchants)
+            ..where((m) => m.id.equals(after!.merchantId)))
+          .getSingle();
+      expect(merchant.name, 'OMV');
+      expect(after!.totalAmount, 550844);
+      expect(after.pfrTime, pfrTime);
+      expect(after.pfrNumber, 'PFR-9');
+    });
+
+    test('refetch preserves item category and re-points item warranty',
+        () async {
+      // Račun sa stavkom + kategorija + garancija vezana za stavku.
+      final saved = await repo.saveParsed(
+        verificationUrl: 'https://suf.purs.gov.rs/v/?vl=C',
+        token: 'C',
+        parsed: const ParsedReceipt(
+          fetchStatus: FetchStatus.complete,
+          itemsStatus: ItemsStatus.fromJournal,
+          itemsSource: ItemsSource.journal,
+          header: ReceiptHeader(merchantName: 'Shop', merchantTin: '555'),
+          items: [
+            ParsedLineItem(
+                name: 'Mleko',
+                quantity: 1,
+                unitPrice: 9000,
+                total: 9000,
+                source: ItemsSource.journal),
+          ],
+        ),
+        now: t0,
+      );
+      final catId = await db.into(db.categories).insert(
+          CategoriesCompanion.insert(name: 'Hrana'));
+      final oldItem = (await repo.itemsFor(saved.receiptId)).single;
+      await (db.update(db.lineItems)..where((i) => i.id.equals(oldItem.id)))
+          .write(LineItemsCompanion(categoryId: Value(catId)));
+      final warrantyId = await db.into(db.warranties).insert(
+            WarrantiesCompanion.insert(
+              receiptId: saved.receiptId,
+              lineItemId: Value(oldItem.id),
+              title: 'Mleko',
+              purchaseDate: t0,
+              expiryDate: t0.add(const Duration(days: 730)),
+            ),
+          );
+
+      // Refetch sa istom stavkom (npr. specs umesto žurnala).
+      final source = _FakeSource(const ParsedReceipt(
+        fetchStatus: FetchStatus.complete,
+        itemsStatus: ItemsStatus.fromSpecifications,
+        itemsSource: ItemsSource.specifications,
+        header: ReceiptHeader(merchantName: 'Shop', merchantTin: '555'),
+        items: [
+          ParsedLineItem(
+              name: 'Mleko',
+              quantity: 1,
+              unitPrice: 9000,
+              total: 9000,
+              source: ItemsSource.specifications),
+        ],
+      ));
+      await RefetchService(source, repo).refetchOne(saved.receiptId, now: t0);
+
+      final newItem = (await repo.itemsFor(saved.receiptId)).single;
+      expect(newItem.id, isNot(oldItem.id)); // zamenjena stavka
+      expect(newItem.categoryId, catId); // kategorija očuvana
+      final warranty = await (db.select(db.warranties)
+            ..where((w) => w.id.equals(warrantyId)))
+          .getSingle();
+      expect(warranty.lineItemId, newItem.id); // garancija prepojena
     });
 
     test('processDue picks only due pendingServer receipts', () async {

@@ -333,6 +333,18 @@ abstract class AppLocalizations {
   /// **'Stavke računa su dopunjene.'**
   String get detailItemsRefreshed;
 
+  /// No description provided for @detailRefreshTooltip.
+  ///
+  /// In sr, this message translates to:
+  /// **'Osveži sa Poreske uprave'**
+  String get detailRefreshTooltip;
+
+  /// No description provided for @detailRefreshConfirmBody.
+  ///
+  /// In sr, this message translates to:
+  /// **'Ponovo preuzeti račun sa Poreske uprave? Postojeće kategorije i garancije se zadržavaju.'**
+  String get detailRefreshConfirmBody;
+
   /// No description provided for @detailUnparsedRow.
   ///
   /// In sr, this message translates to:

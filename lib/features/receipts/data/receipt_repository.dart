@@ -116,12 +116,10 @@ class ReceiptRepository {
       {DateTime? now}) async {
     final ts = now ?? DateTime.now();
     await _db.transaction(() async {
-      // Zameni stavke ako su stigle bolje.
+      // Zameni stavke ako su stigle bolje — ali zadrži korisnički unos: dodelu
+      // kategorije po stavci i garancije vezane za konkretnu stavku (lineItemId).
       if (parsed.items.isNotEmpty) {
-        await (_db.delete(_db.lineItems)
-              ..where((i) => i.receiptId.equals(receiptId)))
-            .go();
-        await _insertItems(receiptId, parsed.items);
+        await _replaceItemsPreserving(receiptId, parsed.items);
       }
 
       final currentRows = await (_db.select(_db.receipts)
@@ -136,20 +134,53 @@ class ReceiptRepository {
           ? _retryPolicy.nextRetryAt(newRetryCount, from: ts)
           : null;
 
+      final header = parsed.header;
+
       // Žurnal (sa PIB-om kupca) stiže tek na refetch-u: popuni buyerId ako
       // je još prazan. NE diramo isBusiness — auto-postavka važi samo pri prvom
       // upisu, da se poštuje eventualni ručni izbor korisnika.
-      final newBuyerId = current.buyerId ?? parsed.header?.buyerId;
-      final newPaymentMethod =
-          current.paymentMethod ?? parsed.header?.paymentMethod;
-      final newPaymentsJson =
-          current.paymentsJson ?? parsed.header?.paymentsJson;
+      final newBuyerId = current.buyerId ?? header?.buyerId;
+      final newPaymentMethod = current.paymentMethod ?? header?.paymentMethod;
+      final newPaymentsJson = current.paymentsJson ?? header?.paymentsJson;
+
+      // Backfill zaglavlja: kad je račun prvi put sačuvan bez žurnala (još nije
+      // bio proknjižen na serveru), upisan je kao UNKNOWN prodavac sa iznosom 0
+      // i bez ПФР vremena/broja računa. Sada kad je žurnal stigao, prebaci zapis
+      // na pravog prodavca i popuni polja zaglavlja — inače prodavac/iznos ostaju
+      // UNKNOWN, a prazan pfr_time gura račun na dno liste sortirane po datumu.
+      final currentMerchant = await (_db.select(_db.merchants)
+            ..where((m) => m.id.equals(current.merchantId)))
+          .getSingleOrNull();
+      final needsHeaderBackfill =
+          header != null && currentMerchant?.tin == 'UNKNOWN';
+      final newMerchantId =
+          needsHeaderBackfill ? await _upsertMerchant(header, ts) : null;
 
       await (_db.update(_db.receipts)..where((r) => r.id.equals(receiptId)))
           .write(ReceiptsCompanion(
         fetchStatus: Value(parsed.fetchStatus),
         itemsStatus: Value(parsed.itemsStatus),
         itemsSource: Value(parsed.itemsSource),
+        merchantId:
+            newMerchantId != null ? Value(newMerchantId) : const Value.absent(),
+        invoiceNumber: needsHeaderBackfill
+            ? Value(header.invoiceNumber)
+            : const Value.absent(),
+        pfrNumber:
+            needsHeaderBackfill ? Value(header.pfrNumber) : const Value.absent(),
+        pfrTime:
+            needsHeaderBackfill ? Value(header.pfrTime) : const Value.absent(),
+        invoiceCounter: needsHeaderBackfill
+            ? Value(header.invoiceCounter)
+            : const Value.absent(),
+        transactionType: needsHeaderBackfill
+            ? Value(header.transactionType)
+            : const Value.absent(),
+        totalAmount: needsHeaderBackfill
+            ? Value(header.totalAmount)
+            : const Value.absent(),
+        taxJson:
+            needsHeaderBackfill ? Value(header.taxJson) : const Value.absent(),
         buyerId: Value(newBuyerId),
         paymentMethod: Value(newPaymentMethod),
         paymentsJson: Value(newPaymentsJson),
@@ -202,6 +233,74 @@ class ReceiptRepository {
   Future<List<LineItemRow>> itemsFor(int receiptId) =>
       (_db.select(_db.lineItems)..where((i) => i.receiptId.equals(receiptId)))
           .get();
+
+  /// Zameni stavke računa novim parsiranim stavkama, ali sačuvaj korisnički
+  /// unos: dodelu kategorije (`categoryId`) i garancije vezane za stavku
+  /// (`Warranties.lineItemId`).
+  ///
+  /// Stare i nove stavke se uparuju po nazivu (FIFO za istoimene); za uparenu
+  /// stavku se prenosi kategorija, a garancije se prepoje sa starog na novi id.
+  /// Neuparene stare stavke nestaju — njihove garancije ostaju na računu
+  /// (lineItemId → null preko ON DELETE SET NULL).
+  Future<void> _replaceItemsPreserving(
+      int receiptId, List<ParsedLineItem> items) async {
+    final oldItems = await itemsFor(receiptId);
+
+    // Garancije vezane za konkretne stare stavke (pre brisanja, da znamo mapu).
+    final itemWarranties = await (_db.select(_db.warranties)
+          ..where((w) =>
+              w.receiptId.equals(receiptId) & w.lineItemId.isNotNull()))
+        .get();
+
+    // Stare stavke grupisane po nazivu (FIFO), za prenos kategorije i mapiranje.
+    final oldByName = <String, List<LineItemRow>>{};
+    for (final o in oldItems) {
+      oldByName.putIfAbsent(o.name, () => <LineItemRow>[]).add(o);
+    }
+
+    // Ubaci nove stavke; zapamti mapu stari_id → novi_id za uparene i skup
+    // svih novih id-jeva (da pri brisanju ne diramo nove neuparene stavke).
+    final oldToNew = <int, int>{};
+    final newIds = <int>[];
+    for (final it in items) {
+      final queue = oldByName[it.name];
+      final matched =
+          (queue != null && queue.isNotEmpty) ? queue.removeAt(0) : null;
+      final newId = await _db.into(_db.lineItems).insert(
+            LineItemsCompanion.insert(
+              receiptId: receiptId,
+              name: it.name,
+              quantity: Value(it.quantity),
+              unit: Value(it.unit),
+              unitPrice: Value(it.unitPrice),
+              total: Value(it.total),
+              taxLabel: Value(it.taxLabel),
+              taxRate: Value(it.taxRate),
+              source: Value(it.source),
+              isUnparsed: Value(it.isUnparsed),
+              categoryId: Value(matched?.categoryId),
+            ),
+          );
+      newIds.add(newId);
+      if (matched != null) oldToNew[matched.id] = newId;
+    }
+
+    // Obriši stare stavke (sve osim upravo ubačenih). ON DELETE SET NULL nulira
+    // lineItemId na garancijama vezanim za stare stavke.
+    await (_db.delete(_db.lineItems)
+          ..where(
+              (i) => i.receiptId.equals(receiptId) & i.id.isNotIn(newIds)))
+        .go();
+
+    // Prepoji garancije sa stare stavke na njenu zamenu.
+    for (final w in itemWarranties) {
+      final newId = oldToNew[w.lineItemId];
+      if (newId != null) {
+        await (_db.update(_db.warranties)..where((x) => x.id.equals(w.id)))
+            .write(WarrantiesCompanion(lineItemId: Value(newId)));
+      }
+    }
+  }
 
   Future<void> _insertItems(int receiptId, List<ParsedLineItem> items) async {
     await _db.batch((b) {

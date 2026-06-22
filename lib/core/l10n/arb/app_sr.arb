@@ -48,6 +48,8 @@
   "detailAttachPhoto": "Priloži fotografiju",
   "detailPendingExplain": "Račun je sačuvan. Prodavac ga još nije proknjižio kod Poreske; stavke će se automatski dopuniti.",
   "detailItemsRefreshed": "Stavke računa su dopunjene.",
+  "detailRefreshTooltip": "Osveži sa Poreske uprave",
+  "detailRefreshConfirmBody": "Ponovo preuzeti račun sa Poreske uprave? Postojeće kategorije i garancije se zadržavaju.",
   "detailUnparsedRow": "Neparsiran red",
 
   "manualTitle": "Ručni unos računa",
