@@ -1,80 +1,85 @@
 # Troškovnik
 
-Flutter aplikacija za skeniranje srpskih fiskalnih računa, preuzimanje podataka sa
-portala Poreske uprave (`suf.purs.gov.rs`, TaxCore) i lokalno enkriptovano čuvanje.
+A Flutter app for scanning Serbian (and Republika Srpska) fiscal receipts, fetching itemized data from the Tax Authority portal, and storing everything locally in an encrypted database — no account, no cloud.
 
-Ovaj repozitorijum pokriva **FREE/MVP deo** (bez AI-ja): skeniranje QR koda, preuzimanje
-i rule-based parsiranje računa, čuvanje u enkriptovanu SQLite bazu, pregled i pretragu.
-Vidi `instrukcije.md` za pun obim.
+[<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="50">](https://play.google.com/store/apps/details?id=rs.antonijevic.troskovnik)
+[<img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="50">](https://apps.apple.com/app/troskovnik/id6746502939)
 
-## Tehnologije
+## Features
 
-- **Flutter** (zakucana verzija kroz FVM — vidi `.fvmrc`)
+- **Scan QR codes** from Serbian fiscal receipts (TaxCore / `suf.purs.gov.rs`)
+- **Fetch itemized data** — line items, tax breakdown, merchant info
+- **Encrypted local storage** — Drift + SQLCipher, no data leaves your device
+- **Categories** — assign categories to line items, with custom category support
+- **Warranties** — track warranty expiry with notifications
+- **Analytics** — monthly spending charts by category and merchant
+- **Localization** — Serbian (Latin & Cyrillic) and English
+
+## Tech stack
+
+- **Flutter** (version pinned via FVM — see `.fvmrc`)
 - **Riverpod** — state management
-- **drift + SQLCipher** — enkriptovana lokalna baza
-- **mobile_scanner** — skeniranje QR koda
-- **dio + html** — preuzimanje i parsiranje stranica portala
-- **workmanager** — background re-fetch za stavke koje još nisu na serveru
-- Lokalizacija SR (default) / EN; RSD format
+- **Drift + SQLCipher** — encrypted local database
+- **mobile_scanner** — QR code scanning
+- **Dio + html** — fetching and parsing the Tax Authority portal
+- **workmanager** — background re-fetch for receipts not yet on the server
 
-## Preduslovi: FVM
+## Getting started
 
-Verzijom Fluttera upravlja [FVM](https://fvm.app). Sve Flutter/Dart komande idu kroz FVM.
+This project uses [FVM](https://fvm.app) to pin the Flutter version.
 
 ```bash
-# 1. Instaliraj FVM (jednom, globalno)
-dart pub global activate fvm        # ili: brew tap leoafarias/fvm && brew install fvm
+# Install FVM (once, globally)
+dart pub global activate fvm
 
-# 2. Instaliraj zakucanu verziju Fluttera za ovaj projekat (čita .fvmrc)
+# Install the pinned Flutter version and get dependencies
 fvm install
-
-# 3. Preuzmi zavisnosti
 fvm flutter pub get
 
-# 4. Generiši lokalizaciju (ARB -> Dart)
+# Generate localizations and database code
 fvm flutter gen-l10n
-```
+fvm dart run build_runner build --delete-conflicting-outputs
 
-## Pokretanje
-
-```bash
+# Run
 fvm flutter run
 ```
 
-## Razvoj
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full development workflow.
 
-```bash
-fvm flutter analyze          # statička analiza (mora biti čisto)
-fvm flutter test             # testovi
-fvm dart run build_runner build --delete-conflicting-outputs   # drift codegen
-```
-
-> **Generisani kod** (`*.g.dart`, `*.drift.dart`) se ne commit-uje — generiše se lokalno
-> kroz `build_runner`. Lokalizacioni izlaz u `lib/core/l10n/gen/` se generiše preko
-> `gen-l10n`.
-
-### IDE / CI
-
-Podesi IDE da koristi FVM SDK putanju: `.fvm/flutter_sdk`. CI korake (`analyze`, `test`)
-pokretati kroz `fvm flutter ...`.
-
-## Struktura
+## Project structure
 
 ```
 lib/
-  core/        # baza, lokalizacija, tema, util
+  core/        # db schema, localization, theme, utils
   features/
-    scan/      # skeniranje QR-a i validacija URL-a
-    source/    # ReceiptSource: preuzimanje + parsiranje sa portala
-    receipts/  # lista, detalj, čuvanje računa
+    scan/      # QR scanning, URL validation, scan state machine
+    source/    # TaxCore client + parsers (journal, specifications)
+    receipts/  # list, detail, repository
+    analytics/ # spending charts and aggregations
+    warranties/# warranty tracking
+    home/      # main shell / bottom navigation
 test/
-  fixtures/    # realni uhvaćeni odgovori portala (za parsere)
-  unit/        # unit testovi
-  widget/      # widget testovi
+  fixtures/    # real captured portal responses (used by parsers)
+  unit/
+  widget/
 ```
 
-## Napomene
+## How it works
 
-- `sqlcipher_flutter_libs` / `sqlite3_flutter_libs` su trenutno objavljeni sa `+eol`
-  oznakom (maintainer ih postepeno gasi). Rade i standardni su izbor za drift+SQLCipher,
-  ali su kandidat za reviziju u kasnijoj fazi.
+Serbian fiscal QR codes contain a verification URL (`https://suf.purs.gov.rs/v/?vl=<token>`). The app:
+
+1. Validates the URL and fetches the portal page
+2. Parses the server-rendered journal (`<pre>` block) for the receipt header
+3. Requests itemized data from the `/specifications` endpoint (AJAX, best-effort)
+4. Falls back to journal text parsing if specifications aren't available yet
+5. Saves everything to an encrypted local SQLite database
+
+If the device is offline, the receipt header is saved immediately and items are fetched automatically in the background when connectivity is restored.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+[MIT](LICENSE)
