@@ -458,4 +458,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get imageMissing => 'Image not found.';
+
+  @override
+  String get backupMenuLabel => 'Backup & Restore';
+
+  @override
+  String get backupTitle => 'Backup & Restore';
+
+  @override
+  String get backupExplain =>
+      'Export creates a ZIP archive with all receipts and images. Import replaces ALL existing data.';
+
+  @override
+  String get backupCreate => 'Create backup';
+
+  @override
+  String get backupImport => 'Import backup';
+
+  @override
+  String get backupImportConfirmTitle => 'Replace all data?';
+
+  @override
+  String get backupImportConfirmBody =>
+      'This will replace all existing data with the backup contents. This cannot be undone.';
+
+  @override
+  String get backupSuccess => 'Backup restored successfully.';
+
+  @override
+  String get backupErrorCorrupt => 'File is corrupted or not a valid backup.';
+
+  @override
+  String get backupError => 'An error occurred. Please try again.';
 }

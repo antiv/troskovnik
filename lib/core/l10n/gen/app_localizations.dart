@@ -950,6 +950,66 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'Slika nije pronađena.'**
   String get imageMissing;
+
+  /// No description provided for @backupMenuLabel.
+  ///
+  /// In sr, this message translates to:
+  /// **'Backup i uvoz'**
+  String get backupMenuLabel;
+
+  /// No description provided for @backupTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Backup i uvoz'**
+  String get backupTitle;
+
+  /// No description provided for @backupExplain.
+  ///
+  /// In sr, this message translates to:
+  /// **'Backup pravi ZIP arhivu sa svim računima i slikama. Uvoz ZAMENJUJE sve postojeće podatke.'**
+  String get backupExplain;
+
+  /// No description provided for @backupCreate.
+  ///
+  /// In sr, this message translates to:
+  /// **'Napravi backup'**
+  String get backupCreate;
+
+  /// No description provided for @backupImport.
+  ///
+  /// In sr, this message translates to:
+  /// **'Uvezi backup'**
+  String get backupImport;
+
+  /// No description provided for @backupImportConfirmTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Zameniti sve podatke?'**
+  String get backupImportConfirmTitle;
+
+  /// No description provided for @backupImportConfirmBody.
+  ///
+  /// In sr, this message translates to:
+  /// **'Ovo će zameniti sve postojeće podatke sadržajem backup-a. Ova akcija se ne može poništiti.'**
+  String get backupImportConfirmBody;
+
+  /// No description provided for @backupSuccess.
+  ///
+  /// In sr, this message translates to:
+  /// **'Backup je uspešno uvezen.'**
+  String get backupSuccess;
+
+  /// No description provided for @backupErrorCorrupt.
+  ///
+  /// In sr, this message translates to:
+  /// **'Fajl je oštećen ili nije ispravan backup.'**
+  String get backupErrorCorrupt;
+
+  /// No description provided for @backupError.
+  ///
+  /// In sr, this message translates to:
+  /// **'Došlo je do greške. Pokušajte ponovo.'**
+  String get backupError;
 }
 
 class _AppLocalizationsDelegate

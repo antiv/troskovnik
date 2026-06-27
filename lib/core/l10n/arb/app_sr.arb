@@ -165,5 +165,16 @@
   "ok": "U redu",
 
   "imageShare": "Podeli",
-  "imageMissing": "Slika nije pronađena."
+  "imageMissing": "Slika nije pronađena.",
+
+  "backupMenuLabel": "Backup i uvoz",
+  "backupTitle": "Backup i uvoz",
+  "backupExplain": "Backup pravi ZIP arhivu sa svim računima i slikama. Uvoz ZAMENJUJE sve postojeće podatke.",
+  "backupCreate": "Napravi backup",
+  "backupImport": "Uvezi backup",
+  "backupImportConfirmTitle": "Zameniti sve podatke?",
+  "backupImportConfirmBody": "Ovo će zameniti sve postojeće podatke sadržajem backup-a. Ova akcija se ne može poništiti.",
+  "backupSuccess": "Backup je uspešno uvezen.",
+  "backupErrorCorrupt": "Fajl je oštećen ili nije ispravan backup.",
+  "backupError": "Došlo je do greške. Pokušajte ponovo."
 }

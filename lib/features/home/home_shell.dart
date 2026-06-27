@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/l10n/gen/app_localizations.dart';
 import '../../core/l10n/locale_controller.dart';
 import '../about/about_app_dialog.dart';
+import '../backup/presentation/backup_sheet.dart';
 import '../analytics/presentation/analytics_screen.dart';
 import '../receipts/presentation/receipt_list_screen.dart';
 import '../scan/presentation/scanner_screen.dart';
@@ -71,9 +72,24 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               ),
             ),
           ),
-          // Overflow meni: O aplikaciji.
+          // Overflow meni: Backup + O aplikaciji.
           PopupMenuButton<void>(
             itemBuilder: (context) => [
+              PopupMenuItem<void>(
+                onTap: () => showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  showDragHandle: true,
+                  builder: (_) => const BackupSheet(),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.backup_outlined, size: 20),
+                    const SizedBox(width: 12),
+                    Text(l10n.backupMenuLabel),
+                  ],
+                ),
+              ),
               PopupMenuItem<void>(
                 onTap: () => AboutAppDialog.show(context),
                 child: Row(
