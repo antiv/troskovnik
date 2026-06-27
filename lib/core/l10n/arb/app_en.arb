@@ -164,5 +164,16 @@
   "ok": "OK",
 
   "imageShare": "Share",
-  "imageMissing": "Image not found."
+  "imageMissing": "Image not found.",
+
+  "backupMenuLabel": "Backup & Restore",
+  "backupTitle": "Backup & Restore",
+  "backupExplain": "Export creates a ZIP archive with all receipts and images. Import replaces ALL existing data.",
+  "backupCreate": "Create backup",
+  "backupImport": "Import backup",
+  "backupImportConfirmTitle": "Replace all data?",
+  "backupImportConfirmBody": "This will replace all existing data with the backup contents. This cannot be undone.",
+  "backupSuccess": "Backup restored successfully.",
+  "backupErrorCorrupt": "File is corrupted or not a valid backup.",
+  "backupError": "An error occurred. Please try again."
 }

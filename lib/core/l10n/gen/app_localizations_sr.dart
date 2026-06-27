@@ -458,6 +458,38 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get imageMissing => 'Slika nije pronađena.';
+
+  @override
+  String get backupMenuLabel => 'Backup i uvoz';
+
+  @override
+  String get backupTitle => 'Backup i uvoz';
+
+  @override
+  String get backupExplain =>
+      'Backup pravi ZIP arhivu sa svim računima i slikama. Uvoz ZAMENJUJE sve postojeće podatke.';
+
+  @override
+  String get backupCreate => 'Napravi backup';
+
+  @override
+  String get backupImport => 'Uvezi backup';
+
+  @override
+  String get backupImportConfirmTitle => 'Zameniti sve podatke?';
+
+  @override
+  String get backupImportConfirmBody =>
+      'Ovo će zameniti sve postojeće podatke sadržajem backup-a. Ova akcija se ne može poništiti.';
+
+  @override
+  String get backupSuccess => 'Backup je uspešno uvezen.';
+
+  @override
+  String get backupErrorCorrupt => 'Fajl je oštećen ili nije ispravan backup.';
+
+  @override
+  String get backupError => 'Došlo je do greške. Pokušajte ponovo.';
 }
 
 /// The translations for Serbian, using the Cyrillic script (`sr_Cyrl`).
@@ -914,4 +946,36 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get imageMissing => 'Слика није пронађена.';
+
+  @override
+  String get backupMenuLabel => 'Бекап и увоз';
+
+  @override
+  String get backupTitle => 'Бекап и увоз';
+
+  @override
+  String get backupExplain =>
+      'Бекап прави ZIP архиву са свим рачунима и сликама. Увоз ЗАМЕЊУЈЕ све постојеће податке.';
+
+  @override
+  String get backupCreate => 'Направи бекап';
+
+  @override
+  String get backupImport => 'Увези бекап';
+
+  @override
+  String get backupImportConfirmTitle => 'Заменити све податке?';
+
+  @override
+  String get backupImportConfirmBody =>
+      'Ово ће заменити све постојеће податке садржајем бекап-а. Ова акција се не може поништити.';
+
+  @override
+  String get backupSuccess => 'Бекап је успешно увезен.';
+
+  @override
+  String get backupErrorCorrupt => 'Фајл је оштећен или није исправан бекап.';
+
+  @override
+  String get backupError => 'Дошло је до грешке. Покушајте поново.';
 }
