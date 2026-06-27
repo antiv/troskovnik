@@ -3,7 +3,7 @@
 A Flutter app for scanning Serbian (and Republika Srpska) fiscal receipts, fetching itemized data from the Tax Authority portal, and storing everything locally in an encrypted database — no account, no cloud.
 
 [<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="50">](https://play.google.com/store/apps/details?id=rs.antonijevic.troskovnik)
-[<img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="50">](https://apps.apple.com/app/troskovnik/id6746502939)
+[<img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="50">](https://apps.apple.com/us/app/tro%C5%A1kovnik/id6783019073)
 
 ## Features
 
