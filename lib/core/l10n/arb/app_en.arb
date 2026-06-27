@@ -7,7 +7,7 @@
 
   "scanTitle": "Scan receipt",
   "scanHint": "Point the camera at the fiscal receipt QR code",
-  "scanManualEntry": "Manual entry",
+  "scanManualEntry": "Enter URL",
   "scanFromGallery": "From gallery",
   "scanNoQrInImage": "No readable QR code in the image",
   "scanImageFailed": "Could not analyze the image. Try again or scan with the camera.",
@@ -165,6 +165,26 @@
 
   "imageShare": "Share",
   "imageMissing": "Image not found.",
+
+  "scanAddExpense": "Add receipt",
+
+  "expenseTitle": "New expense",
+  "expenseMerchantName": "Merchant / description",
+  "expenseMerchantHint": "e.g. EPS, Infostan, market",
+  "expenseMerchantRequired": "Enter merchant name",
+  "expenseAmount": "Amount (RSD)",
+  "expenseAmountRequired": "Enter amount",
+  "expenseAmountInvalid": "Amount must be greater than 0",
+  "expenseDate": "Date",
+  "expensePaymentNotSpecified": "Not specified",
+  "expensePaymentCash": "Cash",
+  "expensePaymentCard": "Card",
+  "expensePaymentTransfer": "Bank transfer",
+  "expenseAddItem": "Add item",
+  "expenseItemName": "Item name",
+  "expenseSave": "Save expense",
+  "expenseSaved": "Expense saved",
+  "expenseTotalRequired": "Add at least one item with an amount greater than 0",
 
   "backupMenuLabel": "Backup & Restore",
   "backupTitle": "Backup & Restore",

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -151,12 +152,14 @@ class _DetailBody extends ConsumerWidget {
         if (detail.merchant.address != null)
           Text(detail.merchant.address!),
         const SizedBox(height: 4),
-        Text('PIB: ${detail.merchant.tin}'),
+        if (!r.isManual) Text('PIB: ${detail.merchant.tin}'),
         if (r.buyerId != null)
           Text('${l10n.detailBuyerId}: ${r.buyerId}'),
         if (r.pfrNumber != null) Text('${l10n.manualPfrNumber}: ${r.pfrNumber}'),
         if (r.pfrTime != null)
-          Text('${l10n.manualPfrTime}: ${r.pfrTime}'),
+          r.isManual
+              ? Text('${l10n.expenseDate}: ${DateFormat('dd.MM.yyyy').format(r.pfrTime!)}')
+              : Text('${l10n.manualPfrTime}: ${r.pfrTime}'),
         const SizedBox(height: 8),
         Row(
           children: [
@@ -220,7 +223,7 @@ class _DetailBody extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 8),
-        if (detail.items.isEmpty && !pending)
+        if (detail.items.isEmpty && !pending && !r.isManual)
           Text(l10n.resultItemsPending)
         else
           ...detail.items.map((it) => _ItemTile(
@@ -256,30 +259,32 @@ class _DetailBody extends ConsumerWidget {
           _TaxBreakdown(taxJson: r.taxJson!),
         ],
 
-        const Divider(height: 24),
-
         // Dokaz (sačuvan žurnal + zvanični SUF link) — #5
-        Text(l10n.detailProof,
-            style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 4),
-        Text(l10n.detailProofHint,
-            style: Theme.of(context).textTheme.bodySmall),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                icon: const Icon(Icons.open_in_new, size: 18),
-                label: Text(l10n.detailOpenOnSuf),
-                onPressed: () => _openOnSuf(context, r.verificationUrl),
+        // Za ručne unose nema TaxCore linka ni refresh dugmeta.
+        if (!r.isManual) ...[
+          const Divider(height: 24),
+          Text(l10n.detailProof,
+              style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 4),
+          Text(l10n.detailProofHint,
+              style: Theme.of(context).textTheme.bodySmall),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.open_in_new, size: 18),
+                  label: Text(l10n.detailOpenOnSuf),
+                  onPressed: () => _openOnSuf(context, r.verificationUrl),
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            // Ručni refresh dostupan i za već učitan račun (uz potvrdu) —
-            // ponovo povuče zaglavlje/stavke, a kategorije/garancije se čuvaju.
-            _RefreshButton(receiptId: r.id, iconOnly: true, confirm: true),
-          ],
-        ),
+              const SizedBox(width: 8),
+              // Ručni refresh dostupan i za već učitan račun (uz potvrdu) —
+              // ponovo povuče zaglavlje/stavke, a kategorije/garancije se čuvaju.
+              _RefreshButton(receiptId: r.id, iconOnly: true, confirm: true),
+            ],
+          ),
+        ],
 
         const Divider(height: 24),
 

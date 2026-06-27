@@ -24,7 +24,7 @@ class AppLocalizationsSr extends AppLocalizations {
   String get scanHint => 'Usmeri kameru na QR kod fiskalnog računa';
 
   @override
-  String get scanManualEntry => 'Ručni unos';
+  String get scanManualEntry => 'Unesi URL';
 
   @override
   String get scanFromGallery => 'Iz galerije';
@@ -460,6 +460,61 @@ class AppLocalizationsSr extends AppLocalizations {
   String get imageMissing => 'Slika nije pronađena.';
 
   @override
+  String get scanAddExpense => 'Unesi račun';
+
+  @override
+  String get expenseTitle => 'Novi trošak';
+
+  @override
+  String get expenseMerchantName => 'Prodavac / opis';
+
+  @override
+  String get expenseMerchantHint => 'npr. EPS, Infostan, pijaca';
+
+  @override
+  String get expenseMerchantRequired => 'Unesite naziv prodavca';
+
+  @override
+  String get expenseAmount => 'Iznos (RSD)';
+
+  @override
+  String get expenseAmountRequired => 'Unesite iznos';
+
+  @override
+  String get expenseAmountInvalid => 'Iznos mora biti veći od 0';
+
+  @override
+  String get expenseDate => 'Datum';
+
+  @override
+  String get expensePaymentNotSpecified => 'Nije navedeno';
+
+  @override
+  String get expensePaymentCash => 'Gotovina';
+
+  @override
+  String get expensePaymentCard => 'Kartica';
+
+  @override
+  String get expensePaymentTransfer => 'Prenos';
+
+  @override
+  String get expenseAddItem => 'Dodaj stavku';
+
+  @override
+  String get expenseItemName => 'Naziv stavke';
+
+  @override
+  String get expenseSave => 'Sačuvaj trošak';
+
+  @override
+  String get expenseSaved => 'Trošak je sačuvan';
+
+  @override
+  String get expenseTotalRequired =>
+      'Dodajte barem jednu stavku sa iznosom većim od 0';
+
+  @override
   String get backupMenuLabel => 'Backup i uvoz';
 
   @override
@@ -512,7 +567,7 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
   String get scanHint => 'Усмери камеру на QR код фискалног рачуна';
 
   @override
-  String get scanManualEntry => 'Ручни унос';
+  String get scanManualEntry => 'Унеси URL';
 
   @override
   String get scanFromGallery => 'Из галерије';
@@ -946,6 +1001,61 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get imageMissing => 'Слика није пронађена.';
+
+  @override
+  String get scanAddExpense => 'Унеси рачун';
+
+  @override
+  String get expenseTitle => 'Нови трошак';
+
+  @override
+  String get expenseMerchantName => 'Продавац / опис';
+
+  @override
+  String get expenseMerchantHint => 'нпр. ЕПС, Инфостан, пијаца';
+
+  @override
+  String get expenseMerchantRequired => 'Унесите назив продавца';
+
+  @override
+  String get expenseAmount => 'Износ (RSD)';
+
+  @override
+  String get expenseAmountRequired => 'Унесите износ';
+
+  @override
+  String get expenseAmountInvalid => 'Износ мора бити већи од 0';
+
+  @override
+  String get expenseDate => 'Датум';
+
+  @override
+  String get expensePaymentNotSpecified => 'Није наведено';
+
+  @override
+  String get expensePaymentCash => 'Готовина';
+
+  @override
+  String get expensePaymentCard => 'Картица';
+
+  @override
+  String get expensePaymentTransfer => 'Пренос';
+
+  @override
+  String get expenseAddItem => 'Додај ставку';
+
+  @override
+  String get expenseItemName => 'Назив ставке';
+
+  @override
+  String get expenseSave => 'Сачувај трошак';
+
+  @override
+  String get expenseSaved => 'Трошак је сачуван';
+
+  @override
+  String get expenseTotalRequired =>
+      'Додајте барем једну ставку са износом већим од 0';
 
   @override
   String get backupMenuLabel => 'Бекап и увоз';

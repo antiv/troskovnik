@@ -107,12 +107,16 @@ class ReceiptListScreen extends ConsumerWidget {
                         _confirmDeleteReceipt(context, ref),
                     onDismissed: (_) => deleteReceipt(ref, item.receipt.id),
                     child: ListTile(
-                      leading: Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                            color: kindColor, shape: BoxShape.circle),
-                      ),
+                      leading: item.receipt.isManual
+                          ? Icon(Icons.edit_outlined,
+                              size: 20,
+                              color: scheme.outline)
+                          : Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                  color: kindColor, shape: BoxShape.circle),
+                            ),
                       title: Text(item.merchant.name),
                       subtitle: Text(
                         item.receipt.pfrTime?.toString().split('.').first ??
