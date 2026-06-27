@@ -5,7 +5,7 @@
 | # | Issue | Oblast | Status |
 |---|-------|--------|--------|
 | [#1](https://github.com/antiv/troskovnik/issues/1) | Open source priprema (LICENSE, CI, CONTRIBUTING) | Infrastruktura |  ✅ |
-| [#7](https://github.com/antiv/troskovnik/issues/7) | Backup/restore — ZIP export/import | Korisničke funkcije | 🔜 |
+| [#7](https://github.com/antiv/troskovnik/issues/7) | Backup/restore — ZIP export/import | Korisničke funkcije | ✅ |
 | [#2](https://github.com/antiv/troskovnik/issues/2) | Ručni unos troška (struja, infostan, loš QR) | Korisničke funkcije | 🔜 |
 | [#3](https://github.com/antiv/troskovnik/issues/3) | Republika Srpska — multi-country Faza A | Proširenje tržišta | 🔜 |
 | [#4](https://github.com/antiv/troskovnik/issues/4) | SuF lookup po broju računa (WebView) | Korisničke funkcije | 🔜 |
