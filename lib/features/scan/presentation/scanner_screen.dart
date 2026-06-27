@@ -7,6 +7,7 @@ import '../../../core/db/enums.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../receipts/presentation/receipt_detail_screen.dart';
 import 'manual_entry_screen.dart';
+import 'manual_expense_screen.dart';
 import 'scan_controller.dart';
 
 /// Skener QR koda (sekcija 7, ekran 1). Posle skeniranja obrađuje rezultat i
@@ -148,25 +149,48 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.white)),
                 const SizedBox(height: 8),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 8,
+                Row(
                   children: [
-                    OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white),
-                      icon: const Icon(Icons.photo_library),
-                      label: Text(l10n.scanFromGallery),
-                      onPressed: _pickFromGallery,
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white),
+                        icon: const Icon(Icons.photo_library),
+                        label: Text(l10n.scanFromGallery,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis),
+                        onPressed: _pickFromGallery,
+                      ),
                     ),
-                    OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white),
-                      icon: const Icon(Icons.keyboard),
-                      label: Text(l10n.scanManualEntry),
-                      onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                            builder: (_) => const ManualEntryScreen()),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white),
+                        icon: const Icon(Icons.edit_outlined),
+                        label: Text(l10n.scanAddExpense,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis),
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                              builder: (_) => const ManualExpenseScreen()),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Tooltip(
+                      message: l10n.scanManualEntry,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(44, 44),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                        ),
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                              builder: (_) => const ManualEntryScreen()),
+                        ),
+                        child: const Icon(Icons.link),
                       ),
                     ),
                   ],

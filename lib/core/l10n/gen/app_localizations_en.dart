@@ -24,7 +24,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanHint => 'Point the camera at the fiscal receipt QR code';
 
   @override
-  String get scanManualEntry => 'Manual entry';
+  String get scanManualEntry => 'Enter URL';
 
   @override
   String get scanFromGallery => 'From gallery';
@@ -458,6 +458,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get imageMissing => 'Image not found.';
+
+  @override
+  String get scanAddExpense => 'Add receipt';
+
+  @override
+  String get expenseTitle => 'New expense';
+
+  @override
+  String get expenseMerchantName => 'Merchant / description';
+
+  @override
+  String get expenseMerchantHint => 'e.g. EPS, Infostan, market';
+
+  @override
+  String get expenseMerchantRequired => 'Enter merchant name';
+
+  @override
+  String get expenseAmount => 'Amount (RSD)';
+
+  @override
+  String get expenseAmountRequired => 'Enter amount';
+
+  @override
+  String get expenseAmountInvalid => 'Amount must be greater than 0';
+
+  @override
+  String get expenseDate => 'Date';
+
+  @override
+  String get expensePaymentNotSpecified => 'Not specified';
+
+  @override
+  String get expensePaymentCash => 'Cash';
+
+  @override
+  String get expensePaymentCard => 'Card';
+
+  @override
+  String get expensePaymentTransfer => 'Bank transfer';
+
+  @override
+  String get expenseAddItem => 'Add item';
+
+  @override
+  String get expenseItemName => 'Item name';
+
+  @override
+  String get expenseSave => 'Save expense';
+
+  @override
+  String get expenseSaved => 'Expense saved';
+
+  @override
+  String get expenseTotalRequired =>
+      'Add at least one item with an amount greater than 0';
 
   @override
   String get backupMenuLabel => 'Backup & Restore';
