@@ -99,6 +99,9 @@ class Receipts extends Table {
   BoolColumn get isBusiness =>
       boolean().withDefault(const Constant(false))();
 
+  BoolColumn get isManual =>
+      boolean().withDefault(const Constant(false))();
+
   TextColumn get imagePath => text().nullable()();
 
   TextColumn get note => text().nullable()();

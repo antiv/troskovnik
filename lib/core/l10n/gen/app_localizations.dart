@@ -132,7 +132,7 @@ abstract class AppLocalizations {
   /// No description provided for @scanManualEntry.
   ///
   /// In sr, this message translates to:
-  /// **'Ručni unos'**
+  /// **'Unesi URL'**
   String get scanManualEntry;
 
   /// No description provided for @scanFromGallery.
@@ -950,6 +950,114 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'Slika nije pronađena.'**
   String get imageMissing;
+
+  /// No description provided for @scanAddExpense.
+  ///
+  /// In sr, this message translates to:
+  /// **'Unesi račun'**
+  String get scanAddExpense;
+
+  /// No description provided for @expenseTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Novi trošak'**
+  String get expenseTitle;
+
+  /// No description provided for @expenseMerchantName.
+  ///
+  /// In sr, this message translates to:
+  /// **'Prodavac / opis'**
+  String get expenseMerchantName;
+
+  /// No description provided for @expenseMerchantHint.
+  ///
+  /// In sr, this message translates to:
+  /// **'npr. EPS, Infostan, pijaca'**
+  String get expenseMerchantHint;
+
+  /// No description provided for @expenseMerchantRequired.
+  ///
+  /// In sr, this message translates to:
+  /// **'Unesite naziv prodavca'**
+  String get expenseMerchantRequired;
+
+  /// No description provided for @expenseAmount.
+  ///
+  /// In sr, this message translates to:
+  /// **'Iznos (RSD)'**
+  String get expenseAmount;
+
+  /// No description provided for @expenseAmountRequired.
+  ///
+  /// In sr, this message translates to:
+  /// **'Unesite iznos'**
+  String get expenseAmountRequired;
+
+  /// No description provided for @expenseAmountInvalid.
+  ///
+  /// In sr, this message translates to:
+  /// **'Iznos mora biti veći od 0'**
+  String get expenseAmountInvalid;
+
+  /// No description provided for @expenseDate.
+  ///
+  /// In sr, this message translates to:
+  /// **'Datum'**
+  String get expenseDate;
+
+  /// No description provided for @expensePaymentNotSpecified.
+  ///
+  /// In sr, this message translates to:
+  /// **'Nije navedeno'**
+  String get expensePaymentNotSpecified;
+
+  /// No description provided for @expensePaymentCash.
+  ///
+  /// In sr, this message translates to:
+  /// **'Gotovina'**
+  String get expensePaymentCash;
+
+  /// No description provided for @expensePaymentCard.
+  ///
+  /// In sr, this message translates to:
+  /// **'Kartica'**
+  String get expensePaymentCard;
+
+  /// No description provided for @expensePaymentTransfer.
+  ///
+  /// In sr, this message translates to:
+  /// **'Prenos'**
+  String get expensePaymentTransfer;
+
+  /// No description provided for @expenseAddItem.
+  ///
+  /// In sr, this message translates to:
+  /// **'Dodaj stavku'**
+  String get expenseAddItem;
+
+  /// No description provided for @expenseItemName.
+  ///
+  /// In sr, this message translates to:
+  /// **'Naziv stavke'**
+  String get expenseItemName;
+
+  /// No description provided for @expenseSave.
+  ///
+  /// In sr, this message translates to:
+  /// **'Sačuvaj trošak'**
+  String get expenseSave;
+
+  /// No description provided for @expenseSaved.
+  ///
+  /// In sr, this message translates to:
+  /// **'Trošak je sačuvan'**
+  String get expenseSaved;
+
+  /// No description provided for @expenseTotalRequired.
+  ///
+  /// In sr, this message translates to:
+  /// **'Dodajte barem jednu stavku sa iznosom većim od 0'**
+  String get expenseTotalRequired;
 
   /// No description provided for @backupMenuLabel.
   ///

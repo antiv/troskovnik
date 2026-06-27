@@ -29,7 +29,7 @@ class AppDatabase extends _$AppDatabase {
       );
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -57,6 +57,11 @@ class AppDatabase extends _$AppDatabase {
           if (from < 5) {
             await m.createTable(categories);
             await _seedDefaultCategories();
+          }
+          // v6: ručni unos troška (isManual flag).
+          if (from < 6) {
+            await customStatement(
+                'ALTER TABLE receipts ADD COLUMN is_manual INTEGER NOT NULL DEFAULT 0');
           }
         },
       );

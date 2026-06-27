@@ -342,6 +342,73 @@ class ReceiptRepository {
         );
   }
 
+  /// Ručni unos troška (bez QR/TaxCore). Kreira ili pronalazi prodavca po imenu,
+  /// upisuje račun sa `isManual = true` i opcionalne stavke.
+  Future<int> saveManual({
+    required String merchantName,
+    required int totalMinor,
+    required DateTime date,
+    String? paymentMethod,
+    String? note,
+    String? imagePath,
+    List<({String name, int totalMinor})> items = const [],
+    DateTime? now,
+  }) async {
+    final ts = now ?? DateTime.now();
+    return _db.transaction(() async {
+      final merchantId = await _upsertManualMerchant(merchantName, ts);
+      final receiptId = await _db.into(_db.receipts).insert(
+            ReceiptsCompanion.insert(
+              merchantId: merchantId,
+              verificationUrl: 'manual:${ts.millisecondsSinceEpoch}',
+              isManual: const Value(true),
+              totalAmount: Value(totalMinor),
+              pfrTime: Value(date),
+              paymentMethod: Value(paymentMethod),
+              fetchStatus: Value(FetchStatus.complete),
+              itemsStatus: Value(ItemsStatus.none),
+              itemsSource: Value(ItemsSource.none),
+              note: Value(note),
+              imagePath: Value(imagePath),
+              createdAt: Value(ts),
+              updatedAt: Value(ts),
+            ),
+          );
+      if (items.isNotEmpty) {
+        await _db.batch((b) {
+          for (final item in items) {
+            b.insert(
+              _db.lineItems,
+              LineItemsCompanion.insert(
+                receiptId: receiptId,
+                name: item.name,
+                total: Value(item.totalMinor),
+                unitPrice: Value(item.totalMinor),
+                source: Value(ItemsSource.none),
+              ),
+            );
+          }
+        });
+      }
+      return receiptId;
+    });
+  }
+
+  Future<int> _upsertManualMerchant(String name, DateTime ts) async {
+    final tin = 'MANUAL:${name.toLowerCase().trim()}';
+    final existing = await (_db.select(_db.merchants)
+          ..where((m) => m.tin.equals(tin)))
+        .getSingleOrNull();
+    if (existing != null) return existing.id;
+    return _db.into(_db.merchants).insert(
+          MerchantsCompanion.insert(
+            tin: tin,
+            name: name,
+            firstSeen: Value(ts),
+          ),
+        );
+  }
+
   Future<int> _upsertUnknownMerchant() async {
     final existing = await (_db.select(_db.merchants)
           ..where((m) => m.tin.equals('UNKNOWN')))

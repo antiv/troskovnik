@@ -7,7 +7,7 @@
 
   "scanTitle": "Скенирај рачун",
   "scanHint": "Усмери камеру на QR код фискалног рачуна",
-  "scanManualEntry": "Ручни унос",
+  "scanManualEntry": "Унеси URL",
   "scanFromGallery": "Из галерије",
   "scanNoQrInImage": "На слици нема читљивог QR кода",
   "scanImageFailed": "Није могуће анализирати слику. Покушај поново или скенирај камером.",
@@ -165,6 +165,26 @@
 
   "imageShare": "Подели",
   "imageMissing": "Слика није пронађена.",
+
+  "scanAddExpense": "Унеси рачун",
+
+  "expenseTitle": "Нови трошак",
+  "expenseMerchantName": "Продавац / опис",
+  "expenseMerchantHint": "нпр. ЕПС, Инфостан, пијаца",
+  "expenseMerchantRequired": "Унесите назив продавца",
+  "expenseAmount": "Износ (RSD)",
+  "expenseAmountRequired": "Унесите износ",
+  "expenseAmountInvalid": "Износ мора бити већи од 0",
+  "expenseDate": "Датум",
+  "expensePaymentNotSpecified": "Није наведено",
+  "expensePaymentCash": "Готовина",
+  "expensePaymentCard": "Картица",
+  "expensePaymentTransfer": "Пренос",
+  "expenseAddItem": "Додај ставку",
+  "expenseItemName": "Назив ставке",
+  "expenseSave": "Сачувај трошак",
+  "expenseSaved": "Трошак је сачуван",
+  "expenseTotalRequired": "Додајте барем једну ставку са износом већим од 0",
 
   "backupMenuLabel": "Бекап и увоз",
   "backupTitle": "Бекап и увоз",
