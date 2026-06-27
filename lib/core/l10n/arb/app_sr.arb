@@ -8,7 +8,7 @@
 
   "scanTitle": "Skeniraj račun",
   "scanHint": "Usmeri kameru na QR kod fiskalnog računa",
-  "scanManualEntry": "Ručni unos",
+  "scanManualEntry": "Unesi URL",
   "scanFromGallery": "Iz galerije",
   "scanNoQrInImage": "Na slici nema čitljivog QR koda",
   "scanImageFailed": "Nije moguće analizirati sliku. Pokušaj ponovo ili skeniraj kamerom.",
@@ -166,6 +166,26 @@
 
   "imageShare": "Podeli",
   "imageMissing": "Slika nije pronađena.",
+
+  "scanAddExpense": "Unesi račun",
+
+  "expenseTitle": "Novi trošak",
+  "expenseMerchantName": "Prodavac / opis",
+  "expenseMerchantHint": "npr. EPS, Infostan, pijaca",
+  "expenseMerchantRequired": "Unesite naziv prodavca",
+  "expenseAmount": "Iznos (RSD)",
+  "expenseAmountRequired": "Unesite iznos",
+  "expenseAmountInvalid": "Iznos mora biti veći od 0",
+  "expenseDate": "Datum",
+  "expensePaymentNotSpecified": "Nije navedeno",
+  "expensePaymentCash": "Gotovina",
+  "expensePaymentCard": "Kartica",
+  "expensePaymentTransfer": "Prenos",
+  "expenseAddItem": "Dodaj stavku",
+  "expenseItemName": "Naziv stavke",
+  "expenseSave": "Sačuvaj trošak",
+  "expenseSaved": "Trošak je sačuvan",
+  "expenseTotalRequired": "Dodajte barem jednu stavku sa iznosom većim od 0",
 
   "backupMenuLabel": "Backup i uvoz",
   "backupTitle": "Backup i uvoz",
