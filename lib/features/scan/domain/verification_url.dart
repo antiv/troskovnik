@@ -1,19 +1,15 @@
-/// Validacija i parsiranje verifikacionog URL-a srpskog fiskalnog računa.
+/// Validacija i parsiranje verifikacionog URL-a fiskalnog računa (TaxCore).
 ///
 /// QR kod sadrži URL oblika:
-///   `https://suf.purs.gov.rs/v/?vl=<TOKEN>`
+///   `https://suf.purs.gov.rs/v/?vl=<TOKEN>`       (Srbija)
+///   `https://suf.poreskaupravars.org/v/?vl=<TOKEN>` (Republika Srpska)
 /// gde je `<TOKEN>` Base64URL-kodirani potpisani zapis (TaxCore).
 ///
 /// Ovaj sloj NE radi mrežu — samo validira oblik i izvlači token. Mrežno
 /// preuzimanje je u ReceiptSource (sekcija 3).
 library;
 
-/// Hostovi koje prihvatamo kao validne verifikacione adrese.
-///
-/// Pored produkcionog `suf.purs.gov.rs`, TaxCore u praksi koristi i poddomene
-/// (npr. `sandbox.suf.purs.gov.rs`), pa proveravamo da se host završava na
-/// `suf.purs.gov.rs`.
-const _verificationHostSuffix = 'suf.purs.gov.rs';
+import '../../../core/domain/country.dart';
 
 /// Rezultat validacije skeniranog sadržaja.
 sealed class ScanValidation {
@@ -25,6 +21,7 @@ class ValidVerificationUrl extends ScanValidation {
   const ValidVerificationUrl({
     required this.normalizedUrl,
     required this.token,
+    required this.country,
   });
 
   /// Normalizovan URL (https, bez fragmenta).
@@ -32,6 +29,9 @@ class ValidVerificationUrl extends ScanValidation {
 
   /// Vrednost `vl` parametra (token), URL-dekodirana.
   final String token;
+
+  /// Zemlja prepoznata iz hosta portala.
+  final Country country;
 }
 
 /// Sadržaj nije fiskalni verifikacioni URL.
@@ -45,7 +45,7 @@ enum InvalidReason {
   /// Nije validan URI uopšte.
   notaUrl,
 
-  /// Host nije *.suf.purs.gov.rs.
+  /// Host nije poznat TaxCore verifikacioni portal.
   wrongHost,
 
   /// Nema `vl` parametra ili je prazan.
@@ -63,10 +63,17 @@ class VerificationUrlValidator {
       return const InvalidVerificationUrl(InvalidReason.notaUrl);
     }
 
+    // Prepoznaj zemlju iz hosta (poddomeni su OK: sandbox.suf.purs.gov.rs).
     final host = uri.host.toLowerCase();
-    final hostOk = host == _verificationHostSuffix ||
-        host.endsWith('.$_verificationHostSuffix');
-    if (!hostOk) {
+    Country? country;
+    for (final c in Country.values) {
+      final suffix = c.portalHost;
+      if (host == suffix || host.endsWith('.$suffix')) {
+        country = c;
+        break;
+      }
+    }
+    if (country == null) {
       return const InvalidVerificationUrl(InvalidReason.wrongHost);
     }
 
@@ -82,7 +89,8 @@ class VerificationUrlValidator {
 
     // Normalizuj na https i izbaci fragment.
     final normalized = uri.replace(scheme: 'https', fragment: '').toString();
-    return ValidVerificationUrl(normalizedUrl: normalized, token: token);
+    return ValidVerificationUrl(
+        normalizedUrl: normalized, token: token, country: country);
   }
 
   static String? _extractVlFromFragment(String fragment) {

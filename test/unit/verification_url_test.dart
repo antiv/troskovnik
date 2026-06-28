@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:troskovnik/core/domain/country.dart';
+import 'package:troskovnik/core/domain/currency.dart';
 import 'package:troskovnik/features/scan/domain/verification_url.dart';
 import 'package:troskovnik/features/scan/domain/vl_token.dart';
 
@@ -58,6 +60,46 @@ void main() {
     test('rejects empty vl token', () {
       final r = v.validate('https://suf.purs.gov.rs/v/?vl=');
       expect((r as InvalidVerificationUrl).reason, InvalidReason.missingToken);
+    });
+
+    test('Serbian URL returns Country.serbia', () {
+      final r = v.validate('https://suf.purs.gov.rs/v/?vl=T') as ValidVerificationUrl;
+      expect(r.country, Country.serbia);
+    });
+
+    test('RS URL accepted and returns Country.republikaSrpska', () {
+      final r = v.validate('https://suf.poreskaupravars.org/v/?vl=RSTOKEN');
+      expect(r, isA<ValidVerificationUrl>());
+      expect((r as ValidVerificationUrl).country, Country.republikaSrpska);
+    });
+
+    test('RS subdomain accepted', () {
+      final r = v.validate('https://test.suf.poreskaupravars.org/v/?vl=T');
+      expect(r, isA<ValidVerificationUrl>());
+      expect((r as ValidVerificationUrl).country, Country.republikaSrpska);
+    });
+
+    test('RS lookalike host rejected', () {
+      final r = v.validate('https://suf.poreskaupravars.org.evil.com/v/?vl=T');
+      expect((r as InvalidVerificationUrl).reason, InvalidReason.wrongHost);
+    });
+  });
+
+  group('Country → Currency mapping', () {
+    test('Serbia maps to RSD', () {
+      expect(Country.serbia.currency, Currency.rsd);
+    });
+
+    test('Republika Srpska maps to BAM', () {
+      expect(Country.republikaSrpska.currency, Currency.bam);
+    });
+
+    test('BAM symbol is KM', () {
+      expect(Currency.bam.symbol, 'KM');
+    });
+
+    test('RSD ISO code is RSD', () {
+      expect(Currency.rsd.isoCode, 'RSD');
     });
   });
 

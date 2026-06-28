@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/domain/currency.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/utils/money_format.dart';
 import '../../categories/domain/category_models.dart';
@@ -239,12 +240,14 @@ class _TotalCard extends StatelessWidget {
             Text(l10n.analyticsTotalSpent,
                 style: TextStyle(color: scheme.onPrimaryContainer)),
             const SizedBox(height: 4),
-            Text(
-              MoneyFormat.fromMinor(summary.totalMinor),
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: scheme.onPrimaryContainer,
-                  fontWeight: FontWeight.bold),
-            ),
+            // Prikazujemo zaseban red po valuti — nikad ne sabiramo RSD + BAM.
+            for (final entry in summary.totalsByCurrency.entries)
+              Text(
+                MoneyFormat.fromMinor(entry.value, entry.key),
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    color: scheme.onPrimaryContainer,
+                    fontWeight: FontWeight.bold),
+              ),
             const SizedBox(height: 4),
             Text(l10n.analyticsReceiptCount(summary.receiptCount),
                 style: TextStyle(color: scheme.onPrimaryContainer)),
@@ -317,11 +320,13 @@ List<Color> _categoryColors(Brightness brightness) {
 /// Pozadina + stil teksta za tooltipove na grafovima. Default fl_chart
 /// tooltip ima slab kontrast u svetloj temi; `inverseSurface` par je čitljiv
 /// u obe teme.
-BarTouchData _barTooltip(ColorScheme scheme) => BarTouchData(
+BarTouchData _barTooltip(ColorScheme scheme,
+        [Currency currency = Currency.rsd]) =>
+    BarTouchData(
       touchTooltipData: BarTouchTooltipData(
         getTooltipColor: (_) => scheme.inverseSurface,
         getTooltipItem: (group, _, rod, _) => BarTooltipItem(
-          MoneyFormat.fromDouble(rod.toY),
+          MoneyFormat.fromDouble(rod.toY, currency),
           TextStyle(
             color: scheme.onInverseSurface,
             fontWeight: FontWeight.bold,
@@ -331,6 +336,8 @@ BarTouchData _barTooltip(ColorScheme scheme) => BarTouchData(
       ),
     );
 
+/// Grafikon potrošnje po mesecima. Kad ima više valuta, prikazuje zaseban
+/// grafikon po valuti (nikad se ne mešaju na istoj osi).
 class _MonthlyChart extends StatelessWidget {
   const _MonthlyChart({required this.monthly});
   final List<MonthlySpending> monthly;
@@ -338,8 +345,43 @@ class _MonthlyChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (monthly.isEmpty) return const SizedBox.shrink();
+
+    // Grupiši po valuti.
+    final byCurrency = <Currency, List<MonthlySpending>>{};
+    for (final m in monthly) {
+      byCurrency.putIfAbsent(m.currency, () => []).add(m);
+    }
+
+    if (byCurrency.length == 1) {
+      return _SingleCurrencyChart(
+          items: monthly, currency: byCurrency.keys.first);
+    }
+
+    return Column(
+      children: [
+        for (final entry in byCurrency.entries) ...[
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text(entry.key.symbol,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          _SingleCurrencyChart(items: entry.value, currency: entry.key),
+          const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+}
+
+class _SingleCurrencyChart extends StatelessWidget {
+  const _SingleCurrencyChart({required this.items, required this.currency});
+  final List<MonthlySpending> items;
+  final Currency currency;
+
+  @override
+  Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final maxY = monthly
+    final maxY = items
             .map((m) => m.totalMinor)
             .fold<int>(0, (a, b) => a > b ? a : b)
             .toDouble() /
@@ -351,12 +393,12 @@ class _MonthlyChart extends StatelessWidget {
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
           maxY: maxY * 1.2,
-          barTouchData: _barTooltip(scheme),
+          barTouchData: _barTooltip(scheme, currency),
           barGroups: [
-            for (var i = 0; i < monthly.length; i++)
+            for (var i = 0; i < items.length; i++)
               BarChartGroupData(x: i, barRods: [
                 BarChartRodData(
-                  toY: monthly[i].totalMinor / 100.0,
+                  toY: items[i].totalMinor / 100.0,
                   color: scheme.primary,
                   width: 14,
                   borderRadius: BorderRadius.circular(3),
@@ -375,10 +417,10 @@ class _MonthlyChart extends StatelessWidget {
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
                   final i = value.toInt();
-                  if (i < 0 || i >= monthly.length) {
+                  if (i < 0 || i >= items.length) {
                     return const SizedBox.shrink();
                   }
-                  final m = monthly[i];
+                  final m = items[i];
                   return Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text('${m.month}/${m.year % 100}',
@@ -544,7 +586,7 @@ class _MerchantList extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(child: Text(m.merchantName)),
-                      Text(MoneyFormat.fromMinor(m.totalMinor),
+                      Text(MoneyFormat.fromMinor(m.totalMinor, m.currency),
                           style: const TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),

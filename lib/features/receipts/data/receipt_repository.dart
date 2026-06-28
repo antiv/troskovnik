@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import '../../../core/db/database.dart';
 import '../../../core/db/enums.dart';
+import '../../../core/domain/country.dart';
 import '../../source/domain/receipt_source.dart';
 import '../domain/retry_policy.dart';
 
@@ -52,6 +53,7 @@ class ReceiptRepository {
     required String verificationUrl,
     required String? token,
     required ParsedReceipt parsed,
+    Country country = Country.serbia,
     DateTime? now,
   }) async {
     final header = parsed.header;
@@ -101,6 +103,8 @@ class ReceiptRepository {
               itemsStatus: Value(parsed.itemsStatus),
               itemsSource: Value(parsed.itemsSource),
               nextRetryAt: Value(nextRetry),
+              country: Value(country),
+              currency: Value(country.currency),
               createdAt: Value(ts),
               updatedAt: Value(ts),
             ),

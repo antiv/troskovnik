@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -84,6 +85,81 @@ void main() {
       expect(r.itemsStatus, ItemsStatus.fromSpecifications);
       expect(r.items, hasLength(1));
       expect(r.items.first.name, 'X');
+    });
+  });
+
+  group('JSON API path (Accept: application/json)', () {
+    const sampleJournal = '============ ФИСКАЛНИ РАЧУН ============\n'
+        '100000001\n'
+        'ТЕСТ ПРОДАВНИЦА\n'
+        '-------------ПРОМЕТ ПРОДАЈА-------------\n'
+        'Назив   Цена         Кол.         Укупно\n'
+        'Производ А (kom) (Ђ)\n'
+        '  50,00   2   100,00\n'
+        'Укупан износ:                     100,00\n'
+        '========================================\n';
+
+    test('isValid:true + journal → complete fromJournal', () {
+      final body = '{"isValid":true,"journal":${jsonEncode(sampleJournal)},'
+          '"invoiceRequest":{"taxId":"100000001","businessName":"Тест"},'
+          '"invoiceResult":{"totalAmount":100.0,"invoiceNumber":"ABC-123","sdcTime":"2026-03-05T10:00:00Z"}}';
+      final raw = RawPortalResponse(
+        verificationUrl: 'https://suf.purs.gov.rs/v/?vl=X',
+        statusCode: 200,
+        body: body,
+        contentType: 'application/json; charset=utf-8',
+      );
+      final r = parser.parse(raw);
+      expect(r.fetchStatus, FetchStatus.complete);
+      expect(r.itemsStatus, ItemsStatus.fromJournal);
+      expect(r.items, isNotEmpty);
+      expect(r.journalText, sampleJournal);
+    });
+
+    test('isValid:false → FetchStatus.invalid', () {
+      const body = '{"isValid":false,"journal":null}';
+      final raw = RawPortalResponse(
+        verificationUrl: 'https://suf.purs.gov.rs/v/?vl=X',
+        statusCode: 200,
+        body: body,
+        contentType: 'application/json',
+      );
+      expect(parser.parse(raw).fetchStatus, FetchStatus.invalid);
+    });
+
+    test('isValid:true + null journal → pendingServer', () {
+      const body = '{"isValid":true,"journal":null}';
+      final raw = RawPortalResponse(
+        verificationUrl: 'https://suf.purs.gov.rs/v/?vl=X',
+        statusCode: 200,
+        body: body,
+        contentType: 'application/json',
+      );
+      final r = parser.parse(raw);
+      expect(r.fetchStatus, FetchStatus.pending);
+      expect(r.itemsStatus, ItemsStatus.pendingServer);
+    });
+
+    test('malformed JSON → pendingServer (graceful fallback)', () {
+      final raw = RawPortalResponse(
+        verificationUrl: 'https://suf.purs.gov.rs/v/?vl=X',
+        statusCode: 200,
+        body: 'not json at all',
+        contentType: 'application/json',
+      );
+      expect(parser.parse(raw).fetchStatus, FetchStatus.pending);
+    });
+
+    test('HTML content-type → uses HTML path, not JSON path', () {
+      // Bez contentType → pada na HTML path → nema <pre> → pending
+      final raw = RawPortalResponse(
+        verificationUrl: 'https://suf.purs.gov.rs/v/?vl=X',
+        statusCode: 200,
+        body: '{"isValid":true,"journal":"test"}',
+      );
+      // JSON body ali bez JSON content-type → HTML parser → nema <pre> → pending
+      final r = parser.parse(raw);
+      expect(r.fetchStatus, FetchStatus.pending);
     });
   });
 

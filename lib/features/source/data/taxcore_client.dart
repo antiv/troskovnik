@@ -39,35 +39,44 @@ class TaxCoreClient implements ReceiptSource {
   @override
   Future<RawPortalResponse> fetch(String verificationUrl) async {
     try {
+      // TaxCore standard: GET sa Accept: application/json vraća strukturirani
+      // JSON (Serbia i ostala TaxCore deployments). Blazor portali (RS) ignorišu
+      // Accept header i vraćaju HTML bez obzira.
       final pageResp = await _dio.get<String>(
         verificationUrl,
-        options: Options(responseType: ResponseType.plain),
+        options: Options(
+          responseType: ResponseType.plain,
+          headers: const {'Accept': 'application/json'},
+        ),
       );
       final pageBody = pageResp.data ?? '';
+      final contentType = pageResp.headers.value('content-type');
+      final isJson = contentType?.contains('application/json') == true;
 
       String? specsBody;
-      // Best-effort: stavke se traže POST-om sa invoiceNumber+token iz stranice
-      // (NE sa vl tokenom). Ako padne ili vrati success:false, ostaje null i
-      // parser pada na žurnal (koji je ionako primaran izvor).
-      final invoiceNumber = _invoiceNumberRe.firstMatch(pageBody)?.group(1);
-      final token = _tokenRe.firstMatch(pageBody)?.group(1);
-      if (invoiceNumber != null && token != null) {
-        try {
-          final base = Uri.parse(verificationUrl);
-          final specsResp = await _dio.post<String>(
-            base.replace(path: specificationsPath, query: '').toString(),
-            data: {'invoiceNumber': invoiceNumber, 'token': token},
-            options: Options(
-              responseType: ResponseType.plain,
-              contentType: Headers.formUrlEncodedContentType,
-              headers: const {'X-Requested-With': 'XMLHttpRequest'},
-            ),
-          );
-          if (specsResp.statusCode == 200) {
-            specsBody = specsResp.data;
+      if (!isJson) {
+        // HTML odgovor: pokušaj specs POST (best-effort).
+        // Za JSON odgovor preskačemo specs — JSON već sadrži sve podatke.
+        final invoiceNumber = _invoiceNumberRe.firstMatch(pageBody)?.group(1);
+        final token = _tokenRe.firstMatch(pageBody)?.group(1);
+        if (invoiceNumber != null && token != null) {
+          try {
+            final base = Uri.parse(verificationUrl);
+            final specsResp = await _dio.post<String>(
+              base.replace(path: specificationsPath, query: '').toString(),
+              data: {'invoiceNumber': invoiceNumber, 'token': token},
+              options: Options(
+                responseType: ResponseType.plain,
+                contentType: Headers.formUrlEncodedContentType,
+                headers: const {'X-Requested-With': 'XMLHttpRequest'},
+              ),
+            );
+            if (specsResp.statusCode == 200) {
+              specsBody = specsResp.data;
+            }
+          } catch (_) {
+            // Stavke nisu (još) dostupne — žurnal je fallback.
           }
-        } catch (_) {
-          // Stavke nisu (još) dostupne — žurnal je fallback.
         }
       }
 
@@ -76,7 +85,7 @@ class TaxCoreClient implements ReceiptSource {
         statusCode: pageResp.statusCode ?? 0,
         body: pageBody,
         specificationsBody: specsBody,
-        contentType: pageResp.headers.value('content-type'),
+        contentType: contentType,
       );
     } on DioException catch (e) {
       switch (e.type) {

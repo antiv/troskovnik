@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 
 import '../../../core/db/database.dart';
 import '../../../core/db/enums.dart';
+import '../../../core/domain/currency.dart';
 import '../../categories/domain/category_models.dart';
 import '../domain/analytics_models.dart';
 
@@ -60,12 +61,17 @@ class AnalyticsRepository {
     final vat = await _estimatedVat(since);
     final byCategory = await _byCategory(since);
 
-    final total = byMerchant.fold<int>(0, (a, m) => a + m.totalMinor);
+    // Zbir po valuti — nikad ne sabiramo RSD + BAM.
+    final totalsByCurrency = <Currency, int>{};
+    for (final m in byMerchant) {
+      totalsByCurrency[m.currency] =
+          (totalsByCurrency[m.currency] ?? 0) + m.totalMinor;
+    }
     final receiptCount =
         byMerchant.fold<int>(0, (a, m) => a + m.receiptCount);
 
     return AnalyticsSummary(
-      totalMinor: total,
+      totalsByCurrency: totalsByCurrency,
       receiptCount: receiptCount,
       estimatedVatMinor: vat,
       monthly: monthly,
@@ -195,25 +201,28 @@ class AnalyticsRepository {
     final ym = r.pfrTime.strftime('%Y-%m');
     final total = r.totalAmount.sum();
     final cnt = r.id.count();
+    final currencyExpr = r.currency.dartCast<int>();
 
     var filter = _validAnd(since) & r.pfrTime.isNotNull();
     if (merchantId != null) filter = filter & r.merchantId.equals(merchantId);
 
     final q = _db.selectOnly(r)
-      ..addColumns([ym, total, cnt])
+      ..addColumns([ym, currencyExpr, total, cnt])
       ..where(filter)
-      ..groupBy([ym])
+      ..groupBy([ym, currencyExpr])
       ..orderBy([OrderingTerm(expression: ym)]);
 
     final rows = await q.get();
     return rows.map((row) {
       final key = row.read(ym) ?? '0000-00';
       final parts = key.split('-');
+      final currencyInt = row.read(currencyExpr) ?? 0;
       return MonthlySpending(
         year: int.tryParse(parts[0]) ?? 0,
         month: int.tryParse(parts.length > 1 ? parts[1] : '0') ?? 0,
         totalMinor: row.read(total) ?? 0,
         receiptCount: row.read(cnt) ?? 0,
+        currency: Currency.values[currencyInt],
       );
     }).toList();
   }
@@ -223,24 +232,27 @@ class AnalyticsRepository {
     final m = _db.merchants;
     final total = r.totalAmount.sum();
     final cnt = r.id.count();
+    final currencyExpr = r.currency.dartCast<int>();
 
     final q = _db.selectOnly(r).join([
       innerJoin(m, m.id.equalsExp(r.merchantId)),
     ])
-      ..addColumns([m.id, m.name, total, cnt])
+      ..addColumns([m.id, m.name, currencyExpr, total, cnt])
       ..where(_validAnd(since))
-      ..groupBy([m.id])
+      ..groupBy([m.id, currencyExpr])
       ..orderBy([OrderingTerm(expression: total, mode: OrderingMode.desc)]);
 
     final rows = await q.get();
-    return rows
-        .map((row) => MerchantSpending(
-              merchantId: row.read(m.id) ?? 0,
-              merchantName: row.read(m.name) ?? '',
-              totalMinor: row.read(total) ?? 0,
-              receiptCount: row.read(cnt) ?? 0,
-            ))
-        .toList();
+    return rows.map((row) {
+      final currencyIdx = row.read(currencyExpr) ?? 0;
+      return MerchantSpending(
+        merchantId: row.read(m.id) ?? 0,
+        merchantName: row.read(m.name) ?? '',
+        totalMinor: row.read(total) ?? 0,
+        receiptCount: row.read(cnt) ?? 0,
+        currency: Currency.values[currencyIdx],
+      );
+    }).toList();
   }
 
   Future<BusinessSplit> _businessSplit(DateTime? since) async {
