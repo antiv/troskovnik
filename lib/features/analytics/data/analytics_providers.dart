@@ -1,8 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/db/providers.dart';
+import '../../../core/domain/currency.dart';
 import '../domain/analytics_models.dart';
 import 'analytics_repository.dart';
+
+/// Izabrana valuta za prikaz analitike. `null` = prikazuje prvu dostupnu.
+class AnalyticsCurrencyNotifier extends Notifier<Currency?> {
+  @override
+  Currency? build() => null;
+
+  void set(Currency? c) => state = c;
+}
+
+final analyticsCurrencyProvider =
+    NotifierProvider<AnalyticsCurrencyNotifier, Currency?>(
+        AnalyticsCurrencyNotifier.new);
 
 /// Izabrani period analitike.
 class AnalyticsRangeNotifier extends Notifier<AnalyticsRange> {
