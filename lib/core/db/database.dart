@@ -31,7 +31,7 @@ class AppDatabase extends _$AppDatabase {
       );
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -72,6 +72,11 @@ class AppDatabase extends _$AppDatabase {
                 'ALTER TABLE receipts ADD COLUMN country INTEGER NOT NULL DEFAULT 0');
             await customStatement(
                 'ALTER TABLE receipts ADD COLUMN currency INTEGER NOT NULL DEFAULT 0');
+          }
+          // v8: flag za nepodudaranje parsiranih podataka sa invoiceResult.
+          if (from < 8) {
+            await customStatement(
+                'ALTER TABLE receipts ADD COLUMN has_discrepancy INTEGER NOT NULL DEFAULT 0');
           }
         },
       );

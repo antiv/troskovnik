@@ -129,6 +129,10 @@ class AppLocalizationsSr extends AppLocalizations {
       'Račun je sačuvan. Prodavac ga još nije proknjižio kod Poreske; stavke će se automatski dopuniti.';
 
   @override
+  String get detailFromJournalExplain =>
+      'Stavke su preuzete iz teksta računa. Osvežite da dobijete preciznije podatke.';
+
+  @override
   String get detailItemsRefreshed => 'Stavke računa su dopunjene.';
 
   @override
@@ -404,7 +408,7 @@ class AppLocalizationsSr extends AppLocalizations {
       'Račun je sačuvan kao dokaz (žurnal + zvanični link Poreske).';
 
   @override
-  String get detailOpenOnSuf => 'Otvori na suf.purs.gov.rs';
+  String get detailOpenOnSuf => 'Otvori fiskalni portal';
 
   @override
   String get detailDeleteReceipt => 'Obriši račun';
@@ -475,7 +479,7 @@ class AppLocalizationsSr extends AppLocalizations {
   String get expenseMerchantRequired => 'Unesite naziv prodavca';
 
   @override
-  String get expenseAmount => 'Iznos (RSD)';
+  String get expenseAmount => 'Iznos';
 
   @override
   String get expenseAmountRequired => 'Unesite iznos';
@@ -485,6 +489,9 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get expenseDate => 'Datum';
+
+  @override
+  String get expenseCurrency => 'Valuta';
 
   @override
   String get expensePaymentNotSpecified => 'Nije navedeno';
@@ -545,6 +552,10 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get backupError => 'Došlo je do greške. Pokušajte ponovo.';
+
+  @override
+  String get detailDiscrepancyWarning =>
+      'Upozorenje: parsirani podaci se ne slažu sa podacima fiskalnog servera. Proverite račun.';
 }
 
 /// The translations for Serbian, using the Cyrillic script (`sr_Cyrl`).
@@ -670,6 +681,10 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
   @override
   String get detailPendingExplain =>
       'Рачун је сачуван. Продавац га још није прокњижио код Пореске; ставке ће се аутоматски допунити.';
+
+  @override
+  String get detailFromJournalExplain =>
+      'Ставке су преузете из текста рачуна. Освежите да добијете прецизније податке.';
 
   @override
   String get detailItemsRefreshed => 'Ставке рачуна су допуњене.';
@@ -947,7 +962,7 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
       'Рачун је сачуван као доказ (журнал + званични линк Пореске).';
 
   @override
-  String get detailOpenOnSuf => 'Отвори на suf.purs.gov.rs';
+  String get detailOpenOnSuf => 'Отвори фискални портал';
 
   @override
   String get detailDeleteReceipt => 'Обриши рачун';
@@ -1018,7 +1033,7 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
   String get expenseMerchantRequired => 'Унесите назив продавца';
 
   @override
-  String get expenseAmount => 'Износ (RSD)';
+  String get expenseAmount => 'Износ';
 
   @override
   String get expenseAmountRequired => 'Унесите износ';
@@ -1028,6 +1043,9 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get expenseDate => 'Датум';
+
+  @override
+  String get expenseCurrency => 'Валута';
 
   @override
   String get expensePaymentNotSpecified => 'Није наведено';
@@ -1088,4 +1106,8 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get backupError => 'Дошло је до грешке. Покушајте поново.';
+
+  @override
+  String get detailDiscrepancyWarning =>
+      'Упозорење: парсирани подаци се не слажу са подацима фискалног сервера. Проверите рачун.';
 }

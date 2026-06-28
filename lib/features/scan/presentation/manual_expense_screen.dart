@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/domain/currency.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/utils/money_format.dart';
 import '../../receipts/data/receipt_providers.dart';
@@ -22,6 +23,7 @@ class _ManualExpenseScreenState extends ConsumerState<ManualExpenseScreen> {
   final _noteController = TextEditingController();
 
   DateTime _date = DateTime.now();
+  Currency _currency = Currency.rsd;
   String? _paymentMethod;
   String? _imagePath;
   bool _busy = false;
@@ -115,6 +117,7 @@ class _ManualExpenseScreenState extends ConsumerState<ManualExpenseScreen> {
         merchantName: _merchantController.text.trim(),
         totalMinor: totalMinor,
         date: _date,
+        currency: _currency,
         paymentMethod: _paymentMethod,
         note: _noteController.text.trim().isEmpty
             ? null
@@ -168,28 +171,55 @@ class _ManualExpenseScreenState extends ConsumerState<ManualExpenseScreen> {
               trailing: const Icon(Icons.calendar_today_outlined),
               onTap: _pickDate,
             ),
-            const SizedBox(height: 4),
-            DropdownButtonFormField<String?>(
-              initialValue: null,
-              decoration: InputDecoration(
-                labelText: l10n.detailPaymentMethod,
-                border: const OutlineInputBorder(),
-              ),
-              items: [
-                DropdownMenuItem(
-                    value: null,
-                    child: Text(l10n.expensePaymentNotSpecified)),
-                DropdownMenuItem(
-                    value: 'Gotovina',
-                    child: Text(l10n.expensePaymentCash)),
-                DropdownMenuItem(
-                    value: 'Kartica',
-                    child: Text(l10n.expensePaymentCard)),
-                DropdownMenuItem(
-                    value: 'Prenos',
-                    child: Text(l10n.expensePaymentTransfer)),
+            const SizedBox(height: 12),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: DropdownButtonFormField<Currency>(
+                    initialValue: _currency,
+                    decoration: InputDecoration(
+                      labelText: l10n.expenseCurrency,
+                      border: const OutlineInputBorder(),
+                    ),
+                    items: Currency.values
+                        .map((c) => DropdownMenuItem(
+                              value: c,
+                              child: Text(c.isoCode),
+                            ))
+                        .toList(),
+                    onChanged: (v) =>
+                        setState(() => _currency = v ?? Currency.rsd),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  flex: 3,
+                  child: DropdownButtonFormField<String?>(
+                    initialValue: null,
+                    decoration: InputDecoration(
+                      labelText: l10n.detailPaymentMethod,
+                      border: const OutlineInputBorder(),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                          value: null,
+                          child: Text(l10n.expensePaymentNotSpecified)),
+                      DropdownMenuItem(
+                          value: 'Gotovina',
+                          child: Text(l10n.expensePaymentCash)),
+                      DropdownMenuItem(
+                          value: 'Kartica',
+                          child: Text(l10n.expensePaymentCard)),
+                      DropdownMenuItem(
+                          value: 'Prenos',
+                          child: Text(l10n.expensePaymentTransfer)),
+                    ],
+                    onChanged: (v) => _paymentMethod = v,
+                  ),
+                ),
               ],
-              onChanged: (v) => _paymentMethod = v,
             ),
             const SizedBox(height: 12),
             TextFormField(
@@ -225,7 +255,7 @@ class _ManualExpenseScreenState extends ConsumerState<ManualExpenseScreen> {
                 const Spacer(),
                 if (totalMinor > 0)
                   Text(
-                    MoneyFormat.fromMinor(totalMinor),
+                    MoneyFormat.fromMinor(totalMinor, _currency),
                     style: Theme.of(context)
                         .textTheme
                         .titleMedium
@@ -238,6 +268,7 @@ class _ManualExpenseScreenState extends ConsumerState<ManualExpenseScreen> {
               _ItemRow(
                 key: ObjectKey(_items[i]),
                 item: _items[i],
+                currency: _currency,
                 l10n: l10n,
                 onRemove: () => _removeItem(i),
               ),
@@ -277,11 +308,13 @@ class _ItemRow extends StatelessWidget {
   const _ItemRow({
     super.key,
     required this.item,
+    required this.currency,
     required this.l10n,
     required this.onRemove,
   });
 
   final _ExpenseItem item;
+  final Currency currency;
   final AppLocalizations l10n;
   final VoidCallback onRemove;
 
@@ -314,7 +347,7 @@ class _ItemRow extends StatelessWidget {
             child: TextFormField(
               controller: item.amountController,
               decoration: InputDecoration(
-                labelText: l10n.expenseAmount,
+                labelText: '${l10n.expenseAmount} (${currency.isoCode})',
                 border: const OutlineInputBorder(),
                 isDense: true,
               ),

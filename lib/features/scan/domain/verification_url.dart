@@ -77,11 +77,26 @@ class VerificationUrlValidator {
       return const InvalidVerificationUrl(InvalidReason.wrongHost);
     }
 
-    // `vl` može biti u query-ju ili u fragmentu (neki QR generatori ga stavljaju
-    // posle #). Prvo probaj standardni query.
+    // Crna Gora: SPA URL s hash rutingom (#/verify?iic=...&tin=...&crtd=...).
+    // Nema `vl` tokena — koristimo `iic` kao jedinstveni identifikator.
+    if (country == Country.montenegro) {
+      final params = _fragmentParams(uri.fragment);
+      final iic = params['iic'];
+      if (iic == null || iic.isEmpty) {
+        return const InvalidVerificationUrl(InvalidReason.missingToken);
+      }
+      // Čuvamo ceo URL (fragment je neophodan za MneClient koji izvlači params).
+      return ValidVerificationUrl(
+        normalizedUrl: uri.replace(scheme: 'https').toString(),
+        token: iic,
+        country: country,
+      );
+    }
+
+    // TaxCore (Srbija, RS): `vl` može biti u query-ju ili fragmentu.
     var token = uri.queryParameters['vl'];
     if ((token == null || token.isEmpty) && uri.fragment.isNotEmpty) {
-      token = _extractVlFromFragment(uri.fragment);
+      token = _fragmentParams(uri.fragment)['vl'];
     }
     if (token == null || token.isEmpty) {
       return const InvalidVerificationUrl(InvalidReason.missingToken);
@@ -93,17 +108,10 @@ class VerificationUrlValidator {
         normalizedUrl: normalized, token: token, country: country);
   }
 
-  static String? _extractVlFromFragment(String fragment) {
-    // Fragment može izgledati kao "/v/?vl=TOKEN" ili "vl=TOKEN".
+  /// Parsira query parametre iz fragmenta (npr. "/verify?iic=X&tin=Y" → {iic: X, tin: Y}).
+  static Map<String, String> _fragmentParams(String fragment) {
     final qIndex = fragment.indexOf('?');
-    final query = qIndex >= 0 ? fragment.substring(qIndex + 1) : fragment;
-    for (final pair in query.split('&')) {
-      final eq = pair.indexOf('=');
-      if (eq < 0) continue;
-      if (pair.substring(0, eq) == 'vl') {
-        return Uri.decodeComponent(pair.substring(eq + 1));
-      }
-    }
-    return null;
+    if (qIndex < 0) return {};
+    return Uri.splitQueryString(fragment.substring(qIndex + 1));
   }
 }

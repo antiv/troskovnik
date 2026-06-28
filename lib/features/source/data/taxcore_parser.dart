@@ -130,6 +130,7 @@ class TaxCoreParser {
     final journalItems = journalParser.parse(journal, taxRatesByLabel: taxRates);
 
     if (journalItems.isNotEmpty) {
+      final discrepancy = _detectJsonDiscrepancy(json, header, journalItems);
       return ParsedReceipt(
         fetchStatus: FetchStatus.complete,
         itemsStatus: ItemsStatus.fromJournal,
@@ -137,6 +138,7 @@ class TaxCoreParser {
         header: header,
         items: journalItems,
         journalText: journal,
+        hasDiscrepancy: discrepancy,
       );
     }
 
@@ -147,6 +149,30 @@ class TaxCoreParser {
       header: header,
       journalText: journal,
     );
+  }
+
+  /// Upoređuje JSON invoiceResult.totalAmount sa parsiranim podacima iz žurnala.
+  /// Tolerancija ±2 minor jedinice (haluga/para) za pokrivanje zaokruživanja.
+  bool _detectJsonDiscrepancy(
+    Map<String, dynamic> json,
+    ReceiptHeader? header,
+    List<ParsedLineItem> items,
+  ) {
+    final invoiceResult = json['invoiceResult'] as Map<String, dynamic>?;
+    if (invoiceResult == null) return false;
+
+    final jsonTotalDouble = (invoiceResult['totalAmount'] as num?)?.toDouble();
+    if (jsonTotalDouble == null) return false;
+
+    const tolerance = 2;
+    // invoiceResult.totalAmount je uvek pozitivan; header i stavke su negativni za refunde.
+    final jsonTotalMinor = (jsonTotalDouble * 100).round().abs();
+    final headerTotal = (header?.totalAmount ?? 0).abs();
+    final itemsTotal = items.fold<int>(0, (s, i) => s + i.total).abs();
+
+    if ((jsonTotalMinor - headerTotal).abs() > tolerance) return true;
+    if ((itemsTotal - headerTotal).abs() > tolerance) return true;
+    return false;
   }
 
   /// Izvlači tekst žurnala iz `<pre>` bloka stranice. `<br/>` postaje novi red,

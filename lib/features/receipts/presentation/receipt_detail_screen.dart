@@ -173,6 +173,32 @@ class _DetailBody extends ConsumerWidget {
         ),
         const Divider(height: 24),
 
+        // Upozorenje: parsirani podaci se ne slažu sa invoiceResult.
+        if (r.hasDiscrepancy) ...[
+          Card(
+            color: Theme.of(context).colorScheme.errorContainer,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  Icon(Icons.warning_amber_rounded,
+                      color: Theme.of(context).colorScheme.onErrorContainer,
+                      size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l10n.detailDiscrepancyWarning,
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onErrorContainer),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+
         // Granični slučaj: stavke u obradi (sekcija 5 UI tretman).
         if (pending) ...[
           Card(
@@ -182,7 +208,9 @@ class _DetailBody extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(l10n.detailPendingExplain),
+                  Text(r.itemsStatus == ItemsStatus.fromJournal
+                      ? l10n.detailFromJournalExplain
+                      : l10n.detailPendingExplain),
                   const SizedBox(height: 8),
                   Align(
                     alignment: Alignment.centerRight,

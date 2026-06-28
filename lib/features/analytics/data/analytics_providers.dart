@@ -35,12 +35,13 @@ final analyticsRepositoryProvider =
   return AnalyticsRepository(db);
 });
 
-/// Reaktivni sažetak analitike za izabrani period.
+/// Reaktivni sažetak analitike za izabrani period i valutu.
 final analyticsSummaryProvider =
     StreamProvider<AnalyticsSummary>((ref) async* {
   final repo = await ref.watch(analyticsRepositoryProvider.future);
   final range = ref.watch(analyticsRangeProvider);
-  yield* repo.watchSummary(range);
+  final currency = ref.watch(analyticsCurrencyProvider);
+  yield* repo.watchSummary(range, currency: currency);
 });
 
 /// Detalji za jednog prodavca (drill-down), za trenutno izabrani period.

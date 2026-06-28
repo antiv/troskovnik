@@ -46,6 +46,7 @@
   "detailRefreshNow": "Refresh now",
   "detailAttachPhoto": "Attach photo",
   "detailPendingExplain": "The receipt is saved. The merchant has not posted it to the Tax Administration yet; items will be filled in automatically.",
+  "detailFromJournalExplain": "Items were read from the receipt text. Refresh to get more accurate data.",
   "detailItemsRefreshed": "Receipt items have been filled in.",
   "detailRefreshTooltip": "Refresh from Tax Administration",
   "detailRefreshConfirmBody": "Re-fetch this receipt from the Tax Administration? Existing categories and warranties are kept.",
@@ -144,7 +145,7 @@
 
   "detailProof": "Proof",
   "detailProofHint": "The receipt is kept as proof (journal + official Tax Administration link).",
-  "detailOpenOnSuf": "Open on suf.purs.gov.rs",
+  "detailOpenOnSuf": "Open fiscal portal",
   "detailDeleteReceipt": "Delete receipt",
   "detailDeleteReceiptConfirm": "Delete this receipt, its items and warranties?",
   "receiptFilterAll": "All",
@@ -172,10 +173,11 @@
   "expenseMerchantName": "Merchant / description",
   "expenseMerchantHint": "e.g. EPS, Infostan, market",
   "expenseMerchantRequired": "Enter merchant name",
-  "expenseAmount": "Amount (RSD)",
+  "expenseAmount": "Amount",
   "expenseAmountRequired": "Enter amount",
   "expenseAmountInvalid": "Amount must be greater than 0",
   "expenseDate": "Date",
+  "expenseCurrency": "Currency",
   "expensePaymentNotSpecified": "Not specified",
   "expensePaymentCash": "Cash",
   "expensePaymentCard": "Card",
@@ -195,5 +197,6 @@
   "backupImportConfirmBody": "This will replace all existing data with the backup contents. This cannot be undone.",
   "backupSuccess": "Backup restored successfully.",
   "backupErrorCorrupt": "File is corrupted or not a valid backup.",
-  "backupError": "An error occurred. Please try again."
+  "backupError": "An error occurred. Please try again.",
+  "detailDiscrepancyWarning": "Warning: parsed data does not match fiscal server data. Please verify this receipt."
 }

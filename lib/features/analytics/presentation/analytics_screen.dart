@@ -36,18 +36,21 @@ class AnalyticsScreen extends ConsumerWidget {
 
     return Column(
       children: [
-        Row(
-          children: [
-            Expanded(child: _RangeSelector()),
-            if (availableCurrencies.length > 1)
-              _CurrencyPicker(
-                currencies: availableCurrencies,
-                selected: activeCurrency,
-                onSelected: (c) =>
-                    ref.read(analyticsCurrencyProvider.notifier).set(c),
-              ),
-            const _ExportButton(),
-          ],
+        Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: Row(
+            children: [
+              Expanded(child: _RangeSelector()),
+              if (availableCurrencies.length > 1)
+                _CurrencyPicker(
+                  currencies: availableCurrencies,
+                  selected: activeCurrency,
+                  onSelected: (c) =>
+                      ref.read(analyticsCurrencyProvider.notifier).set(c),
+                ),
+              const _ExportButton(),
+            ],
+          ),
         ),
         Expanded(
           child: summaryAsync.when(
@@ -90,12 +93,12 @@ class AnalyticsScreen extends ConsumerWidget {
                   ),
                   _Section(
                     title: l10n.analyticsBusinessSplit,
-                    child: _BusinessSplitBar(split: s.businessSplit),
+                    child: _BusinessSplitBar(split: s.businessSplit, currency: activeCurrency),
                   ),
                   if (s.byPaymentMethod.isNotEmpty)
                     _Section(
                       title: l10n.analyticsByPayment,
-                      child: _PaymentSplitBar(items: s.byPaymentMethod),
+                      child: _PaymentSplitBar(items: s.byPaymentMethod, currency: activeCurrency),
                     ),
                   _Section(
                     title: l10n.analyticsByMerchant,
@@ -116,12 +119,13 @@ class AnalyticsScreen extends ConsumerWidget {
                               builder: (_) => const CategoriesScreen()),
                         ),
                       ),
-                      child: _CategoryList(items: s.byCategory),
+                      child: _CategoryList(items: s.byCategory, currency: activeCurrency),
                     ),
                   _Section(
                     title: l10n.analyticsTopItems,
                     child: _TopItemsList(
                       items: s.topItems,
+                      currency: activeCurrency,
                       onTap: (it) => _showItemSheet(context, it.name),
                     ),
                   ),
@@ -185,7 +189,7 @@ class _RangeSelector extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final range = ref.watch(analyticsRangeProvider);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
       child: SegmentedButton<AnalyticsRange>(
         showSelectedIcon: false,
         segments: [
@@ -464,18 +468,18 @@ class _SingleCurrencyChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final maxY = items
-            .map((m) => m.totalMinor)
-            .fold<int>(0, (a, b) => a > b ? a : b)
-            .toDouble() /
-        100.0;
+    final maxVal = items.map((m) => m.totalMinor).fold<int>(0, (a, b) => a > b ? a : b);
+    final minVal = items.map((m) => m.totalMinor).fold<int>(0, (a, b) => a < b ? a : b);
+    final maxY = (maxVal / 100.0) * 1.2;
+    final minY = minVal < 0 ? (minVal / 100.0) * 1.2 : 0.0;
 
     return SizedBox(
       height: 200,
       child: BarChart(
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
-          maxY: maxY * 1.2,
+          maxY: maxY == 0 ? 1 : maxY,
+          minY: minY,
           barTouchData: _barTooltip(scheme, currency),
           barGroups: [
             for (var i = 0; i < items.length; i++)
@@ -522,8 +526,9 @@ class _SingleCurrencyChart extends StatelessWidget {
 }
 
 class _BusinessSplitBar extends StatelessWidget {
-  const _BusinessSplitBar({required this.split});
+  const _BusinessSplitBar({required this.split, required this.currency});
   final BusinessSplit split;
+  final Currency currency;
 
   @override
   Widget build(BuildContext context) {
@@ -531,28 +536,32 @@ class _BusinessSplitBar extends StatelessWidget {
     final palette = _categoryColors(Theme.of(context).brightness);
     final personalColor = palette[0]; // zelena (brend)
     final businessColor = palette[1]; // plava
-    final total = split.totalMinor;
-    final bizFraction = total == 0 ? 0.0 : split.businessMinor / total;
+    // Negativne vrednosti (refundacije) klampujemo na 0 za vizuelni prikaz trake;
+    // stvarni iznosi (mogu biti negativni) prikazuju se u legendi.
+    final bizFlex = split.businessMinor.clamp(0, 1000000);
+    final perFlex = split.personalMinor.clamp(0, 1000000);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(6),
-          child: Row(
-            children: [
-              if (bizFraction > 0)
-                Expanded(
-                  flex: (bizFraction * 1000).round(),
-                  child: Container(height: 20, color: businessColor),
+          child: bizFlex + perFlex == 0
+              ? Container(height: 20, color: personalColor)
+              : Row(
+                  children: [
+                    if (bizFlex > 0)
+                      Expanded(
+                        flex: bizFlex,
+                        child: Container(height: 20, color: businessColor),
+                      ),
+                    if (perFlex > 0)
+                      Expanded(
+                        flex: perFlex,
+                        child: Container(height: 20, color: personalColor),
+                      ),
+                  ],
                 ),
-              if (bizFraction < 1)
-                Expanded(
-                  flex: ((1 - bizFraction) * 1000).round(),
-                  child: Container(height: 20, color: personalColor),
-                ),
-            ],
-          ),
         ),
         const SizedBox(height: 8),
         Row(
@@ -561,11 +570,11 @@ class _BusinessSplitBar extends StatelessWidget {
             _LegendDot(
                 color: businessColor,
                 label:
-                    '${l10n.analyticsBusiness}: ${MoneyFormat.fromMinor(split.businessMinor)}'),
+                    '${l10n.analyticsBusiness}: ${MoneyFormat.fromMinor(split.businessMinor, currency)}'),
             _LegendDot(
                 color: personalColor,
                 label:
-                    '${l10n.analyticsPersonal}: ${MoneyFormat.fromMinor(split.personalMinor)}'),
+                    '${l10n.analyticsPersonal}: ${MoneyFormat.fromMinor(split.personalMinor, currency)}'),
           ],
         ),
       ],
@@ -590,8 +599,9 @@ class _LegendDot extends StatelessWidget {
 }
 
 class _PaymentSplitBar extends StatelessWidget {
-  const _PaymentSplitBar({required this.items});
+  const _PaymentSplitBar({required this.items, required this.currency});
   final List<PaymentMethodSpending> items;
+  final Currency currency;
 
   String _label(BuildContext context, String method) =>
       method == AnalyticsRepository.paymentUnknownKey
@@ -602,8 +612,10 @@ class _PaymentSplitBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = _categoryColors(Theme.of(context).brightness);
     Color colorFor(int i) => palette[i % palette.length];
-    final total = items.fold<int>(0, (a, e) => a + e.totalMinor);
-    if (total <= 0) return const SizedBox.shrink();
+    // Samo pozitivne stavke učestvuju u vizuelnom prikazu trake.
+    final positiveItems = items.where((e) => e.totalMinor > 0).toList();
+    final positiveTotal = positiveItems.fold<int>(0, (a, e) => a + e.totalMinor);
+    if (positiveTotal <= 0) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -612,9 +624,9 @@ class _PaymentSplitBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(6),
           child: Row(
             children: [
-              for (var i = 0; i < items.length; i++)
+              for (var i = 0; i < positiveItems.length; i++)
                 Expanded(
-                  flex: (items[i].totalMinor / total * 1000)
+                  flex: (positiveItems[i].totalMinor / positiveTotal * 1000)
                       .round()
                       .clamp(1, 1000000),
                   child: Container(height: 20, color: colorFor(i)),
@@ -631,7 +643,7 @@ class _PaymentSplitBar extends StatelessWidget {
               _LegendDot(
                 color: colorFor(i),
                 label:
-                    '${_label(context, items[i].method)}: ${MoneyFormat.fromMinor(items[i].totalMinor)}',
+                    '${_label(context, items[i].method)}: ${MoneyFormat.fromMinor(items[i].totalMinor, currency)}',
               ),
           ],
         ),
@@ -677,7 +689,7 @@ class _MerchantList extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
-                      value: maxV == 0 ? 0 : m.totalMinor / maxV,
+                      value: maxV == 0 ? 0 : (m.totalMinor / maxV).clamp(0.0, 1.0),
                       minHeight: 6,
                       backgroundColor: scheme.surfaceContainerHighest,
                     ),
@@ -692,25 +704,28 @@ class _MerchantList extends StatelessWidget {
 }
 
 class _TopItemsList extends StatelessWidget {
-  const _TopItemsList({required this.items, this.onTap});
+  const _TopItemsList({required this.items, required this.currency, this.onTap});
   final List<TopItem> items;
+  final Currency currency;
 
   /// Klik na artikal (drill-down). Null → red nije interaktivan.
   final void Function(TopItem)? onTap;
 
   @override
   Widget build(BuildContext context) {
-    if (items.isEmpty) return const SizedBox.shrink();
+    // Filtriramo stavke sa negativnim ukupnim iznosom (refundovani artikli).
+    final positiveItems = items.where((it) => it.totalMinor > 0).toList();
+    if (positiveItems.isEmpty) return const SizedBox.shrink();
     return Column(
       children: [
-        for (final it in items)
+        for (final it in positiveItems)
           ListTile(
             dense: true,
             contentPadding: EdgeInsets.zero,
             onTap: onTap == null ? null : () => onTap!(it),
             title: Text(it.name),
             subtitle: Text('×${it.count}'),
-            trailing: Text(MoneyFormat.fromMinor(it.totalMinor),
+            trailing: Text(MoneyFormat.fromMinor(it.totalMinor, currency),
                 style: const TextStyle(fontWeight: FontWeight.bold)),
           ),
       ],
@@ -719,8 +734,9 @@ class _TopItemsList extends StatelessWidget {
 }
 
 class _CategoryList extends StatelessWidget {
-  const _CategoryList({required this.items});
+  const _CategoryList({required this.items, required this.currency});
   final List<CategorySpending> items;
+  final Currency currency;
 
   @override
   Widget build(BuildContext context) {
@@ -748,7 +764,7 @@ class _CategoryList extends StatelessWidget {
                         Text(c.categoryName),
                       ],
                     ),
-                    Text(MoneyFormat.fromMinor(c.totalMinor),
+                    Text(MoneyFormat.fromMinor(c.totalMinor, currency),
                         style: const TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
@@ -756,7 +772,7 @@ class _CategoryList extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
-                    value: maxV == 0 ? 0 : c.totalMinor / maxV,
+                    value: maxV == 0 ? 0 : (c.totalMinor / maxV).clamp(0.0, 1.0),
                     minHeight: 6,
                     backgroundColor: scheme.surfaceContainerHighest,
                   ),
@@ -848,6 +864,7 @@ class _MerchantDetailSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final async = ref.watch(merchantDetailProvider(merchantId));
+    final currency = ref.watch(analyticsCurrencyProvider) ?? Currency.rsd;
     return _SheetScaffold(
       title: name,
       child: async.when(
@@ -863,11 +880,11 @@ class _MerchantDetailSheet extends ConsumerWidget {
                 Expanded(
                     child: _StatTile(
                         label: l10n.analyticsTotalSpent,
-                        value: MoneyFormat.fromMinor(d.totalMinor))),
+                        value: MoneyFormat.fromMinor(d.totalMinor, currency))),
                 Expanded(
                     child: _StatTile(
                         label: l10n.analyticsAverage,
-                        value: MoneyFormat.fromMinor(d.averageMinor))),
+                        value: MoneyFormat.fromMinor(d.averageMinor, currency))),
               ],
             ),
             const SizedBox(height: 4),
@@ -885,6 +902,7 @@ class _MerchantDetailSheet extends ConsumerWidget {
                 title: l10n.analyticsTopItems,
                 child: _TopItemsList(
                   items: d.topItems,
+                  currency: currency,
                   onTap: (it) => _showItemSheet(context, it.name),
                 ),
               ),
@@ -903,6 +921,7 @@ class _ItemDetailSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final async = ref.watch(itemDetailProvider(name));
+    final currency = ref.watch(analyticsCurrencyProvider) ?? Currency.rsd;
     return _SheetScaffold(
       title: name,
       child: async.when(
@@ -922,7 +941,7 @@ class _ItemDetailSheet extends ConsumerWidget {
                 Expanded(
                     child: _StatTile(
                         label: l10n.analyticsTotalSpent,
-                        value: MoneyFormat.fromMinor(d.totalMinor))),
+                        value: MoneyFormat.fromMinor(d.totalMinor, currency))),
               ],
             ),
             const SizedBox(height: 4),
@@ -932,7 +951,7 @@ class _ItemDetailSheet extends ConsumerWidget {
             if (d.priceHistory.length >= 2)
               _Section(
                 title: l10n.analyticsPriceHistory,
-                child: _PriceHistoryChart(points: d.priceHistory),
+                child: _PriceHistoryChart(points: d.priceHistory, currency: currency),
               ),
             if (d.byMerchant.isNotEmpty)
               _Section(
@@ -954,8 +973,9 @@ class _ItemDetailSheet extends ConsumerWidget {
 }
 
 class _PriceHistoryChart extends StatelessWidget {
-  const _PriceHistoryChart({required this.points});
+  const _PriceHistoryChart({required this.points, this.currency = Currency.rsd});
   final List<PricePoint> points;
+  final Currency currency;
 
   @override
   Widget build(BuildContext context) {
@@ -970,7 +990,7 @@ class _PriceHistoryChart extends StatelessWidget {
               getTooltipItems: (spots) => [
                 for (final s in spots)
                   LineTooltipItem(
-                    MoneyFormat.fromDouble(s.y),
+                    MoneyFormat.fromDouble(s.y, currency),
                     TextStyle(
                       color: scheme.onInverseSurface,
                       fontWeight: FontWeight.bold,
