@@ -1,23 +1,31 @@
 import 'package:intl/intl.dart';
 
-/// Formatting helpers for Serbian dinar (RSD) amounts.
+import '../domain/currency.dart';
+
+/// Formatiranje novčanih iznosa u minor jedinicama (para/feninga, 1/100 osnovne).
 ///
-/// Amounts are stored as integer minor units (para, 1/100 RSD) to avoid
-/// floating-point rounding, and formatted with the `sr_RS` locale
-/// (space thousands separator, comma decimal).
+/// Iznosi su čuvani kao int da bi se izbegli floating-point problemi. Simbol i
+/// locale biraju se po valuti računa.
 class MoneyFormat {
   MoneyFormat._();
 
-  static final NumberFormat _rsd = NumberFormat.currency(
-    locale: 'sr_RS',
-    symbol: 'RSD',
-    decimalDigits: 2,
-  );
+  static final _formatters = <Currency, NumberFormat>{};
 
-  /// Formats minor units (para) as e.g. "1.234,56 RSD".
-  static String fromMinor(int minorUnits) =>
-      _rsd.format(minorUnits / 100.0);
+  static NumberFormat _fmt(Currency currency) =>
+      _formatters.putIfAbsent(
+        currency,
+        () => NumberFormat.currency(
+          locale: currency.locale,
+          symbol: currency.symbol,
+          decimalDigits: 2,
+        ),
+      );
 
-  /// Formats a decimal amount already in RSD.
-  static String fromDouble(double amount) => _rsd.format(amount);
+  /// Formatira minor jedinice (para/fening) npr. "1.234,56 RSD" ili "1.234,56 KM".
+  static String fromMinor(int minorUnits, [Currency currency = Currency.rsd]) =>
+      _fmt(currency).format(minorUnits / 100.0);
+
+  /// Formatira decimalni iznos već u osnovnoj jedinici.
+  static String fromDouble(double amount, [Currency currency = Currency.rsd]) =>
+      _fmt(currency).format(amount);
 }

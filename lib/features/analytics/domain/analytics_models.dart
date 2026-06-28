@@ -1,38 +1,44 @@
 /// Modeli rezultata analitike potrošnje (agregacije nad postojećim podacima).
 ///
-/// Svi iznosi su u para (1/100 RSD), kao i u ostatku baze.
+/// Svi iznosi su u minor jedinicama (para/fening, 1/100 osnovne valute).
+/// Valute se NIKAD ne sabiraju — svaki model nosi svoju valutu.
 library;
 
+import '../../../core/domain/currency.dart';
 import '../../categories/domain/category_models.dart';
 
-/// Potrošnja u jednom kalendarskom mesecu.
+/// Potrošnja u jednom kalendarskom mesecu (po valuti).
 class MonthlySpending {
   const MonthlySpending({
     required this.year,
     required this.month,
     required this.totalMinor,
     required this.receiptCount,
+    this.currency = Currency.rsd,
   });
 
   final int year;
   final int month; // 1..12
   final int totalMinor;
   final int receiptCount;
+  final Currency currency;
 }
 
-/// Potrošnja kod jednog prodavca.
+/// Potrošnja kod jednog prodavca (po valuti).
 class MerchantSpending {
   const MerchantSpending({
     required this.merchantId,
     required this.merchantName,
     required this.totalMinor,
     required this.receiptCount,
+    this.currency = Currency.rsd,
   });
 
   final int merchantId;
   final String merchantName;
   final int totalMinor;
   final int receiptCount;
+  final Currency currency;
 }
 
 /// Potrošnja po jednom načinu plaćanja (uklj. kombinovano — iznos je deo
@@ -78,7 +84,7 @@ class TopItem {
 /// Zbirni pregled analitike za izabrani period.
 class AnalyticsSummary {
   const AnalyticsSummary({
-    required this.totalMinor,
+    required this.totalsByCurrency,
     required this.receiptCount,
     required this.estimatedVatMinor,
     required this.monthly,
@@ -89,7 +95,8 @@ class AnalyticsSummary {
     required this.byCategory,
   });
 
-  final int totalMinor;
+  /// Ukupan iznos po valuti — nikad se ne sabiraju različite valute.
+  final Map<Currency, int> totalsByCurrency;
   final int receiptCount;
 
   /// Procenjen PDV iz stavki koje imaju poresku stopu (samo računi sa

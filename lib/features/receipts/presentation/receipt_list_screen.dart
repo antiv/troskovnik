@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/domain/country.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/utils/money_format.dart';
 import '../../../core/widgets/clearable_search_field.dart';
@@ -130,11 +131,16 @@ class ReceiptListScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            MoneyFormat.fromMinor(item.receipt.totalAmount),
+                            MoneyFormat.fromMinor(item.receipt.totalAmount,
+                                item.receipt.currency),
                             style:
                                 const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 2),
+                          if (item.receipt.country != Country.serbia)
+                            Text(item.receipt.country.currency.symbol,
+                                style: const TextStyle(
+                                    fontSize: 10, fontWeight: FontWeight.w500)),
                           ItemsStatusBadge(
                             fetchStatus: item.receipt.fetchStatus,
                             itemsStatus: item.receipt.itemsStatus,
