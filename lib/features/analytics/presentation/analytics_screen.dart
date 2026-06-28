@@ -23,12 +23,29 @@ class AnalyticsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final summaryAsync = ref.watch(analyticsSummaryProvider);
+    final selectedCurrency = ref.watch(analyticsCurrencyProvider);
+
+    // Dostupne valute (prazno dok se učitava).
+    final availableCurrencies = summaryAsync
+            .whenData((s) => s.totalsByCurrency.keys.toList())
+            .value ??
+        const <Currency>[];
+    final activeCurrency = availableCurrencies.contains(selectedCurrency)
+        ? selectedCurrency!
+        : (availableCurrencies.isNotEmpty ? availableCurrencies.first : Currency.rsd);
 
     return Column(
       children: [
         Row(
           children: [
             Expanded(child: _RangeSelector()),
+            if (availableCurrencies.length > 1)
+              _CurrencyPicker(
+                currencies: availableCurrencies,
+                selected: activeCurrency,
+                onSelected: (c) =>
+                    ref.read(analyticsCurrencyProvider.notifier).set(c),
+              ),
             const _ExportButton(),
           ],
         ),
@@ -46,14 +63,30 @@ class AnalyticsScreen extends ConsumerWidget {
                   ),
                 );
               }
+
+              // Filtriraj podatke po aktivnoj valuti.
+              final monthly = s.monthly
+                  .where((m) => m.currency == activeCurrency)
+                  .toList();
+              final byMerchant = s.byMerchant
+                  .where((m) => m.currency == activeCurrency)
+                  .toList();
+              final totalMinor = s.totalsByCurrency[activeCurrency] ?? 0;
+
               return ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  _TotalCard(summary: s),
+                  _TotalCard(
+                    totalMinor: totalMinor,
+                    currency: activeCurrency,
+                    receiptCount: s.receiptCount,
+                    estimatedVatMinor: s.estimatedVatMinor,
+                  ),
                   const SizedBox(height: 16),
                   _Section(
                     title: l10n.analyticsByMonth,
-                    child: _MonthlyChart(monthly: s.monthly),
+                    child: _SingleCurrencyChart(
+                        items: monthly, currency: activeCurrency),
                   ),
                   _Section(
                     title: l10n.analyticsBusinessSplit,
@@ -67,7 +100,7 @@ class AnalyticsScreen extends ConsumerWidget {
                   _Section(
                     title: l10n.analyticsByMerchant,
                     child: _MerchantList(
-                      merchants: s.byMerchant,
+                      merchants: byMerchant,
                       onTap: (m) => _showMerchantSheet(
                           context, m.merchantId, m.merchantName),
                     ),
@@ -87,7 +120,6 @@ class AnalyticsScreen extends ConsumerWidget {
                     ),
                   _Section(
                     title: l10n.analyticsTopItems,
-                    // subtitle: l10n.analyticsItemsHint,
                     child: _TopItemsList(
                       items: s.topItems,
                       onTap: (it) => _showItemSheet(context, it.name),
@@ -103,6 +135,50 @@ class AnalyticsScreen extends ConsumerWidget {
   }
 }
 
+class _CurrencyPicker extends StatelessWidget {
+  const _CurrencyPicker({
+    required this.currencies,
+    required this.selected,
+    required this.onSelected,
+  });
+  final List<Currency> currencies;
+  final Currency selected;
+  final void Function(Currency) onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<Currency>(
+      tooltip: selected.symbol,
+      icon: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.currency_exchange, size: 18),
+          const SizedBox(width: 2),
+          Text(selected.symbol,
+              style: Theme.of(context).textTheme.labelMedium),
+        ],
+      ),
+      onSelected: onSelected,
+      itemBuilder: (_) => [
+        for (final c in currencies)
+          PopupMenuItem(
+            value: c,
+            child: Row(
+              children: [
+                if (c == selected)
+                  const Icon(Icons.check, size: 16)
+                else
+                  const SizedBox(width: 16),
+                const SizedBox(width: 8),
+                Text(c.symbol),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 class _RangeSelector extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -111,6 +187,7 @@ class _RangeSelector extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
       child: SegmentedButton<AnalyticsRange>(
+        showSelectedIcon: false,
         segments: [
           ButtonSegment(
               value: AnalyticsRange.last3Months,
@@ -223,8 +300,16 @@ Future<void> _runExport(
 }
 
 class _TotalCard extends StatelessWidget {
-  const _TotalCard({required this.summary});
-  final AnalyticsSummary summary;
+  const _TotalCard({
+    required this.totalMinor,
+    required this.currency,
+    required this.receiptCount,
+    required this.estimatedVatMinor,
+  });
+  final int totalMinor;
+  final Currency currency;
+  final int receiptCount;
+  final int estimatedVatMinor;
 
   @override
   Widget build(BuildContext context) {
@@ -240,16 +325,14 @@ class _TotalCard extends StatelessWidget {
             Text(l10n.analyticsTotalSpent,
                 style: TextStyle(color: scheme.onPrimaryContainer)),
             const SizedBox(height: 4),
-            // Prikazujemo zaseban red po valuti — nikad ne sabiramo RSD + BAM.
-            for (final entry in summary.totalsByCurrency.entries)
-              Text(
-                MoneyFormat.fromMinor(entry.value, entry.key),
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: scheme.onPrimaryContainer,
-                    fontWeight: FontWeight.bold),
-              ),
+            Text(
+              MoneyFormat.fromMinor(totalMinor, currency),
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: scheme.onPrimaryContainer,
+                  fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 4),
-            Text(l10n.analyticsReceiptCount(summary.receiptCount),
+            Text(l10n.analyticsReceiptCount(receiptCount),
                 style: TextStyle(color: scheme.onPrimaryContainer)),
             const Divider(height: 20),
             Row(
@@ -257,7 +340,7 @@ class _TotalCard extends StatelessWidget {
               children: [
                 Text(l10n.analyticsEstimatedVat,
                     style: TextStyle(color: scheme.onPrimaryContainer)),
-                Text(MoneyFormat.fromMinor(summary.estimatedVatMinor),
+                Text(MoneyFormat.fromMinor(estimatedVatMinor, currency),
                     style: TextStyle(
                         color: scheme.onPrimaryContainer,
                         fontWeight: FontWeight.bold)),

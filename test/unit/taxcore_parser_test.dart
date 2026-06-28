@@ -163,6 +163,99 @@ void main() {
     });
   });
 
+  group('Republika Srpska (JSON API, ijekavski žurnal)', () {
+    // Realni RS račun: PIB je 13 cifara, "вријеме" (ijekavski), BAM valuta.
+    const rsJournal = '============ ФИСКАЛНИ РАЧУН ============\n'
+        '             4401941690008              \n'
+        '    "RDT SWISSLION" d.o.o. Trebinje     \n'
+        '           Draženska gora bb            \n'
+        '                Trebinje                \n'
+        'Касир:                    Nada Kovacevic\n'
+        'ЕСИР број:                        77/4.0\n'
+        '-------------ПРОМЕТ ПРОДАЈА-------------\n'
+        'Артикли\n'
+        '========================================\n'
+        'Назив   Цијена       Кол.         Укупно\n'
+        'Porodicna karta /Kom (Е)\n'
+        '       100,00          1          100,00\n'
+        '----------------------------------------\n'
+        'Укупан износ:                     100,00\n'
+        'Платна картица:                   100,00\n'
+        '========================================\n'
+        'Ознака       Име      Стопа        Порез\n'
+        'Е             ПДВ   17,00%         14,53\n'
+        '----------------------------------------\n'
+        'Укупан износила пореза:               14,53\n'
+        '========================================\n'
+        'ПФР вријеме:         28.6.2026. 10:22:50\n'
+        'ПФР број рачуна:  8FENPZP8-8FENPZP8-1973\n'
+        'Бројач рачуна:               1969/1973ПП\n'
+        '========================================\n'
+        '======== КРАЈ ФИСКАЛНОГ РАЧУНА =========\n';
+
+    test('RS JSON response → complete fromJournal', () {
+      final body = '{"isValid":true,"journal":${jsonEncode(rsJournal)}}';
+      final raw = RawPortalResponse(
+        verificationUrl: 'https://suf.poreskaupravars.org/v/?vl=X',
+        statusCode: 200,
+        body: body,
+        contentType: 'application/json; charset=utf-8',
+      );
+      final r = parser.parse(raw);
+      expect(r.fetchStatus, FetchStatus.complete);
+      expect(r.itemsStatus, ItemsStatus.fromJournal);
+      expect(r.items, isNotEmpty);
+    });
+
+    test('RS header: PIB 13 cifara, ijekavsko "вријеме", pfrNumber, counter',
+        () {
+      final body = '{"isValid":true,"journal":${jsonEncode(rsJournal)}}';
+      final raw = RawPortalResponse(
+        verificationUrl: 'https://suf.poreskaupravars.org/v/?vl=X',
+        statusCode: 200,
+        body: body,
+        contentType: 'application/json',
+      );
+      final r = parser.parse(raw);
+      expect(r.header, isNotNull);
+      expect(r.header!.merchantTin, '4401941690008');
+      expect(r.header!.pfrNumber, '8FENPZP8-8FENPZP8-1973');
+      expect(r.header!.invoiceCounter, '1969/1973ПП');
+      expect(r.header!.pfrTime, isNotNull);
+      expect(r.header!.pfrTime!.day, 28);
+      expect(r.header!.pfrTime!.month, 6);
+      expect(r.header!.totalAmount, 10000); // 100,00 KM = 10000 para
+      expect(r.header!.transactionType, TransactionType.sale);
+    });
+
+    test('RS refund: ПРОМЕТ РЕФУНДАЦИЈЕ → TransactionType.refund', () {
+      const refundJournal = '============ ФИСКАЛНИ РАЧУН ============\n'
+          '             4401941690008              \n'
+          'Продавница RS\n'
+          'Касир:                        Test\n'
+          '----------ПРОМЕТ РЕФУНДАЦИЈЕ-----------\n'
+          'Артикли\n'
+          'Назив   Цијена       Кол.         Укупно\n'
+          'Artikal A (Е)\n'
+          '       50,00          1           50,00\n'
+          'Укупан износ:                      50,00\n'
+          'Готовина:                          50,00\n'
+          'Е             ПДВ   17,00%          7,26\n'
+          'ПФР вријеме:         15.6.2026. 15:21:37\n'
+          'ПФР број рачуна:  AAAAAAAA-AAAAAAAA-1000\n'
+          'Бројач рачуна:                1000/1001ПП\n';
+      final body = '{"isValid":true,"journal":${jsonEncode(refundJournal)}}';
+      final raw = RawPortalResponse(
+        verificationUrl: 'https://suf.poreskaupravars.org/v/?vl=X',
+        statusCode: 200,
+        body: body,
+        contentType: 'application/json',
+      );
+      final r = parser.parse(raw);
+      expect(r.header!.transactionType, TransactionType.refund);
+    });
+  });
+
   group('full real page (local fixture, not committed)', () {
     final pageFile = File('test/fixtures/complete.page.html');
 
