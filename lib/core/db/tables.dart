@@ -115,6 +115,10 @@ class Receipts extends Table {
   IntColumn get currency =>
       intEnum<Currency>().withDefault(Constant(Currency.rsd.index))();
 
+  // --- Validacija ---
+  BoolColumn get hasDiscrepancy =>
+      boolean().withDefault(const Constant(false))();
+
   // --- Meta ---
   DateTimeColumn get createdAt =>
       dateTime().withDefault(currentDateAndTime)();

@@ -1,15 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/db/providers.dart';
-import '../../source/data/taxcore_client.dart';
+import '../../source/data/multi_source_registry.dart';
 import '../../source/domain/receipt_source.dart';
 import '../../warranties/data/warranty_providers.dart';
 import 'receipt_repository.dart';
 import 'refetch_service.dart';
 
-/// Izvor podataka računa (TaxCore portal preko dio).
+/// Izvor podataka računa — automatski bira klijenta po zemlji portala.
 final receiptSourceProvider =
-    Provider<ReceiptSource>((ref) => TaxCoreClient());
+    Provider<ReceiptSource>((ref) => MultiSourceRegistry());
 
 /// Repository — dostupan tek kad se baza otvori.
 final receiptRepositoryProvider = FutureProvider<ReceiptRepository>((ref) async {

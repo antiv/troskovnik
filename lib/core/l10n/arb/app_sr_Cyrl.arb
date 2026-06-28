@@ -46,6 +46,7 @@
   "detailRefreshNow": "Освежи сада",
   "detailAttachPhoto": "Приложи фотографију",
   "detailPendingExplain": "Рачун је сачуван. Продавац га још није прокњижио код Пореске; ставке ће се аутоматски допунити.",
+  "detailFromJournalExplain": "Ставке су преузете из текста рачуна. Освежите да добијете прецизније податке.",
   "detailItemsRefreshed": "Ставке рачуна су допуњене.",
   "detailRefreshTooltip": "Освежи са Пореске управе",
   "detailRefreshConfirmBody": "Поново преузети рачун са Пореске управе? Постојеће категорије и гаранције се задржавају.",
@@ -144,7 +145,7 @@
 
   "detailProof": "Доказ",
   "detailProofHint": "Рачун је сачуван као доказ (журнал + званични линк Пореске).",
-  "detailOpenOnSuf": "Отвори на suf.purs.gov.rs",
+  "detailOpenOnSuf": "Отвори фискални портал",
   "detailDeleteReceipt": "Обриши рачун",
   "detailDeleteReceiptConfirm": "Обрисати овај рачун, његове ставке и гаранције?",
   "receiptFilterAll": "Сви",
@@ -172,10 +173,11 @@
   "expenseMerchantName": "Продавац / опис",
   "expenseMerchantHint": "нпр. ЕПС, Инфостан, пијаца",
   "expenseMerchantRequired": "Унесите назив продавца",
-  "expenseAmount": "Износ (RSD)",
+  "expenseAmount": "Износ",
   "expenseAmountRequired": "Унесите износ",
   "expenseAmountInvalid": "Износ мора бити већи од 0",
   "expenseDate": "Датум",
+  "expenseCurrency": "Валута",
   "expensePaymentNotSpecified": "Није наведено",
   "expensePaymentCash": "Готовина",
   "expensePaymentCard": "Картица",
@@ -195,5 +197,6 @@
   "backupImportConfirmBody": "Ово ће заменити све постојеће податке садржајем бекап-а. Ова акција се не може поништити.",
   "backupSuccess": "Бекап је успешно увезен.",
   "backupErrorCorrupt": "Фајл је оштећен или није исправан бекап.",
-  "backupError": "Дошло је до грешке. Покушајте поново."
+  "backupError": "Дошло је до грешке. Покушајте поново.",
+  "detailDiscrepancyWarning": "Упозорење: парсирани подаци се не слажу са подацима фискалног сервера. Проверите рачун."
 }

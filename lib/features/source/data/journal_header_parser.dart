@@ -149,7 +149,7 @@ class JournalHeaderParser {
       pfrTime: pfrTime,
       invoiceCounter: invoiceCounter,
       transactionType: transactionType,
-      totalAmount: totalAmount,
+      totalAmount: transactionType == TransactionType.refund ? -totalAmount : totalAmount,
       paymentMethod: paymentMethod,
       paymentsJson: payments.isEmpty ? null : jsonEncode(payments),
       taxJson: taxRates.isEmpty

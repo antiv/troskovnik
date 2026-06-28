@@ -129,6 +129,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The receipt is saved. The merchant has not posted it to the Tax Administration yet; items will be filled in automatically.';
 
   @override
+  String get detailFromJournalExplain =>
+      'Items were read from the receipt text. Refresh to get more accurate data.';
+
+  @override
   String get detailItemsRefreshed => 'Receipt items have been filled in.';
 
   @override
@@ -404,7 +408,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'The receipt is kept as proof (journal + official Tax Administration link).';
 
   @override
-  String get detailOpenOnSuf => 'Open on suf.purs.gov.rs';
+  String get detailOpenOnSuf => 'Open fiscal portal';
 
   @override
   String get detailDeleteReceipt => 'Delete receipt';
@@ -475,7 +479,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get expenseMerchantRequired => 'Enter merchant name';
 
   @override
-  String get expenseAmount => 'Amount (RSD)';
+  String get expenseAmount => 'Amount';
 
   @override
   String get expenseAmountRequired => 'Enter amount';
@@ -485,6 +489,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get expenseDate => 'Date';
+
+  @override
+  String get expenseCurrency => 'Currency';
 
   @override
   String get expensePaymentNotSpecified => 'Not specified';
@@ -545,4 +552,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupError => 'An error occurred. Please try again.';
+
+  @override
+  String get detailDiscrepancyWarning =>
+      'Warning: parsed data does not match fiscal server data. Please verify this receipt.';
 }

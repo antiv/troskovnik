@@ -28,8 +28,6 @@ class ItemsStatusBadge extends StatelessWidget {
         return _chip(l10n.badgeItemsPending, scheme.tertiaryContainer,
             scheme.onTertiaryContainer, Icons.hourglass_top);
       case ItemsStatus.fromJournal:
-        return _chip(l10n.badgeFromJournal, scheme.secondaryContainer,
-            scheme.onSecondaryContainer, Icons.notes);
       case ItemsStatus.none:
       case ItemsStatus.fromSpecifications:
         return const SizedBox.shrink();

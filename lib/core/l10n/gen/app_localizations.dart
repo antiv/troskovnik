@@ -327,6 +327,12 @@ abstract class AppLocalizations {
   /// **'Račun je sačuvan. Prodavac ga još nije proknjižio kod Poreske; stavke će se automatski dopuniti.'**
   String get detailPendingExplain;
 
+  /// No description provided for @detailFromJournalExplain.
+  ///
+  /// In sr, this message translates to:
+  /// **'Stavke su preuzete iz teksta računa. Osvežite da dobijete preciznije podatke.'**
+  String get detailFromJournalExplain;
+
   /// No description provided for @detailItemsRefreshed.
   ///
   /// In sr, this message translates to:
@@ -846,7 +852,7 @@ abstract class AppLocalizations {
   /// No description provided for @detailOpenOnSuf.
   ///
   /// In sr, this message translates to:
-  /// **'Otvori na suf.purs.gov.rs'**
+  /// **'Otvori fiskalni portal'**
   String get detailOpenOnSuf;
 
   /// No description provided for @detailDeleteReceipt.
@@ -984,7 +990,7 @@ abstract class AppLocalizations {
   /// No description provided for @expenseAmount.
   ///
   /// In sr, this message translates to:
-  /// **'Iznos (RSD)'**
+  /// **'Iznos'**
   String get expenseAmount;
 
   /// No description provided for @expenseAmountRequired.
@@ -1004,6 +1010,12 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'Datum'**
   String get expenseDate;
+
+  /// No description provided for @expenseCurrency.
+  ///
+  /// In sr, this message translates to:
+  /// **'Valuta'**
+  String get expenseCurrency;
 
   /// No description provided for @expensePaymentNotSpecified.
   ///
@@ -1118,6 +1130,12 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'Došlo je do greške. Pokušajte ponovo.'**
   String get backupError;
+
+  /// No description provided for @detailDiscrepancyWarning.
+  ///
+  /// In sr, this message translates to:
+  /// **'Upozorenje: parsirani podaci se ne slažu sa podacima fiskalnog servera. Proverite račun.'**
+  String get detailDiscrepancyWarning;
 }
 
 class _AppLocalizationsDelegate

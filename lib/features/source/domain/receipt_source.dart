@@ -41,6 +41,7 @@ class ParsedReceipt {
     this.header,
     this.items = const [],
     this.journalText,
+    this.hasDiscrepancy = false,
   });
 
   final FetchStatus fetchStatus;
@@ -50,6 +51,10 @@ class ParsedReceipt {
   final ReceiptHeader? header;
   final List<ParsedLineItem> items;
   final String? journalText;
+
+  /// True ako se parsirani podaci ne slažu sa server-potvrdnim podacima
+  /// (npr. zbir stavki ili ukupan iznos odstupa od invoiceResult).
+  final bool hasDiscrepancy;
 }
 
 /// Parsirano zaglavlje računa.

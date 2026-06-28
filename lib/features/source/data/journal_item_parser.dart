@@ -31,8 +31,9 @@ class JournalItemParser {
 
   // Red sa vrednostima: tri broja razdvojena razmacima (srpski ili en-US
   // format — SrNumber sam prepoznaje decimalni separator).
+  // Treći broj (ukupno) može biti negativan kod refundacija.
   static final _valuesLine = RegExp(
-    r'^\s*([\d][\d.,]*)\s+([\d][\d.,]*)\s+([\d][\d.,]*)\s*$',
+    r'^\s*([\d][\d.,]*)\s+([\d][\d.,]*)\s+(-?[\d][\d.,]*)\s*$',
     unicode: true,
   );
 

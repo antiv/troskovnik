@@ -2,7 +2,7 @@ import 'package:workmanager/workmanager.dart';
 
 import '../../../core/db/database.dart';
 import '../../../core/db/db_key.dart';
-import '../../source/data/taxcore_client.dart';
+import '../../source/data/multi_source_registry.dart';
 import 'receipt_repository.dart';
 import 'refetch_service.dart';
 
@@ -42,7 +42,7 @@ void callbackDispatcher() {
     final key = await DbKeyManager().getOrCreateKey();
     final db = AppDatabase.encrypted(key);
     try {
-      final service = RefetchService(TaxCoreClient(), ReceiptRepository(db));
+      final service = RefetchService(MultiSourceRegistry(), ReceiptRepository(db));
       await service.processDue();
       return true;
     } finally {

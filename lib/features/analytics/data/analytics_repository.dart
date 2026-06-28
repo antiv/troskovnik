@@ -34,6 +34,7 @@ class AnalyticsRepository {
   Stream<AnalyticsSummary> watchSummary(
     AnalyticsRange range, {
     DateTime? now,
+    Currency? currency,
   }) {
     // Bilo koja izmena receipts/line_items/merchants pokreće preračun.
     final trigger = _db
@@ -43,23 +44,26 @@ class AnalyticsRepository {
           readsFrom: {_db.receipts, _db.lineItems, _db.merchants},
         )
         .watch();
-    return trigger.asyncMap((_) => loadSummary(range, now: now));
+    return trigger.asyncMap((_) => loadSummary(range, now: now, currency: currency));
   }
 
   Future<AnalyticsSummary> loadSummary(
     AnalyticsRange range, {
     DateTime? now,
+    Currency? currency,
   }) async {
     final ts = now ?? DateTime.now();
     final since = _since(range, ts);
 
+    // _monthly i _byMerchant su bez currency filtera — grupisani su po valuti
+    // i screen ih filtrira u Dart-u da bi picker imao sve dostupne valute.
     final monthly = await _monthly(since);
     final byMerchant = await _byMerchant(since);
-    final split = await _businessSplit(since);
-    final byPayment = await _byPaymentMethod(since);
-    final topItems = await _topItems(since);
-    final vat = await _estimatedVat(since);
-    final byCategory = await _byCategory(since);
+    final split = await _businessSplit(since, currency: currency);
+    final byPayment = await _byPaymentMethod(since, currency: currency);
+    final topItems = await _topItems(since, currency: currency);
+    final vat = await _estimatedVat(since, currency: currency);
+    final byCategory = await _byCategory(since, currency: currency);
 
     // Zbir po valuti — nikad ne sabiramo RSD + BAM.
     final totalsByCurrency = <Currency, int>{};
@@ -183,16 +187,19 @@ class AnalyticsRepository {
     );
   }
 
-  /// Zajednički filter: validni računi (+ opciono period po pfr_time/created_at).
-  Expression<bool> _validAnd(DateTime? since) {
+  /// Zajednički filter: validni računi (+ opciono period i valuta).
+  Expression<bool> _validAnd(DateTime? since, {Currency? currency}) {
     final r = _db.receipts;
-    final notInvalid = r.fetchStatus.equalsValue(FetchStatus.invalid).not();
-    if (since == null) return notInvalid;
-
-    // U periodu: pfr_time >= since, ili (nema pfr_time) created_at >= since.
-    final inPeriod = r.pfrTime.isBiggerOrEqualValue(since) |
-        (r.pfrTime.isNull() & r.createdAt.isBiggerOrEqualValue(since));
-    return notInvalid & inPeriod;
+    var expr = r.fetchStatus.equalsValue(FetchStatus.invalid).not();
+    if (since != null) {
+      final inPeriod = r.pfrTime.isBiggerOrEqualValue(since) |
+          (r.pfrTime.isNull() & r.createdAt.isBiggerOrEqualValue(since));
+      expr = expr & inPeriod;
+    }
+    if (currency != null) {
+      expr = expr & r.currency.equalsValue(currency);
+    }
+    return expr;
   }
 
   Future<List<MonthlySpending>> _monthly(DateTime? since,
@@ -255,13 +262,13 @@ class AnalyticsRepository {
     }).toList();
   }
 
-  Future<BusinessSplit> _businessSplit(DateTime? since) async {
+  Future<BusinessSplit> _businessSplit(DateTime? since, {Currency? currency}) async {
     final r = _db.receipts;
     final total = r.totalAmount.sum();
 
     final q = _db.selectOnly(r)
       ..addColumns([r.isBusiness, total])
-      ..where(_validAnd(since))
+      ..where(_validAnd(since, currency: currency))
       ..groupBy([r.isBusiness]);
 
     final rows = await q.get();
@@ -282,11 +289,11 @@ class AnalyticsRepository {
   /// Potrošnja po načinu plaćanja. Agregacija u Dart-u jer su iznosi u JSON-u
   /// (`payments_json`); kombinovano plaćanje se deli po načinima. Fallback:
   /// ako nema strukture, ceo iznos ide na `payment_method`, pa na „Nepoznato".
-  Future<List<PaymentMethodSpending>> _byPaymentMethod(DateTime? since) async {
+  Future<List<PaymentMethodSpending>> _byPaymentMethod(DateTime? since, {Currency? currency}) async {
     final r = _db.receipts;
     final q = _db.selectOnly(r)
       ..addColumns([r.paymentsJson, r.paymentMethod, r.totalAmount])
-      ..where(_validAnd(since));
+      ..where(_validAnd(since, currency: currency));
 
     final totals = <String, int>{};
     final counts = <String, int>{};
@@ -334,13 +341,13 @@ class AnalyticsRepository {
   static const _paymentUnknownKey = '__unknown__';
 
   Future<List<TopItem>> _topItems(DateTime? since,
-      {int limit = 10, int? merchantId}) async {
+      {int limit = 10, int? merchantId, Currency? currency}) async {
     final r = _db.receipts;
     final li = _db.lineItems;
     final total = li.total.sum();
     final cnt = li.id.count();
 
-    var filter = _validAnd(since) & li.isUnparsed.equals(false);
+    var filter = _validAnd(since, currency: currency) & li.isUnparsed.equals(false);
     if (merchantId != null) filter = filter & r.merchantId.equals(merchantId);
 
     final q = _db.selectOnly(li).join([
@@ -362,7 +369,7 @@ class AnalyticsRepository {
         .toList();
   }
 
-  Future<List<CategorySpending>> _byCategory(DateTime? since) async {
+  Future<List<CategorySpending>> _byCategory(DateTime? since, {Currency? currency}) async {
     final li = _db.lineItems;
     final c = _db.categories;
     final r = _db.receipts;
@@ -374,7 +381,7 @@ class AnalyticsRepository {
       leftOuterJoin(c, c.id.equalsExp(li.categoryId)),
     ])
       ..addColumns([c.id, c.name, c.color, total, cnt])
-      ..where(_validAnd(since) & li.isUnparsed.equals(false))
+      ..where(_validAnd(since, currency: currency) & li.isUnparsed.equals(false))
       ..groupBy([c.id]);
 
     final rows = await q.get();
@@ -393,7 +400,7 @@ class AnalyticsRepository {
   /// Procenjen PDV iz stavki koje imaju poresku stopu:
   /// pdv = total - total / (1 + rate/100). Samo računi sa strukturiranim
   /// stavkama; vraća zaokružen zbir u para.
-  Future<int> _estimatedVat(DateTime? since) async {
+  Future<int> _estimatedVat(DateTime? since, {Currency? currency}) async {
     final r = _db.receipts;
     final li = _db.lineItems;
 
@@ -401,7 +408,7 @@ class AnalyticsRepository {
       innerJoin(r, r.id.equalsExp(li.receiptId)),
     ])
       ..addColumns([li.total, li.taxRate])
-      ..where(_validAnd(since) &
+      ..where(_validAnd(since, currency: currency) &
           li.isUnparsed.equals(false) &
           li.taxRate.isNotNull());
 
