@@ -13,15 +13,33 @@ import 'scan_controller.dart';
 /// Skener QR koda (sekcija 7, ekran 1). Posle skeniranja obrađuje rezultat i
 /// vodi na detalj ili prikazuje stanje greške/„u obradi".
 class ScannerScreen extends ConsumerStatefulWidget {
-  const ScannerScreen({super.key});
+  const ScannerScreen({super.key, required this.isActive});
+
+  final bool isActive;
 
   @override
   ConsumerState<ScannerScreen> createState() => _ScannerScreenState();
 }
 
 class _ScannerScreenState extends ConsumerState<ScannerScreen> {
-  final _controller = MobileScannerController();
+  final _controller = MobileScannerController(autoStart: false);
   bool _processing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isActive) _controller.start();
+  }
+
+  @override
+  void didUpdateWidget(ScannerScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive && !oldWidget.isActive) {
+      _controller.start();
+    } else if (!widget.isActive && oldWidget.isActive) {
+      _controller.stop();
+    }
+  }
 
   @override
   void dispose() {

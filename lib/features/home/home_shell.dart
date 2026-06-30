@@ -106,11 +106,11 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       ),
       body: IndexedStack(
         index: _index,
-        children: const [
-          ScannerScreen(),
-          ReceiptListScreen(),
-          WarrantyListScreen(),
-          AnalyticsScreen(),
+        children: [
+          ScannerScreen(isActive: _index == 0),
+          const ReceiptListScreen(),
+          const WarrantyListScreen(),
+          const AnalyticsScreen(),
         ],
       ),
       bottomNavigationBar: NavigationBar(
