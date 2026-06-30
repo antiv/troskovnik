@@ -11,7 +11,8 @@ import 'journal_item_parser.dart';
 class JournalHeaderParser {
   const JournalHeaderParser();
 
-  static final _pibLine = RegExp(r'^\s*(\d{8,9})\s*$');
+  // RS PIB je 13 cifara, srpski 9 (ili 8 za stare); oba oblika prihvatamo.
+  static final _pibLine = RegExp(r'^\s*(\d{8,13})\s*$');
   // ИД купца (PIB/ID kupca): npr. "ИД купца:        10:104318304".
   // Grupa 1 = tip ("10" = PIB firme), grupa 2 = broj.
   static final _buyerId =
@@ -19,15 +20,17 @@ class JournalHeaderParser {
   static final _cashier = RegExp(r'Касир\s*:?\s*(.*)$', unicode: true);
   static final _esir = RegExp(r'ЕСИР\s+број\s*:?\s*(.*)$', unicode: true);
   static final _pfrTime =
-      RegExp(r'ПФР\s+време\s*:?\s*(.+)$', unicode: true);
+      RegExp(r'ПФР\s+вр(?:иј)?еме\s*:?\s*(.+)$', unicode: true);
   static final _pfrNumber =
       RegExp(r'ПФР\s+број\s+рачуна\s*:?\s*(\S+)', unicode: true);
   static final _counter =
       RegExp(r'Бројач\s+рачуна\s*:?\s*(\S+)', unicode: true);
-  static final _totalAmount =
-      RegExp(r'Укупан\s+износ\s*:?\s*([\d][\d.,]*)', unicode: true);
+  static final _totalAmount = RegExp(
+        r'(Укупан\s+износ|Укупна\s+рефундација)\s*:?\s*([\d][\d.,]*)',
+        unicode: true,
+      );
   static final _saleType = RegExp(r'ПРОМЕТ\s+ПРОДАЈА', unicode: true);
-  static final _refundType = RegExp(r'ПРОМЕТ\s+РЕФУНДАЦИЈА', unicode: true);
+  static final _refundType = RegExp(r'ПРОМЕТ\s+РЕФУНДАЦИЈ', unicode: true);
 
   // Red obračuna poreza: "Ђ  О-ПДВ  20,00%  21,67" (ili en-US "20.00%  21.67").
   static final _taxRow = RegExp(
@@ -92,7 +95,7 @@ class JournalHeaderParser {
 
       final tot = _totalAmount.firstMatch(line);
       if (tot != null && totalAmount == 0) {
-        totalAmount = SrNumber.tryParseToMinor(tot.group(1)!) ?? 0;
+        totalAmount = SrNumber.tryParseToMinor(tot.group(2)!) ?? 0;
       }
 
       final pay = _payment.firstMatch(line);
@@ -146,7 +149,7 @@ class JournalHeaderParser {
       pfrTime: pfrTime,
       invoiceCounter: invoiceCounter,
       transactionType: transactionType,
-      totalAmount: totalAmount,
+      totalAmount: transactionType == TransactionType.refund ? -totalAmount : totalAmount,
       paymentMethod: paymentMethod,
       paymentsJson: payments.isEmpty ? null : jsonEncode(payments),
       taxJson: taxRates.isEmpty

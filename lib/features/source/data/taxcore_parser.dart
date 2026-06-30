@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:html/parser.dart' as html_parser;
 
 import '../../../core/db/enums.dart';
@@ -24,7 +26,13 @@ class TaxCoreParser {
   final SpecificationsParser specsParser;
 
   ParsedReceipt parse(RawPortalResponse raw) {
-    // Trajno nevažeći / nepostojeći račun → invalid.
+    // JSON path: TaxCore standard API (GET /v/?vl=... sa Accept: application/json).
+    // Serbia i ostala TaxCore deployments vraćaju JSON; Blazor portali (RS) vraćaju HTML.
+    if (raw.contentType?.contains('application/json') == true) {
+      return _parseJson(raw.body);
+    }
+
+    // HTML path: postojeća logika.
     if (raw.statusCode == 404 || _looksInvalid(raw.body)) {
       return const ParsedReceipt(
         fetchStatus: FetchStatus.invalid,
@@ -81,6 +89,90 @@ class TaxCoreParser {
       header: header,
       journalText: journal,
     );
+  }
+
+  /// Parsira TaxCore JSON odgovor (`Accept: application/json`).
+  ///
+  /// JSON sadrži `journal` kao plain-text string (isti format kao `<pre>` u HTML-u),
+  /// pa se isti parseri primenjuju. Polje `isValid` koristi se za validaciju.
+  ParsedReceipt _parseJson(String body) {
+    final Map<String, dynamic> json;
+    try {
+      json = jsonDecode(body) as Map<String, dynamic>;
+    } catch (_) {
+      return const ParsedReceipt(
+        fetchStatus: FetchStatus.pending,
+        itemsStatus: ItemsStatus.pendingServer,
+        itemsSource: ItemsSource.none,
+      );
+    }
+
+    final isValid = json['isValid'] as bool? ?? false;
+    if (!isValid) {
+      return const ParsedReceipt(
+        fetchStatus: FetchStatus.invalid,
+        itemsStatus: ItemsStatus.none,
+        itemsSource: ItemsSource.none,
+      );
+    }
+
+    final journal = json['journal'] as String?;
+    if (journal == null || journal.trim().isEmpty) {
+      return const ParsedReceipt(
+        fetchStatus: FetchStatus.pending,
+        itemsStatus: ItemsStatus.pendingServer,
+        itemsSource: ItemsSource.none,
+      );
+    }
+
+    final header = headerParser.parse(journal);
+    final taxRates = headerParser.parseTaxRates(journal);
+    final journalItems = journalParser.parse(journal, taxRatesByLabel: taxRates);
+
+    if (journalItems.isNotEmpty) {
+      final discrepancy = _detectJsonDiscrepancy(json, header, journalItems);
+      return ParsedReceipt(
+        fetchStatus: FetchStatus.complete,
+        itemsStatus: ItemsStatus.fromJournal,
+        itemsSource: ItemsSource.journal,
+        header: header,
+        items: journalItems,
+        journalText: journal,
+        hasDiscrepancy: discrepancy,
+      );
+    }
+
+    return ParsedReceipt(
+      fetchStatus: FetchStatus.headerOnly,
+      itemsStatus: ItemsStatus.pendingServer,
+      itemsSource: ItemsSource.none,
+      header: header,
+      journalText: journal,
+    );
+  }
+
+  /// Upoređuje JSON invoiceResult.totalAmount sa parsiranim podacima iz žurnala.
+  /// Tolerancija ±2 minor jedinice (haluga/para) za pokrivanje zaokruživanja.
+  bool _detectJsonDiscrepancy(
+    Map<String, dynamic> json,
+    ReceiptHeader? header,
+    List<ParsedLineItem> items,
+  ) {
+    final invoiceResult = json['invoiceResult'] as Map<String, dynamic>?;
+    if (invoiceResult == null) return false;
+
+    final jsonTotalDouble = (invoiceResult['totalAmount'] as num?)?.toDouble();
+    if (jsonTotalDouble == null) return false;
+
+    const tolerance = 2;
+    // invoiceResult.totalAmount je uvek pozitivan; header i stavke su negativni za refunde.
+    final jsonTotalMinor = (jsonTotalDouble * 100).round().abs();
+    final headerTotal = (header?.totalAmount ?? 0).abs();
+    final itemsTotal = items.fold<int>(0, (s, i) => s + i.total).abs();
+
+    if ((jsonTotalMinor - headerTotal).abs() > tolerance) return true;
+    if ((itemsTotal - headerTotal).abs() > tolerance) return true;
+    return false;
   }
 
   /// Izvlači tekst žurnala iz `<pre>` bloka stranice. `<br/>` postaje novi red,

@@ -96,6 +96,16 @@ rm -rf "$ARCHIVE" "$IPA_DIR"
 mkdir -p "$(dirname "$ARCHIVE")" "$IPA_DIR"
 
 # --- 1) Flutter build (assets + App.framework), bez potpisivanja ---
+
+# flutter pub get generiše FlutterGeneratedPluginSwiftPackage/Package.swift sa
+# .iOS("13.0") (Flutter SDK minimum), ali file_picker 12+ zahteva .iOS("14.0").
+# Xcode SPM validacija se pokreće pre Flutter build faza i odbija build.
+# Korigujemo pre nego što xcodebuild dobije šansu da to vidi.
+SPM_PKG="ios/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage/Package.swift"
+if [[ -f "$SPM_PKG" ]]; then
+  sed -i '' 's/.iOS("13.0")/.iOS("14.0")/' "$SPM_PKG"
+fi
+
 echo "==> flutter build ios (release, --no-codesign)"
 $FLUTTER build ios --release --no-codesign
 

@@ -39,16 +39,37 @@ class TaxCoreClient implements ReceiptSource {
   @override
   Future<RawPortalResponse> fetch(String verificationUrl) async {
     try {
-      final pageResp = await _dio.get<String>(
+      // Korak 1: HTML request (bez Accept: json) → Srbija vraća stranicu
+      // sa žurnalom u <pre> i inline skriptom za specs.
+      // RS (Blazor) vraća HTML bez <pre>, pa proveravamo da li ima žurnal.
+      final htmlResp = await _dio.get<String>(
         verificationUrl,
         options: Options(responseType: ResponseType.plain),
       );
-      final pageBody = pageResp.data ?? '';
+      final htmlBody = htmlResp.data ?? '';
+      final contentType = htmlResp.headers.value('content-type');
+      final hasJournalInHtml = _parser.extractJournal(htmlBody) != null;
+
+      String pageBody;
+      String? finalContentType;
+      if (hasJournalInHtml) {
+        // Srbija: koristimo HTML + pokušamo specs.
+        pageBody = htmlBody;
+        finalContentType = contentType;
+      } else {
+        // RS (Blazor): nema <pre> u HTML-u — fallback na JSON API.
+        final jsonResp = await _dio.get<String>(
+          verificationUrl,
+          options: Options(
+            responseType: ResponseType.plain,
+            headers: const {'Accept': 'application/json'},
+          ),
+        );
+        pageBody = jsonResp.data ?? '';
+        finalContentType = jsonResp.headers.value('content-type');
+      }
 
       String? specsBody;
-      // Best-effort: stavke se traže POST-om sa invoiceNumber+token iz stranice
-      // (NE sa vl tokenom). Ako padne ili vrati success:false, ostaje null i
-      // parser pada na žurnal (koji je ionako primaran izvor).
       final invoiceNumber = _invoiceNumberRe.firstMatch(pageBody)?.group(1);
       final token = _tokenRe.firstMatch(pageBody)?.group(1);
       if (invoiceNumber != null && token != null) {
@@ -73,10 +94,10 @@ class TaxCoreClient implements ReceiptSource {
 
       return RawPortalResponse(
         verificationUrl: verificationUrl,
-        statusCode: pageResp.statusCode ?? 0,
+        statusCode: htmlResp.statusCode ?? 0,
         body: pageBody,
         specificationsBody: specsBody,
-        contentType: pageResp.headers.value('content-type'),
+        contentType: finalContentType,
       );
     } on DioException catch (e) {
       switch (e.type) {

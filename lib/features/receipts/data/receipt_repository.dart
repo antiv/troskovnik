@@ -2,6 +2,8 @@ import 'package:drift/drift.dart';
 
 import '../../../core/db/database.dart';
 import '../../../core/db/enums.dart';
+import '../../../core/domain/country.dart';
+import '../../../core/domain/currency.dart';
 import '../../source/domain/receipt_source.dart';
 import '../domain/retry_policy.dart';
 
@@ -52,6 +54,7 @@ class ReceiptRepository {
     required String verificationUrl,
     required String? token,
     required ParsedReceipt parsed,
+    Country country = Country.serbia,
     DateTime? now,
   }) async {
     final header = parsed.header;
@@ -100,7 +103,10 @@ class ReceiptRepository {
               fetchStatus: Value(parsed.fetchStatus),
               itemsStatus: Value(parsed.itemsStatus),
               itemsSource: Value(parsed.itemsSource),
+              hasDiscrepancy: Value(parsed.hasDiscrepancy),
               nextRetryAt: Value(nextRetry),
+              country: Value(country),
+              currency: Value(country.currency),
               createdAt: Value(ts),
               updatedAt: Value(ts),
             ),
@@ -134,6 +140,9 @@ class ReceiptRepository {
           ? _retryPolicy.nextRetryAt(newRetryCount, from: ts)
           : null;
 
+      // Nikad ne degradiramo status — fromSpecifications je bolji od fromJournal.
+      final newItemsStatus = _betterItemsStatus(current.itemsStatus, parsed.itemsStatus);
+
       final header = parsed.header;
 
       // Žurnal (sa PIB-om kupca) stiže tek na refetch-u: popuni buyerId ako
@@ -159,7 +168,7 @@ class ReceiptRepository {
       await (_db.update(_db.receipts)..where((r) => r.id.equals(receiptId)))
           .write(ReceiptsCompanion(
         fetchStatus: Value(parsed.fetchStatus),
-        itemsStatus: Value(parsed.itemsStatus),
+        itemsStatus: Value(newItemsStatus),
         itemsSource: Value(parsed.itemsSource),
         merchantId:
             newMerchantId != null ? Value(newMerchantId) : const Value.absent(),
@@ -185,6 +194,7 @@ class ReceiptRepository {
         paymentMethod: Value(newPaymentMethod),
         paymentsJson: Value(newPaymentsJson),
         journalText: Value(parsed.journalText ?? current.journalText),
+        hasDiscrepancy: Value(parsed.hasDiscrepancy),
         retryCount: Value(newRetryCount),
         nextRetryAt: Value(nextRetry),
         updatedAt: Value(ts),
@@ -348,6 +358,7 @@ class ReceiptRepository {
     required String merchantName,
     required int totalMinor,
     required DateTime date,
+    Currency currency = Currency.rsd,
     String? paymentMethod,
     String? note,
     String? imagePath,
@@ -363,6 +374,7 @@ class ReceiptRepository {
               verificationUrl: 'manual:${ts.millisecondsSinceEpoch}',
               isManual: const Value(true),
               totalAmount: Value(totalMinor),
+              currency: Value(currency),
               pfrTime: Value(date),
               paymentMethod: Value(paymentMethod),
               fetchStatus: Value(FetchStatus.complete),
@@ -417,5 +429,16 @@ class ReceiptRepository {
     return _db.into(_db.merchants).insert(
           MerchantsCompanion.insert(tin: 'UNKNOWN', name: 'UNKNOWN'),
         );
+  }
+
+  // fromSpecifications > fromJournal > pendingServer > none
+  static ItemsStatus _betterItemsStatus(ItemsStatus current, ItemsStatus next) {
+    const rank = {
+      ItemsStatus.none: 0,
+      ItemsStatus.pendingServer: 1,
+      ItemsStatus.fromJournal: 2,
+      ItemsStatus.fromSpecifications: 3,
+    };
+    return (rank[next] ?? 0) > (rank[current] ?? 0) ? next : current;
   }
 }

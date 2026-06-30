@@ -16,8 +16,13 @@ class JournalItemParser {
 
   // Marker linije (rade i sa ćirilicom i sa razmacima/crticama oko teksta).
   static final _itemsStart = RegExp(r'Артикли', unicode: true);
-  static final _tableHeader = RegExp(r'Назив.*Цена.*Кол', unicode: true);
-  static final _totalLine = RegExp(r'Укупан\s+износ\s*:', unicode: true);
+  // "Цена" (Srbija/Ekavski) ili "Цијена" (RS/Ijekavski): Ц(?:иј)?ена.
+  static final _tableHeader = RegExp(r'Назив.*Ц(?:иј)?ена.*Кол', unicode: true);
+  // Kraj stavki: normalna suma ili RS рефундација.
+  static final _totalLine = RegExp(
+    r'(Укупан\s+износ|Укупна\s+рефундација)\s*:',
+    unicode: true,
+  );
 
   // Naziv stavke: hvata trailing zagrade na kraju kao (jedinica) i (oznaka).
   // Poreska oznaka je jedan ćirilićni/latinični karakter u poslednjoj zagradi.
@@ -26,8 +31,9 @@ class JournalItemParser {
 
   // Red sa vrednostima: tri broja razdvojena razmacima (srpski ili en-US
   // format — SrNumber sam prepoznaje decimalni separator).
+  // Treći broj (ukupno) može biti negativan kod refundacija.
   static final _valuesLine = RegExp(
-    r'^\s*([\d][\d.,]*)\s+([\d][\d.,]*)\s+([\d][\d.,]*)\s*$',
+    r'^\s*([\d][\d.,]*)\s+([\d][\d.,]*)\s+(-?[\d][\d.,]*)\s*$',
     unicode: true,
   );
 
@@ -84,7 +90,20 @@ class JournalItemParser {
           j < end ? _valuesLine.firstMatch(lines[j]) : null;
 
       if (valuesMatch == null) {
-        // Naziv bez prepoznatog reda vrednosti → neparsiran.
+        // Možda naziv prelazi na sljedeći red (dugački nazivi se prelome).
+        // Pogledaj još jedan red naprijed: ako je on values, spoji oba u naziv.
+        var k = j + 1;
+        while (k < end && lines[k].trim().isEmpty) { k++; }
+        if (k < end) {
+          final valuesMatchK = _valuesLine.firstMatch(lines[k]);
+          if (valuesMatchK != null) {
+            final wrappedName = '${nameLine.trim()} ${lines[j].trim()}';
+            items.add(_buildItem(wrappedName, valuesMatchK, taxRatesByLabel));
+            i = k + 1;
+            continue;
+          }
+        }
+        // Naziv bez vrednosti → neparsiran, ali samo ako linija nije prazna/separator.
         items.add(ParsedLineItem.unparsed(nameLine, ItemsSource.journal));
         i++;
         continue;

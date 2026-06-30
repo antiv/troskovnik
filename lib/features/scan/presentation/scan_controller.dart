@@ -63,6 +63,7 @@ class ScanController {
       final result = await repo.saveParsed(
         verificationUrl: valid.normalizedUrl,
         token: valid.token,
+        country: valid.country,
         parsed: parsed,
       );
       return ScanSaved(
@@ -75,6 +76,7 @@ class ScanController {
       final result = await repo.saveParsed(
         verificationUrl: valid.normalizedUrl,
         token: valid.token,
+        country: valid.country,
         parsed: const ParsedReceipt(
           fetchStatus: FetchStatus.pending,
           itemsStatus: ItemsStatus.pendingServer,

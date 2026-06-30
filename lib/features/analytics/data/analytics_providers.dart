@@ -1,8 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/db/providers.dart';
+import '../../../core/domain/currency.dart';
 import '../domain/analytics_models.dart';
 import 'analytics_repository.dart';
+
+/// Izabrana valuta za prikaz analitike. `null` = prikazuje prvu dostupnu.
+class AnalyticsCurrencyNotifier extends Notifier<Currency?> {
+  @override
+  Currency? build() => null;
+
+  void set(Currency? c) => state = c;
+}
+
+final analyticsCurrencyProvider =
+    NotifierProvider<AnalyticsCurrencyNotifier, Currency?>(
+        AnalyticsCurrencyNotifier.new);
 
 /// Izabrani period analitike.
 class AnalyticsRangeNotifier extends Notifier<AnalyticsRange> {
@@ -22,12 +35,13 @@ final analyticsRepositoryProvider =
   return AnalyticsRepository(db);
 });
 
-/// Reaktivni sažetak analitike za izabrani period.
+/// Reaktivni sažetak analitike za izabrani period i valutu.
 final analyticsSummaryProvider =
     StreamProvider<AnalyticsSummary>((ref) async* {
   final repo = await ref.watch(analyticsRepositoryProvider.future);
   final range = ref.watch(analyticsRangeProvider);
-  yield* repo.watchSummary(range);
+  final currency = ref.watch(analyticsCurrencyProvider);
+  yield* repo.watchSummary(range, currency: currency);
 });
 
 /// Detalji za jednog prodavca (drill-down), za trenutno izabrani period.

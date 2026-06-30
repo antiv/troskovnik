@@ -3,6 +3,8 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:troskovnik/core/db/database.dart';
 import 'package:troskovnik/core/db/enums.dart';
+import 'package:troskovnik/core/domain/country.dart';
+import 'package:troskovnik/core/domain/currency.dart';
 import 'package:troskovnik/features/analytics/data/analytics_repository.dart';
 import 'package:troskovnik/features/analytics/domain/analytics_models.dart';
 
@@ -84,7 +86,7 @@ void main() {
     final maxiAgg = s.byMerchant.firstWhere((x) => x.merchantName == 'Maxi');
     expect(maxiAgg.totalMinor, 5000);
     expect(maxiAgg.receiptCount, 2);
-    expect(s.totalMinor, 14000);
+    expect(s.totalsByCurrency[Currency.rsd], 14000);
     expect(s.receiptCount, 3);
   });
 
@@ -141,7 +143,7 @@ void main() {
 
     final s = await repo.loadSummary(AnalyticsRange.all,
         now: DateTime(2026, 2, 1));
-    expect(s.totalMinor, 0);
+    expect(s.totalsByCurrency.isEmpty, isTrue);
     expect(s.isEmpty, isTrue);
   });
 
@@ -152,7 +154,7 @@ void main() {
 
     final s = await repo.loadSummary(AnalyticsRange.last3Months,
         now: DateTime(2026, 6, 1));
-    expect(s.totalMinor, 2000); // stari (2024) izbačen
+    expect(s.totalsByCurrency[Currency.rsd], 2000); // stari (2024) izbačen
   });
 
   Future<void> itemFull(int receiptId, String name,
@@ -261,5 +263,70 @@ void main() {
     expect(by[AnalyticsRepository.paymentUnknownKey], 5000);
     // Sortirano opadajuće po iznosu.
     expect(s.byPaymentMethod.first.method, 'Картица');
+  });
+
+  Future<int> receiptWithCurrency({
+    required int merchantId,
+    required int total,
+    required DateTime pfrTime,
+    required Country country,
+  }) =>
+      db.into(db.receipts).insert(
+            ReceiptsCompanion.insert(
+              merchantId: merchantId,
+              verificationUrl: 'u${DateTime.now().microsecondsSinceEpoch}c',
+              pfrTime: Value(pfrTime),
+              totalAmount: Value(total),
+              fetchStatus: Value(FetchStatus.complete),
+              country: Value(country),
+              currency: Value(country.currency),
+            ),
+          );
+
+  test('mixed RSD + BAM — totalsByCurrency never sums different currencies',
+      () async {
+    final srb = await merchant('100', 'Prodavac RS');
+    final bih = await merchant('200', 'Prodavac BiH');
+
+    await receiptWithCurrency(
+        merchantId: srb,
+        total: 50000,
+        pfrTime: DateTime.utc(2026, 3, 5),
+        country: Country.serbia);
+    await receiptWithCurrency(
+        merchantId: bih,
+        total: 10000,
+        pfrTime: DateTime.utc(2026, 3, 10),
+        country: Country.republikaSrpska);
+
+    final s = await repo.loadSummary(AnalyticsRange.all,
+        now: DateTime(2026, 4, 1));
+
+    // Svaka valuta ima zaseban zbir.
+    expect(s.totalsByCurrency[Currency.rsd], 50000);
+    expect(s.totalsByCurrency[Currency.bam], 10000);
+    // Ne sme da postoji jedan zajednički zbir koji miješa valute.
+    expect(s.totalsByCurrency.length, 2);
+
+    // Mesečna analitika: isti mesec, ali razdvojeni po valuti.
+    final march = s.monthly.where((m) => m.month == 3).toList();
+    expect(march, hasLength(2));
+    final marchRsd = march.firstWhere((m) => m.currency == Currency.rsd);
+    final marchBam = march.firstWhere((m) => m.currency == Currency.bam);
+    expect(marchRsd.totalMinor, 50000);
+    expect(marchBam.totalMinor, 10000);
+  });
+
+  test('existing serbia receipts default to Country.serbia / Currency.rsd',
+      () async {
+    // Računi bez eksplicitnog country/currency (stari, pre v7) trebaju
+    // defaultovati na Srbiju i RSD zahvaljujući DEFAULT 0 u migraciji.
+    final m = await merchant('300', 'Stari prodavac');
+    await receipt(merchantId: m, total: 30000, pfrTime: DateTime(2026, 1, 1));
+
+    final s = await repo.loadSummary(AnalyticsRange.all,
+        now: DateTime(2026, 2, 1));
+    expect(s.totalsByCurrency[Currency.rsd], 30000);
+    expect(s.totalsByCurrency.containsKey(Currency.bam), isFalse);
   });
 }

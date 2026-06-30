@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/db/database.dart' show LineItemRow, LineItemsCompanion;
 import '../../../core/db/enums.dart';
+import '../../../core/domain/currency.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/utils/money_format.dart';
 import '../../categories/data/category_providers.dart';
@@ -163,7 +164,7 @@ class _DetailBody extends ConsumerWidget {
         const SizedBox(height: 8),
         Row(
           children: [
-            Text(MoneyFormat.fromMinor(r.totalAmount),
+            Text(MoneyFormat.fromMinor(r.totalAmount, r.currency),
                 style: Theme.of(context).textTheme.headlineSmall),
             const Spacer(),
             ItemsStatusBadge(
@@ -171,6 +172,32 @@ class _DetailBody extends ConsumerWidget {
           ],
         ),
         const Divider(height: 24),
+
+        // Upozorenje: parsirani podaci se ne slažu sa invoiceResult.
+        if (r.hasDiscrepancy) ...[
+          Card(
+            color: Theme.of(context).colorScheme.errorContainer,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  Icon(Icons.warning_amber_rounded,
+                      color: Theme.of(context).colorScheme.onErrorContainer,
+                      size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l10n.detailDiscrepancyWarning,
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onErrorContainer),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
 
         // Granični slučaj: stavke u obradi (sekcija 5 UI tretman).
         if (pending) ...[
@@ -181,7 +208,9 @@ class _DetailBody extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(l10n.detailPendingExplain),
+                  Text(r.itemsStatus == ItemsStatus.fromJournal
+                      ? l10n.detailFromJournalExplain
+                      : l10n.detailPendingExplain),
                   const SizedBox(height: 8),
                   Align(
                     alignment: Alignment.centerRight,
@@ -228,6 +257,7 @@ class _DetailBody extends ConsumerWidget {
         else
           ...detail.items.map((it) => _ItemTile(
                 item: it,
+                currency: r.currency,
                 l10n: l10n,
                 onAddWarranty: () => _addWarranty(
                   context,
@@ -247,7 +277,9 @@ class _DetailBody extends ConsumerWidget {
               style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           _PaymentBreakdown(
-              paymentsJson: r.paymentsJson, paymentMethod: r.paymentMethod),
+              paymentsJson: r.paymentsJson,
+              paymentMethod: r.paymentMethod,
+              currency: r.currency),
         ],
 
         // Obračun poreza
@@ -398,11 +430,13 @@ class _RefreshButtonState extends ConsumerState<_RefreshButton> {
 class _ItemTile extends ConsumerWidget {
   const _ItemTile({
     required this.item,
+    required this.currency,
     required this.l10n,
     required this.onAddWarranty,
     required this.onCategoryTap,
   });
   final LineItemRow item;
+  final Currency currency;
   final AppLocalizations l10n;
   final VoidCallback onAddWarranty;
   final VoidCallback onCategoryTap;
@@ -440,7 +474,7 @@ class _ItemTile extends ConsumerWidget {
         children: [
           Flexible(
             child: Text(
-                '$qty × ${MoneyFormat.fromMinor(item.unitPrice)}'
+                '$qty × ${MoneyFormat.fromMinor(item.unitPrice, currency)}'
                 '${item.taxLabel != null ? '  (${item.taxLabel})' : ''}',
                 overflow: TextOverflow.ellipsis),
           ),
@@ -465,7 +499,7 @@ class _ItemTile extends ConsumerWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(MoneyFormat.fromMinor(item.total)),
+          Text(MoneyFormat.fromMinor(item.total, currency)),
           IconButton(
             tooltip: l10n.warrantyAddForItem,
             icon: const Icon(Icons.shield_outlined, size: 18),
@@ -478,9 +512,14 @@ class _ItemTile extends ConsumerWidget {
 }
 
 class _PaymentBreakdown extends StatelessWidget {
-  const _PaymentBreakdown({required this.paymentsJson, required this.paymentMethod});
+  const _PaymentBreakdown({
+    required this.paymentsJson,
+    required this.paymentMethod,
+    this.currency = Currency.rsd,
+  });
   final String? paymentsJson;
   final String? paymentMethod;
+  final Currency currency;
 
   @override
   Widget build(BuildContext context) {
@@ -499,7 +538,7 @@ class _PaymentBreakdown extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(e.key),
-                      Text(MoneyFormat.fromMinor((e.value as num).toInt()),
+                      Text(MoneyFormat.fromMinor((e.value as num).toInt(), currency),
                           style: const TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ))

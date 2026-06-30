@@ -1,5 +1,7 @@
 import 'package:drift/drift.dart';
 
+import '../domain/country.dart';
+import '../domain/currency.dart';
 import 'enums.dart';
 
 /// Prodavci (merchants). Imena polja na engleskom; srpski pojam u komentaru.
@@ -105,6 +107,17 @@ class Receipts extends Table {
   TextColumn get imagePath => text().nullable()();
 
   TextColumn get note => text().nullable()();
+
+  // --- Zemlja / valuta ---
+  IntColumn get country =>
+      intEnum<Country>().withDefault(Constant(Country.serbia.index))();
+
+  IntColumn get currency =>
+      intEnum<Currency>().withDefault(Constant(Currency.rsd.index))();
+
+  // --- Validacija ---
+  BoolColumn get hasDiscrepancy =>
+      boolean().withDefault(const Constant(false))();
 
   // --- Meta ---
   DateTimeColumn get createdAt =>

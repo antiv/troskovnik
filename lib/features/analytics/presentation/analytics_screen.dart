@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/domain/currency.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/utils/money_format.dart';
 import '../../categories/domain/category_models.dart';
@@ -22,14 +23,34 @@ class AnalyticsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final summaryAsync = ref.watch(analyticsSummaryProvider);
+    final selectedCurrency = ref.watch(analyticsCurrencyProvider);
+
+    // Dostupne valute (prazno dok se učitava).
+    final availableCurrencies = summaryAsync
+            .whenData((s) => s.totalsByCurrency.keys.toList())
+            .value ??
+        const <Currency>[];
+    final activeCurrency = availableCurrencies.contains(selectedCurrency)
+        ? selectedCurrency!
+        : (availableCurrencies.isNotEmpty ? availableCurrencies.first : Currency.rsd);
 
     return Column(
       children: [
-        Row(
-          children: [
-            Expanded(child: _RangeSelector()),
-            const _ExportButton(),
-          ],
+        Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: Row(
+            children: [
+              Expanded(child: _RangeSelector()),
+              if (availableCurrencies.length > 1)
+                _CurrencyPicker(
+                  currencies: availableCurrencies,
+                  selected: activeCurrency,
+                  onSelected: (c) =>
+                      ref.read(analyticsCurrencyProvider.notifier).set(c),
+                ),
+              const _ExportButton(),
+            ],
+          ),
         ),
         Expanded(
           child: summaryAsync.when(
@@ -45,28 +66,44 @@ class AnalyticsScreen extends ConsumerWidget {
                   ),
                 );
               }
+
+              // Filtriraj podatke po aktivnoj valuti.
+              final monthly = s.monthly
+                  .where((m) => m.currency == activeCurrency)
+                  .toList();
+              final byMerchant = s.byMerchant
+                  .where((m) => m.currency == activeCurrency)
+                  .toList();
+              final totalMinor = s.totalsByCurrency[activeCurrency] ?? 0;
+
               return ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  _TotalCard(summary: s),
+                  _TotalCard(
+                    totalMinor: totalMinor,
+                    currency: activeCurrency,
+                    receiptCount: s.receiptCount,
+                    estimatedVatMinor: s.estimatedVatMinor,
+                  ),
                   const SizedBox(height: 16),
                   _Section(
                     title: l10n.analyticsByMonth,
-                    child: _MonthlyChart(monthly: s.monthly),
+                    child: _SingleCurrencyChart(
+                        items: monthly, currency: activeCurrency),
                   ),
                   _Section(
                     title: l10n.analyticsBusinessSplit,
-                    child: _BusinessSplitBar(split: s.businessSplit),
+                    child: _BusinessSplitBar(split: s.businessSplit, currency: activeCurrency),
                   ),
                   if (s.byPaymentMethod.isNotEmpty)
                     _Section(
                       title: l10n.analyticsByPayment,
-                      child: _PaymentSplitBar(items: s.byPaymentMethod),
+                      child: _PaymentSplitBar(items: s.byPaymentMethod, currency: activeCurrency),
                     ),
                   _Section(
                     title: l10n.analyticsByMerchant,
                     child: _MerchantList(
-                      merchants: s.byMerchant,
+                      merchants: byMerchant,
                       onTap: (m) => _showMerchantSheet(
                           context, m.merchantId, m.merchantName),
                     ),
@@ -82,13 +119,13 @@ class AnalyticsScreen extends ConsumerWidget {
                               builder: (_) => const CategoriesScreen()),
                         ),
                       ),
-                      child: _CategoryList(items: s.byCategory),
+                      child: _CategoryList(items: s.byCategory, currency: activeCurrency),
                     ),
                   _Section(
                     title: l10n.analyticsTopItems,
-                    // subtitle: l10n.analyticsItemsHint,
                     child: _TopItemsList(
                       items: s.topItems,
+                      currency: activeCurrency,
                       onTap: (it) => _showItemSheet(context, it.name),
                     ),
                   ),
@@ -102,14 +139,59 @@ class AnalyticsScreen extends ConsumerWidget {
   }
 }
 
+class _CurrencyPicker extends StatelessWidget {
+  const _CurrencyPicker({
+    required this.currencies,
+    required this.selected,
+    required this.onSelected,
+  });
+  final List<Currency> currencies;
+  final Currency selected;
+  final void Function(Currency) onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<Currency>(
+      tooltip: selected.symbol,
+      icon: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.currency_exchange, size: 18),
+          const SizedBox(width: 2),
+          Text(selected.symbol,
+              style: Theme.of(context).textTheme.labelMedium),
+        ],
+      ),
+      onSelected: onSelected,
+      itemBuilder: (_) => [
+        for (final c in currencies)
+          PopupMenuItem(
+            value: c,
+            child: Row(
+              children: [
+                if (c == selected)
+                  const Icon(Icons.check, size: 16)
+                else
+                  const SizedBox(width: 16),
+                const SizedBox(width: 8),
+                Text(c.symbol),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 class _RangeSelector extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final range = ref.watch(analyticsRangeProvider);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
       child: SegmentedButton<AnalyticsRange>(
+        showSelectedIcon: false,
         segments: [
           ButtonSegment(
               value: AnalyticsRange.last3Months,
@@ -222,8 +304,16 @@ Future<void> _runExport(
 }
 
 class _TotalCard extends StatelessWidget {
-  const _TotalCard({required this.summary});
-  final AnalyticsSummary summary;
+  const _TotalCard({
+    required this.totalMinor,
+    required this.currency,
+    required this.receiptCount,
+    required this.estimatedVatMinor,
+  });
+  final int totalMinor;
+  final Currency currency;
+  final int receiptCount;
+  final int estimatedVatMinor;
 
   @override
   Widget build(BuildContext context) {
@@ -240,13 +330,13 @@ class _TotalCard extends StatelessWidget {
                 style: TextStyle(color: scheme.onPrimaryContainer)),
             const SizedBox(height: 4),
             Text(
-              MoneyFormat.fromMinor(summary.totalMinor),
+              MoneyFormat.fromMinor(totalMinor, currency),
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: scheme.onPrimaryContainer,
                   fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
-            Text(l10n.analyticsReceiptCount(summary.receiptCount),
+            Text(l10n.analyticsReceiptCount(receiptCount),
                 style: TextStyle(color: scheme.onPrimaryContainer)),
             const Divider(height: 20),
             Row(
@@ -254,7 +344,7 @@ class _TotalCard extends StatelessWidget {
               children: [
                 Text(l10n.analyticsEstimatedVat,
                     style: TextStyle(color: scheme.onPrimaryContainer)),
-                Text(MoneyFormat.fromMinor(summary.estimatedVatMinor),
+                Text(MoneyFormat.fromMinor(estimatedVatMinor, currency),
                     style: TextStyle(
                         color: scheme.onPrimaryContainer,
                         fontWeight: FontWeight.bold)),
@@ -317,11 +407,13 @@ List<Color> _categoryColors(Brightness brightness) {
 /// Pozadina + stil teksta za tooltipove na grafovima. Default fl_chart
 /// tooltip ima slab kontrast u svetloj temi; `inverseSurface` par je čitljiv
 /// u obe teme.
-BarTouchData _barTooltip(ColorScheme scheme) => BarTouchData(
+BarTouchData _barTooltip(ColorScheme scheme,
+        [Currency currency = Currency.rsd]) =>
+    BarTouchData(
       touchTooltipData: BarTouchTooltipData(
         getTooltipColor: (_) => scheme.inverseSurface,
         getTooltipItem: (group, _, rod, _) => BarTooltipItem(
-          MoneyFormat.fromDouble(rod.toY),
+          MoneyFormat.fromDouble(rod.toY, currency),
           TextStyle(
             color: scheme.onInverseSurface,
             fontWeight: FontWeight.bold,
@@ -331,6 +423,8 @@ BarTouchData _barTooltip(ColorScheme scheme) => BarTouchData(
       ),
     );
 
+/// Grafikon potrošnje po mesecima. Kad ima više valuta, prikazuje zaseban
+/// grafikon po valuti (nikad se ne mešaju na istoj osi).
 class _MonthlyChart extends StatelessWidget {
   const _MonthlyChart({required this.monthly});
   final List<MonthlySpending> monthly;
@@ -338,25 +432,60 @@ class _MonthlyChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (monthly.isEmpty) return const SizedBox.shrink();
+
+    // Grupiši po valuti.
+    final byCurrency = <Currency, List<MonthlySpending>>{};
+    for (final m in monthly) {
+      byCurrency.putIfAbsent(m.currency, () => []).add(m);
+    }
+
+    if (byCurrency.length == 1) {
+      return _SingleCurrencyChart(
+          items: monthly, currency: byCurrency.keys.first);
+    }
+
+    return Column(
+      children: [
+        for (final entry in byCurrency.entries) ...[
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text(entry.key.symbol,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          _SingleCurrencyChart(items: entry.value, currency: entry.key),
+          const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+}
+
+class _SingleCurrencyChart extends StatelessWidget {
+  const _SingleCurrencyChart({required this.items, required this.currency});
+  final List<MonthlySpending> items;
+  final Currency currency;
+
+  @override
+  Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final maxY = monthly
-            .map((m) => m.totalMinor)
-            .fold<int>(0, (a, b) => a > b ? a : b)
-            .toDouble() /
-        100.0;
+    final maxVal = items.map((m) => m.totalMinor).fold<int>(0, (a, b) => a > b ? a : b);
+    final minVal = items.map((m) => m.totalMinor).fold<int>(0, (a, b) => a < b ? a : b);
+    final maxY = (maxVal / 100.0) * 1.2;
+    final minY = minVal < 0 ? (minVal / 100.0) * 1.2 : 0.0;
 
     return SizedBox(
       height: 200,
       child: BarChart(
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
-          maxY: maxY * 1.2,
-          barTouchData: _barTooltip(scheme),
+          maxY: maxY == 0 ? 1 : maxY,
+          minY: minY,
+          barTouchData: _barTooltip(scheme, currency),
           barGroups: [
-            for (var i = 0; i < monthly.length; i++)
+            for (var i = 0; i < items.length; i++)
               BarChartGroupData(x: i, barRods: [
                 BarChartRodData(
-                  toY: monthly[i].totalMinor / 100.0,
+                  toY: items[i].totalMinor / 100.0,
                   color: scheme.primary,
                   width: 14,
                   borderRadius: BorderRadius.circular(3),
@@ -375,10 +504,10 @@ class _MonthlyChart extends StatelessWidget {
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
                   final i = value.toInt();
-                  if (i < 0 || i >= monthly.length) {
+                  if (i < 0 || i >= items.length) {
                     return const SizedBox.shrink();
                   }
-                  final m = monthly[i];
+                  final m = items[i];
                   return Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text('${m.month}/${m.year % 100}',
@@ -397,8 +526,9 @@ class _MonthlyChart extends StatelessWidget {
 }
 
 class _BusinessSplitBar extends StatelessWidget {
-  const _BusinessSplitBar({required this.split});
+  const _BusinessSplitBar({required this.split, required this.currency});
   final BusinessSplit split;
+  final Currency currency;
 
   @override
   Widget build(BuildContext context) {
@@ -406,28 +536,32 @@ class _BusinessSplitBar extends StatelessWidget {
     final palette = _categoryColors(Theme.of(context).brightness);
     final personalColor = palette[0]; // zelena (brend)
     final businessColor = palette[1]; // plava
-    final total = split.totalMinor;
-    final bizFraction = total == 0 ? 0.0 : split.businessMinor / total;
+    // Negativne vrednosti (refundacije) klampujemo na 0 za vizuelni prikaz trake;
+    // stvarni iznosi (mogu biti negativni) prikazuju se u legendi.
+    final bizFlex = split.businessMinor.clamp(0, 1000000);
+    final perFlex = split.personalMinor.clamp(0, 1000000);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(6),
-          child: Row(
-            children: [
-              if (bizFraction > 0)
-                Expanded(
-                  flex: (bizFraction * 1000).round(),
-                  child: Container(height: 20, color: businessColor),
+          child: bizFlex + perFlex == 0
+              ? Container(height: 20, color: personalColor)
+              : Row(
+                  children: [
+                    if (bizFlex > 0)
+                      Expanded(
+                        flex: bizFlex,
+                        child: Container(height: 20, color: businessColor),
+                      ),
+                    if (perFlex > 0)
+                      Expanded(
+                        flex: perFlex,
+                        child: Container(height: 20, color: personalColor),
+                      ),
+                  ],
                 ),
-              if (bizFraction < 1)
-                Expanded(
-                  flex: ((1 - bizFraction) * 1000).round(),
-                  child: Container(height: 20, color: personalColor),
-                ),
-            ],
-          ),
         ),
         const SizedBox(height: 8),
         Row(
@@ -436,11 +570,11 @@ class _BusinessSplitBar extends StatelessWidget {
             _LegendDot(
                 color: businessColor,
                 label:
-                    '${l10n.analyticsBusiness}: ${MoneyFormat.fromMinor(split.businessMinor)}'),
+                    '${l10n.analyticsBusiness}: ${MoneyFormat.fromMinor(split.businessMinor, currency)}'),
             _LegendDot(
                 color: personalColor,
                 label:
-                    '${l10n.analyticsPersonal}: ${MoneyFormat.fromMinor(split.personalMinor)}'),
+                    '${l10n.analyticsPersonal}: ${MoneyFormat.fromMinor(split.personalMinor, currency)}'),
           ],
         ),
       ],
@@ -465,8 +599,9 @@ class _LegendDot extends StatelessWidget {
 }
 
 class _PaymentSplitBar extends StatelessWidget {
-  const _PaymentSplitBar({required this.items});
+  const _PaymentSplitBar({required this.items, required this.currency});
   final List<PaymentMethodSpending> items;
+  final Currency currency;
 
   String _label(BuildContext context, String method) =>
       method == AnalyticsRepository.paymentUnknownKey
@@ -477,8 +612,10 @@ class _PaymentSplitBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = _categoryColors(Theme.of(context).brightness);
     Color colorFor(int i) => palette[i % palette.length];
-    final total = items.fold<int>(0, (a, e) => a + e.totalMinor);
-    if (total <= 0) return const SizedBox.shrink();
+    // Samo pozitivne stavke učestvuju u vizuelnom prikazu trake.
+    final positiveItems = items.where((e) => e.totalMinor > 0).toList();
+    final positiveTotal = positiveItems.fold<int>(0, (a, e) => a + e.totalMinor);
+    if (positiveTotal <= 0) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -487,9 +624,9 @@ class _PaymentSplitBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(6),
           child: Row(
             children: [
-              for (var i = 0; i < items.length; i++)
+              for (var i = 0; i < positiveItems.length; i++)
                 Expanded(
-                  flex: (items[i].totalMinor / total * 1000)
+                  flex: (positiveItems[i].totalMinor / positiveTotal * 1000)
                       .round()
                       .clamp(1, 1000000),
                   child: Container(height: 20, color: colorFor(i)),
@@ -506,7 +643,7 @@ class _PaymentSplitBar extends StatelessWidget {
               _LegendDot(
                 color: colorFor(i),
                 label:
-                    '${_label(context, items[i].method)}: ${MoneyFormat.fromMinor(items[i].totalMinor)}',
+                    '${_label(context, items[i].method)}: ${MoneyFormat.fromMinor(items[i].totalMinor, currency)}',
               ),
           ],
         ),
@@ -544,7 +681,7 @@ class _MerchantList extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(child: Text(m.merchantName)),
-                      Text(MoneyFormat.fromMinor(m.totalMinor),
+                      Text(MoneyFormat.fromMinor(m.totalMinor, m.currency),
                           style: const TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
@@ -552,7 +689,7 @@ class _MerchantList extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
-                      value: maxV == 0 ? 0 : m.totalMinor / maxV,
+                      value: maxV == 0 ? 0 : (m.totalMinor / maxV).clamp(0.0, 1.0),
                       minHeight: 6,
                       backgroundColor: scheme.surfaceContainerHighest,
                     ),
@@ -567,25 +704,28 @@ class _MerchantList extends StatelessWidget {
 }
 
 class _TopItemsList extends StatelessWidget {
-  const _TopItemsList({required this.items, this.onTap});
+  const _TopItemsList({required this.items, required this.currency, this.onTap});
   final List<TopItem> items;
+  final Currency currency;
 
   /// Klik na artikal (drill-down). Null → red nije interaktivan.
   final void Function(TopItem)? onTap;
 
   @override
   Widget build(BuildContext context) {
-    if (items.isEmpty) return const SizedBox.shrink();
+    // Filtriramo stavke sa negativnim ukupnim iznosom (refundovani artikli).
+    final positiveItems = items.where((it) => it.totalMinor > 0).toList();
+    if (positiveItems.isEmpty) return const SizedBox.shrink();
     return Column(
       children: [
-        for (final it in items)
+        for (final it in positiveItems)
           ListTile(
             dense: true,
             contentPadding: EdgeInsets.zero,
             onTap: onTap == null ? null : () => onTap!(it),
             title: Text(it.name),
             subtitle: Text('×${it.count}'),
-            trailing: Text(MoneyFormat.fromMinor(it.totalMinor),
+            trailing: Text(MoneyFormat.fromMinor(it.totalMinor, currency),
                 style: const TextStyle(fontWeight: FontWeight.bold)),
           ),
       ],
@@ -594,8 +734,9 @@ class _TopItemsList extends StatelessWidget {
 }
 
 class _CategoryList extends StatelessWidget {
-  const _CategoryList({required this.items});
+  const _CategoryList({required this.items, required this.currency});
   final List<CategorySpending> items;
+  final Currency currency;
 
   @override
   Widget build(BuildContext context) {
@@ -623,7 +764,7 @@ class _CategoryList extends StatelessWidget {
                         Text(c.categoryName),
                       ],
                     ),
-                    Text(MoneyFormat.fromMinor(c.totalMinor),
+                    Text(MoneyFormat.fromMinor(c.totalMinor, currency),
                         style: const TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
@@ -631,7 +772,7 @@ class _CategoryList extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
-                    value: maxV == 0 ? 0 : c.totalMinor / maxV,
+                    value: maxV == 0 ? 0 : (c.totalMinor / maxV).clamp(0.0, 1.0),
                     minHeight: 6,
                     backgroundColor: scheme.surfaceContainerHighest,
                   ),
@@ -723,6 +864,7 @@ class _MerchantDetailSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final async = ref.watch(merchantDetailProvider(merchantId));
+    final currency = ref.watch(analyticsCurrencyProvider) ?? Currency.rsd;
     return _SheetScaffold(
       title: name,
       child: async.when(
@@ -738,11 +880,11 @@ class _MerchantDetailSheet extends ConsumerWidget {
                 Expanded(
                     child: _StatTile(
                         label: l10n.analyticsTotalSpent,
-                        value: MoneyFormat.fromMinor(d.totalMinor))),
+                        value: MoneyFormat.fromMinor(d.totalMinor, currency))),
                 Expanded(
                     child: _StatTile(
                         label: l10n.analyticsAverage,
-                        value: MoneyFormat.fromMinor(d.averageMinor))),
+                        value: MoneyFormat.fromMinor(d.averageMinor, currency))),
               ],
             ),
             const SizedBox(height: 4),
@@ -760,6 +902,7 @@ class _MerchantDetailSheet extends ConsumerWidget {
                 title: l10n.analyticsTopItems,
                 child: _TopItemsList(
                   items: d.topItems,
+                  currency: currency,
                   onTap: (it) => _showItemSheet(context, it.name),
                 ),
               ),
@@ -778,6 +921,7 @@ class _ItemDetailSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final async = ref.watch(itemDetailProvider(name));
+    final currency = ref.watch(analyticsCurrencyProvider) ?? Currency.rsd;
     return _SheetScaffold(
       title: name,
       child: async.when(
@@ -797,7 +941,7 @@ class _ItemDetailSheet extends ConsumerWidget {
                 Expanded(
                     child: _StatTile(
                         label: l10n.analyticsTotalSpent,
-                        value: MoneyFormat.fromMinor(d.totalMinor))),
+                        value: MoneyFormat.fromMinor(d.totalMinor, currency))),
               ],
             ),
             const SizedBox(height: 4),
@@ -807,7 +951,7 @@ class _ItemDetailSheet extends ConsumerWidget {
             if (d.priceHistory.length >= 2)
               _Section(
                 title: l10n.analyticsPriceHistory,
-                child: _PriceHistoryChart(points: d.priceHistory),
+                child: _PriceHistoryChart(points: d.priceHistory, currency: currency),
               ),
             if (d.byMerchant.isNotEmpty)
               _Section(
@@ -829,8 +973,9 @@ class _ItemDetailSheet extends ConsumerWidget {
 }
 
 class _PriceHistoryChart extends StatelessWidget {
-  const _PriceHistoryChart({required this.points});
+  const _PriceHistoryChart({required this.points, this.currency = Currency.rsd});
   final List<PricePoint> points;
+  final Currency currency;
 
   @override
   Widget build(BuildContext context) {
@@ -845,7 +990,7 @@ class _PriceHistoryChart extends StatelessWidget {
               getTooltipItems: (spots) => [
                 for (final s in spots)
                   LineTooltipItem(
-                    MoneyFormat.fromDouble(s.y),
+                    MoneyFormat.fromDouble(s.y, currency),
                     TextStyle(
                       color: scheme.onInverseSurface,
                       fontWeight: FontWeight.bold,

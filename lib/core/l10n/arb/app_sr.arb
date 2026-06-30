@@ -47,6 +47,7 @@
   "detailRefreshNow": "Osveži sada",
   "detailAttachPhoto": "Priloži fotografiju",
   "detailPendingExplain": "Račun je sačuvan. Prodavac ga još nije proknjižio kod Poreske; stavke će se automatski dopuniti.",
+  "detailFromJournalExplain": "Stavke su preuzete iz teksta računa. Osvežite da dobijete preciznije podatke.",
   "detailItemsRefreshed": "Stavke računa su dopunjene.",
   "detailRefreshTooltip": "Osveži sa Poreske uprave",
   "detailRefreshConfirmBody": "Ponovo preuzeti račun sa Poreske uprave? Postojeće kategorije i garancije se zadržavaju.",
@@ -145,7 +146,7 @@
 
   "detailProof": "Dokaz",
   "detailProofHint": "Račun je sačuvan kao dokaz (žurnal + zvanični link Poreske).",
-  "detailOpenOnSuf": "Otvori na suf.purs.gov.rs",
+  "detailOpenOnSuf": "Otvori fiskalni portal",
   "detailDeleteReceipt": "Obriši račun",
   "detailDeleteReceiptConfirm": "Obrisati ovaj račun, njegove stavke i garancije?",
   "receiptFilterAll": "Svi",
@@ -173,10 +174,11 @@
   "expenseMerchantName": "Prodavac / opis",
   "expenseMerchantHint": "npr. EPS, Infostan, pijaca",
   "expenseMerchantRequired": "Unesite naziv prodavca",
-  "expenseAmount": "Iznos (RSD)",
+  "expenseAmount": "Iznos",
   "expenseAmountRequired": "Unesite iznos",
   "expenseAmountInvalid": "Iznos mora biti veći od 0",
   "expenseDate": "Datum",
+  "expenseCurrency": "Valuta",
   "expensePaymentNotSpecified": "Nije navedeno",
   "expensePaymentCash": "Gotovina",
   "expensePaymentCard": "Kartica",
@@ -196,5 +198,6 @@
   "backupImportConfirmBody": "Ovo će zameniti sve postojeće podatke sadržajem backup-a. Ova akcija se ne može poništiti.",
   "backupSuccess": "Backup je uspešno uvezen.",
   "backupErrorCorrupt": "Fajl je oštećen ili nije ispravan backup.",
-  "backupError": "Došlo je do greške. Pokušajte ponovo."
+  "backupError": "Došlo je do greške. Pokušajte ponovo.",
+  "detailDiscrepancyWarning": "Upozorenje: parsirani podaci se ne slažu sa podacima fiskalnog servera. Proverite račun."
 }
