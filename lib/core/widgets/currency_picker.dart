@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../domain/currency.dart';
 
+/// Omotač oko [Currency]? za PopupMenuButton — instanca nikad nije `null`
+/// (za razliku od `Currency?`), pa se izbor "Svi" ne meša sa zatvaranjem
+/// menija bez izbora. Vidi napomenu uz `onSelected` u [CurrencyPicker].
+class _PickerValue {
+  const _PickerValue(this.currency);
+  final Currency? currency;
+}
+
 /// Kružno dugme za izbor valute sa bedžom koji prikazuje trenutno izabrani
 /// kod/simbol u uglu. Otvara padajući meni sa dostupnim valutama.
 ///
@@ -36,13 +44,16 @@ class CurrencyPicker extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final badgeLabel = _labelFor(selected);
 
-    return PopupMenuButton<Currency?>(
+    return PopupMenuButton<_PickerValue>(
       tooltip: badgeLabel,
-      onSelected: onSelected,
+      // PopupMenuButton tretira povratnu vrednost `null` kao da je meni
+      // zatvoren bez izbora (poziva onCanceled, ne onSelected), pa "Svi"
+      // (Currency? == null) mora da putuje kroz omotač koji nikad nije null.
+      onSelected: (v) => onSelected(v.currency),
       itemBuilder: (_) => [
         if (allLabel != null)
-          PopupMenuItem<Currency?>(
-            value: null,
+          PopupMenuItem<_PickerValue>(
+            value: const _PickerValue(null),
             child: Row(
               children: [
                 if (selected == null)
@@ -55,8 +66,8 @@ class CurrencyPicker extends StatelessWidget {
             ),
           ),
         for (final c in currencies)
-          PopupMenuItem<Currency?>(
-            value: c,
+          PopupMenuItem<_PickerValue>(
+            value: _PickerValue(c),
             child: Row(
               children: [
                 if (c == selected)
