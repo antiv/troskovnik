@@ -106,6 +106,7 @@ class TaxCoreClient implements ReceiptSource {
           throw const NoNetworkException();
         case DioExceptionType.receiveTimeout:
         case DioExceptionType.sendTimeout:
+        case DioExceptionType.transformTimeout:
         case DioExceptionType.badResponse:
         case DioExceptionType.badCertificate:
         case DioExceptionType.cancel:
