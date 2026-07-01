@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../core/domain/currency.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/utils/money_format.dart';
+import '../../../core/widgets/currency_picker.dart';
 import '../../categories/domain/category_models.dart';
 import '../../categories/presentation/categories_screen.dart';
 import '../../categories/presentation/category_tag.dart';
@@ -42,9 +43,10 @@ class AnalyticsScreen extends ConsumerWidget {
             children: [
               Expanded(child: _RangeSelector()),
               if (availableCurrencies.length > 1)
-                _CurrencyPicker(
+                CurrencyPicker(
                   currencies: availableCurrencies,
                   selected: activeCurrency,
+                  labelBuilder: (c) => c.symbol,
                   onSelected: (c) =>
                       ref.read(analyticsCurrencyProvider.notifier).set(c),
                 ),
@@ -134,50 +136,6 @@ class AnalyticsScreen extends ConsumerWidget {
             },
           ),
         ),
-      ],
-    );
-  }
-}
-
-class _CurrencyPicker extends StatelessWidget {
-  const _CurrencyPicker({
-    required this.currencies,
-    required this.selected,
-    required this.onSelected,
-  });
-  final List<Currency> currencies;
-  final Currency selected;
-  final void Function(Currency) onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton<Currency>(
-      tooltip: selected.symbol,
-      icon: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.currency_exchange, size: 18),
-          const SizedBox(width: 2),
-          Text(selected.symbol,
-              style: Theme.of(context).textTheme.labelMedium),
-        ],
-      ),
-      onSelected: onSelected,
-      itemBuilder: (_) => [
-        for (final c in currencies)
-          PopupMenuItem(
-            value: c,
-            child: Row(
-              children: [
-                if (c == selected)
-                  const Icon(Icons.check, size: 16)
-                else
-                  const SizedBox(width: 16),
-                const SizedBox(width: 8),
-                Text(c.symbol),
-              ],
-            ),
-          ),
       ],
     );
   }
