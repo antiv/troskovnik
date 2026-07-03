@@ -148,6 +148,7 @@
   "detailOpenOnSuf": "Отвори фискални портал",
   "detailDeleteReceipt": "Обриши рачун",
   "detailDeleteReceiptConfirm": "Обрисати овај рачун, његове ставке и гаранције?",
+  "detailEditReceipt": "Измени рачун",
   "receiptFilterAll": "Сви",
   "receiptFilterBusiness": "Пословни",
   "receiptFilterPersonal": "Приватни",
@@ -170,6 +171,7 @@
   "scanAddExpense": "Унеси рачун",
 
   "expenseTitle": "Нови трошак",
+  "expenseEditTitle": "Измени трошак",
   "expenseMerchantName": "Продавац / опис",
   "expenseMerchantHint": "нпр. ЕПС, Инфостан, пијаца",
   "expenseMerchantRequired": "Унесите назив продавца",

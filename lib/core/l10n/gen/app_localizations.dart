@@ -867,6 +867,12 @@ abstract class AppLocalizations {
   /// **'Obrisati ovaj račun, njegove stavke i garancije?'**
   String get detailDeleteReceiptConfirm;
 
+  /// No description provided for @detailEditReceipt.
+  ///
+  /// In sr, this message translates to:
+  /// **'Izmeni račun'**
+  String get detailEditReceipt;
+
   /// No description provided for @receiptFilterAll.
   ///
   /// In sr, this message translates to:
@@ -968,6 +974,12 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'Novi trošak'**
   String get expenseTitle;
+
+  /// No description provided for @expenseEditTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Izmeni trošak'**
+  String get expenseEditTitle;
 
   /// No description provided for @expenseMerchantName.
   ///

@@ -9,8 +9,38 @@ import '../../../core/utils/money_format.dart';
 import '../../receipts/data/receipt_providers.dart';
 import '../../receipts/presentation/receipt_detail_screen.dart';
 
+/// Početne vrednosti za izmenu postojećeg ručnog (`isManual`) računa.
+class ManualExpenseInitial {
+  const ManualExpenseInitial({
+    required this.receiptId,
+    required this.merchantName,
+    required this.date,
+    required this.currency,
+    this.paymentMethod,
+    this.note,
+    this.imagePath,
+    this.items = const [],
+  });
+
+  final int receiptId;
+  final String merchantName;
+  final DateTime date;
+  final Currency currency;
+  final String? paymentMethod;
+  final String? note;
+  final String? imagePath;
+  final List<({String name, int totalMinor})> items;
+}
+
+/// Forma za ručni unos troška. Radi u dva moda:
+///  - novi unos (`initial == null`) → `saveManual`
+///  - izmena ručnog/IPS računa (`initial != null`) → `updateManual`
 class ManualExpenseScreen extends ConsumerStatefulWidget {
-  const ManualExpenseScreen({super.key});
+  const ManualExpenseScreen({super.key, this.initial});
+
+  final ManualExpenseInitial? initial;
+
+  bool get isEdit => initial != null;
 
   @override
   ConsumerState<ManualExpenseScreen> createState() =>
@@ -29,6 +59,27 @@ class _ManualExpenseScreenState extends ConsumerState<ManualExpenseScreen> {
   bool _busy = false;
 
   final _items = <_ExpenseItem>[];
+
+  @override
+  void initState() {
+    super.initState();
+    final initial = widget.initial;
+    if (initial != null) {
+      _merchantController.text = initial.merchantName;
+      _noteController.text = initial.note ?? '';
+      _date = initial.date;
+      _currency = initial.currency;
+      _paymentMethod = initial.paymentMethod;
+      _imagePath = initial.imagePath;
+      for (final it in initial.items) {
+        final item = _ExpenseItem();
+        item.nameController.text = it.name;
+        item.amountController.text = (it.totalMinor / 100).toStringAsFixed(2);
+        item.amountController.addListener(_onAmountChanged);
+        _items.add(item);
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -113,15 +164,36 @@ class _ManualExpenseScreenState extends ConsumerState<ManualExpenseScreen> {
           .toList();
 
       final repo = await ref.read(receiptRepositoryProvider.future);
+      final note = _noteController.text.trim().isEmpty
+          ? null
+          : _noteController.text.trim();
+      final initial = widget.initial;
+
+      if (initial != null) {
+        await repo.updateManual(
+          receiptId: initial.receiptId,
+          merchantName: _merchantController.text.trim(),
+          totalMinor: totalMinor,
+          date: _date,
+          currency: _currency,
+          paymentMethod: _paymentMethod,
+          note: note,
+          imagePath: _imagePath,
+          items: validItems,
+        );
+        if (!mounted) return;
+        messenger.showSnackBar(SnackBar(content: Text(l10n.expenseSaved)));
+        navigator.pop();
+        return;
+      }
+
       final receiptId = await repo.saveManual(
         merchantName: _merchantController.text.trim(),
         totalMinor: totalMinor,
         date: _date,
         currency: _currency,
         paymentMethod: _paymentMethod,
-        note: _noteController.text.trim().isEmpty
-            ? null
-            : _noteController.text.trim(),
+        note: note,
         imagePath: _imagePath,
         items: validItems,
       );
@@ -144,7 +216,8 @@ class _ManualExpenseScreenState extends ConsumerState<ManualExpenseScreen> {
     final totalMinor = _computeTotalMinor();
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.expenseTitle)),
+      appBar: AppBar(
+          title: Text(widget.isEdit ? l10n.expenseEditTitle : l10n.expenseTitle)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -197,7 +270,7 @@ class _ManualExpenseScreenState extends ConsumerState<ManualExpenseScreen> {
                 Expanded(
                   flex: 3,
                   child: DropdownButtonFormField<String?>(
-                    initialValue: null,
+                    initialValue: _paymentMethod,
                     decoration: InputDecoration(
                       labelText: l10n.detailPaymentMethod,
                       border: const OutlineInputBorder(),

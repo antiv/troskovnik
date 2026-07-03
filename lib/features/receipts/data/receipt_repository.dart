@@ -4,6 +4,7 @@ import '../../../core/db/database.dart';
 import '../../../core/db/enums.dart';
 import '../../../core/domain/country.dart';
 import '../../../core/domain/currency.dart';
+import '../../scan/domain/ips_qr.dart';
 import '../../source/domain/receipt_source.dart';
 import '../domain/retry_policy.dart';
 
@@ -403,6 +404,74 @@ class ReceiptRepository {
         });
       }
       return receiptId;
+    });
+  }
+
+  /// Sačuvaj IPS nalog za plaćanje kao ručni račun (`isManual = true`), da bude
+  /// editabilan kao i ostali ručni unosi. Naziv primaoca (N) → prodavac, svrha
+  /// (S) → stavka, iznos/valuta iz polja I; račun (R) i poziv na broj (RO) idu u
+  /// belešku (nema zasebnog polja u šemi).
+  Future<int> saveIps(IpsQrData data, {DateTime? now}) {
+    final itemName = data.purpose ?? data.recipientFirstLine;
+    final noteLines = <String>[
+      if (data.purpose != null) data.purpose!,
+      'Račun: ${data.recipientAccount}',
+      if (data.referenceNumber != null)
+        'Poziv na broj: ${data.referenceNumber}',
+    ];
+    return saveManual(
+      merchantName: data.recipientFirstLine,
+      totalMinor: data.amountMinor,
+      date: now ?? DateTime.now(),
+      currency: data.currency,
+      paymentMethod: 'Prenos',
+      note: noteLines.join('\n'),
+      items: [(name: itemName, totalMinor: data.amountMinor)],
+      now: now,
+    );
+  }
+
+  /// Izmena ručnog (`isManual`) računa iz edit forme: ažurira prodavca, iznos,
+  /// valutu, datum, način plaćanja, belešku i foto, pa zamenjuje stavke uz
+  /// očuvanje dodeljenih kategorija i garancija (kao kod re-fetch-a).
+  Future<void> updateManual({
+    required int receiptId,
+    required String merchantName,
+    required int totalMinor,
+    required DateTime date,
+    Currency currency = Currency.rsd,
+    String? paymentMethod,
+    String? note,
+    String? imagePath,
+    List<({String name, int totalMinor})> items = const [],
+    DateTime? now,
+  }) async {
+    final ts = now ?? DateTime.now();
+    await _db.transaction(() async {
+      final merchantId = await _upsertManualMerchant(merchantName, ts);
+      await (_db.update(_db.receipts)..where((r) => r.id.equals(receiptId)))
+          .write(ReceiptsCompanion(
+        merchantId: Value(merchantId),
+        totalAmount: Value(totalMinor),
+        currency: Value(currency),
+        pfrTime: Value(date),
+        paymentMethod: Value(paymentMethod),
+        note: Value(note),
+        imagePath: Value(imagePath),
+        updatedAt: Value(ts),
+      ));
+
+      final parsedItems = [
+        for (final item in items)
+          ParsedLineItem(
+            name: item.name,
+            quantity: 1.0,
+            total: item.totalMinor,
+            unitPrice: item.totalMinor,
+            source: ItemsSource.none,
+          ),
+      ];
+      await _replaceItemsPreserving(receiptId, parsedItems);
     });
   }
 
