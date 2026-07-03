@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/db/enums.dart';
 import '../../receipts/data/receipt_providers.dart';
 import '../../source/domain/receipt_source.dart';
+import '../domain/ips_qr.dart';
 import '../domain/verification_url.dart';
 
 /// Ishod obrade jednog skeniranja.
@@ -43,6 +44,23 @@ class ScanController {
   final VerificationUrlValidator _validator;
 
   Future<ScanOutcome> process(String rawScan) async {
+    // IPS nalog za plaćanje nije fiskalni URL — prepoznaj ga pre URL validacije
+    // i sačuvaj kao ručni račun (bez mreže).
+    final ips = IpsQrParser.tryParse(rawScan);
+    if (ips != null) {
+      final repo = await _ref.read(receiptRepositoryProvider.future);
+      final receiptId = await repo.saveIps(ips);
+      return ScanSaved(
+        receiptId: receiptId,
+        wasDuplicate: false,
+        parsed: const ParsedReceipt(
+          fetchStatus: FetchStatus.complete,
+          itemsStatus: ItemsStatus.none,
+          itemsSource: ItemsSource.none,
+        ),
+      );
+    }
+
     final validation = _validator.validate(rawScan);
     if (validation is InvalidVerificationUrl) {
       return ScanNotFiscal(validation.reason);

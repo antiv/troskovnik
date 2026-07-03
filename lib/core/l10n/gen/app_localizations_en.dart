@@ -418,6 +418,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Delete this receipt, its items and warranties?';
 
   @override
+  String get detailEditReceipt => 'Edit receipt';
+
+  @override
   String get receiptFilterAll => 'All';
 
   @override
@@ -468,6 +471,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get expenseTitle => 'New expense';
+
+  @override
+  String get expenseEditTitle => 'Edit expense';
 
   @override
   String get expenseMerchantName => 'Merchant / description';

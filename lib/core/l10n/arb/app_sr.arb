@@ -149,6 +149,7 @@
   "detailOpenOnSuf": "Otvori fiskalni portal",
   "detailDeleteReceipt": "Obriši račun",
   "detailDeleteReceiptConfirm": "Obrisati ovaj račun, njegove stavke i garancije?",
+  "detailEditReceipt": "Izmeni račun",
   "receiptFilterAll": "Svi",
   "receiptFilterBusiness": "Poslovni",
   "receiptFilterPersonal": "Privatni",
@@ -171,6 +172,7 @@
   "scanAddExpense": "Unesi račun",
 
   "expenseTitle": "Novi trošak",
+  "expenseEditTitle": "Izmeni trošak",
   "expenseMerchantName": "Prodavac / opis",
   "expenseMerchantHint": "npr. EPS, Infostan, pijaca",
   "expenseMerchantRequired": "Unesite naziv prodavca",

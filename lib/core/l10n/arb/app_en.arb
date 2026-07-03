@@ -148,6 +148,7 @@
   "detailOpenOnSuf": "Open fiscal portal",
   "detailDeleteReceipt": "Delete receipt",
   "detailDeleteReceiptConfirm": "Delete this receipt, its items and warranties?",
+  "detailEditReceipt": "Edit receipt",
   "receiptFilterAll": "All",
   "receiptFilterBusiness": "Business",
   "receiptFilterPersonal": "Personal",
@@ -170,6 +171,7 @@
   "scanAddExpense": "Add receipt",
 
   "expenseTitle": "New expense",
+  "expenseEditTitle": "Edit expense",
   "expenseMerchantName": "Merchant / description",
   "expenseMerchantHint": "e.g. EPS, Infostan, market",
   "expenseMerchantRequired": "Enter merchant name",

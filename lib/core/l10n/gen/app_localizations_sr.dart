@@ -418,6 +418,9 @@ class AppLocalizationsSr extends AppLocalizations {
       'Obrisati ovaj račun, njegove stavke i garancije?';
 
   @override
+  String get detailEditReceipt => 'Izmeni račun';
+
+  @override
   String get receiptFilterAll => 'Svi';
 
   @override
@@ -468,6 +471,9 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get expenseTitle => 'Novi trošak';
+
+  @override
+  String get expenseEditTitle => 'Izmeni trošak';
 
   @override
   String get expenseMerchantName => 'Prodavac / opis';
@@ -972,6 +978,9 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
       'Обрисати овај рачун, његове ставке и гаранције?';
 
   @override
+  String get detailEditReceipt => 'Измени рачун';
+
+  @override
   String get receiptFilterAll => 'Сви';
 
   @override
@@ -1022,6 +1031,9 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get expenseTitle => 'Нови трошак';
+
+  @override
+  String get expenseEditTitle => 'Измени трошак';
 
   @override
   String get expenseMerchantName => 'Продавац / опис';

@@ -14,6 +14,7 @@ import '../../../core/utils/money_format.dart';
 import '../../categories/data/category_providers.dart';
 import '../../categories/presentation/category_picker_sheet.dart';
 import '../../categories/presentation/category_tag.dart';
+import '../../scan/presentation/manual_expense_screen.dart';
 import '../../warranties/presentation/add_warranty_sheet.dart';
 import '../data/receipt_providers.dart';
 import 'receipt_detail_controller.dart';
@@ -87,6 +88,12 @@ class ReceiptDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.detailTitle),
         actions: [
+          if (detailAsync.value?.receipt.isManual ?? false)
+            IconButton(
+              icon: const Icon(Icons.edit_outlined),
+              tooltip: l10n.detailEditReceipt,
+              onPressed: () => _editReceipt(context, detailAsync.value!),
+            ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
             tooltip: l10n.detailDeleteReceipt,
@@ -105,6 +112,28 @@ class ReceiptDetailScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  /// Otvara formu za izmenu ručnog (`isManual`) računa, popunjenu trenutnim
+  /// vrednostima. Forma je ista kao za novi unos (create/edit mod).
+  void _editReceipt(BuildContext context, ReceiptDetail detail) {
+    final r = detail.receipt;
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => ManualExpenseScreen(
+        initial: ManualExpenseInitial(
+          receiptId: r.id,
+          merchantName: detail.merchant.name,
+          date: r.pfrTime ?? r.createdAt,
+          currency: r.currency,
+          paymentMethod: r.paymentMethod,
+          note: r.note,
+          imagePath: r.imagePath,
+          items: [
+            for (final i in detail.items) (name: i.name, totalMinor: i.total),
+          ],
+        ),
+      ),
+    ));
   }
 
   Future<void> _confirmDeleteReceipt(
