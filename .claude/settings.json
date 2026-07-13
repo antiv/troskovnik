@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(adb devices *)",
+      "Bash(pkill -f \"flutter run\")",
+      "Bash(brew list *)",
+      "Bash(brew info *)",
+      "Bash(brew install *)",
+      "Bash(sips -g pixelWidth -g pixelHeight user_real.jpg)",
+      "Bash(ZXingReader -format QRCode user_real.jpg)"
+    ]
+  }
+}

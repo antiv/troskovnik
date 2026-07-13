@@ -10,6 +10,7 @@
   "scanHint": "Usmeri kameru na QR kod fiskalnog računa",
   "scanManualEntry": "Unesi URL",
   "scanFromGallery": "Iz galerije",
+  "scanCapturePhoto": "Ne očitava se? Uslikaj kod",
   "scanNoQrInImage": "Na slici nema čitljivog QR koda",
   "scanImageFailed": "Nije moguće analizirati sliku. Pokušaj ponovo ili skeniraj kamerom.",
   "scanBatchMode": "Skeniraj više zaredom",
@@ -140,6 +141,7 @@
   "languageEnglish": "English",
 
   "aboutTitle": "O aplikaciji",
+  "moreAppsLabel": "Još aplikacija",
   "aboutVersionLabel": "VERZIJA",
   "aboutPoweredBy": "POWERED BY",
   "aboutClose": "Zatvori",

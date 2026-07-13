@@ -141,6 +141,12 @@ abstract class AppLocalizations {
   /// **'Iz galerije'**
   String get scanFromGallery;
 
+  /// No description provided for @scanCapturePhoto.
+  ///
+  /// In sr, this message translates to:
+  /// **'Ne očitava se? Uslikaj kod'**
+  String get scanCapturePhoto;
+
   /// No description provided for @scanNoQrInImage.
   ///
   /// In sr, this message translates to:
@@ -818,6 +824,12 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'O aplikaciji'**
   String get aboutTitle;
+
+  /// No description provided for @moreAppsLabel.
+  ///
+  /// In sr, this message translates to:
+  /// **'Još aplikacija'**
+  String get moreAppsLabel;
 
   /// No description provided for @aboutVersionLabel.
   ///

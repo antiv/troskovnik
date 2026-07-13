@@ -30,6 +30,9 @@ class AppLocalizationsSr extends AppLocalizations {
   String get scanFromGallery => 'Iz galerije';
 
   @override
+  String get scanCapturePhoto => 'Ne očitava se? Uslikaj kod';
+
+  @override
   String get scanNoQrInImage => 'Na slici nema čitljivog QR koda';
 
   @override
@@ -392,6 +395,9 @@ class AppLocalizationsSr extends AppLocalizations {
   String get aboutTitle => 'O aplikaciji';
 
   @override
+  String get moreAppsLabel => 'Još aplikacija';
+
+  @override
   String get aboutVersionLabel => 'VERZIJA';
 
   @override
@@ -588,6 +594,9 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get scanFromGallery => 'Из галерије';
+
+  @override
+  String get scanCapturePhoto => 'Не очитава се? Усликај код';
 
   @override
   String get scanNoQrInImage => 'На слици нема читљивог QR кода';
@@ -950,6 +959,9 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get aboutTitle => 'О апликацији';
+
+  @override
+  String get moreAppsLabel => 'Још апликација';
 
   @override
   String get aboutVersionLabel => 'ВЕРЗИЈА';

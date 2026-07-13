@@ -9,6 +9,7 @@
   "scanHint": "Усмери камеру на QR код фискалног рачуна",
   "scanManualEntry": "Унеси URL",
   "scanFromGallery": "Из галерије",
+  "scanCapturePhoto": "Не очитава се? Усликај код",
   "scanNoQrInImage": "На слици нема читљивог QR кода",
   "scanImageFailed": "Није могуће анализирати слику. Покушај поново или скенирај камером.",
   "scanBatchMode": "Скенирај више заредом",
@@ -139,6 +140,7 @@
   "languageEnglish": "English",
 
   "aboutTitle": "О апликацији",
+  "moreAppsLabel": "Још апликација",
   "aboutVersionLabel": "ВЕРЗИЈА",
   "aboutPoweredBy": "POWERED BY",
   "aboutClose": "Затвори",

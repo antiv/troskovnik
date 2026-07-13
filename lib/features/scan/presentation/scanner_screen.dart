@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -6,6 +8,9 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../core/db/enums.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../receipts/presentation/receipt_detail_screen.dart';
+import '../data/qr_image_decoder.dart';
+import '../domain/ips_qr.dart';
+import '../domain/verification_url.dart';
 import 'manual_entry_screen.dart';
 import 'manual_expense_screen.dart';
 import 'scan_controller.dart';
@@ -22,13 +27,30 @@ class ScannerScreen extends ConsumerStatefulWidget {
 }
 
 class _ScannerScreenState extends ConsumerState<ScannerScreen> {
-  final _controller = MobileScannerController(autoStart: false);
+  // Samo QR: ML Kit na statičnim slikama (galerija) ume da „prepozna" lažne
+  // 1D barkodove u linijama razdvajanja računa (====/----), pa bi se
+  // validirao pogrešan sadržaj. Fiskalni i IPS kodovi su uvek QR.
+  final _controller = MobileScannerController(
+    autoStart: false,
+    formats: const [BarcodeFormat.qrCode],
+  );
   bool _processing = false;
+
+  /// „Uslikaj kod" se nudi tek kad živo skeniranje očigledno ne prolazi:
+  /// ML Kit javlja samo uspehe, pa je jedini signal proteklo vreme bez
+  /// detekcije. Jednom prikazano dugme ostaje do uspešnog skena (bez
+  /// treperenja), a sklanja se pri napuštanju taba.
+  static const _captureButtonDelay = Duration(seconds: 5);
+  Timer? _captureButtonTimer;
+  bool _showCaptureButton = false;
 
   @override
   void initState() {
     super.initState();
-    if (widget.isActive) _controller.start();
+    if (widget.isActive) {
+      _controller.start();
+      _armCaptureButton();
+    }
   }
 
   @override
@@ -36,15 +58,35 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     super.didUpdateWidget(oldWidget);
     if (widget.isActive && !oldWidget.isActive) {
       _controller.start();
+      _armCaptureButton();
     } else if (!widget.isActive && oldWidget.isActive) {
       _controller.stop();
+      _hideCaptureButton();
     }
   }
 
   @override
   void dispose() {
+    _captureButtonTimer?.cancel();
     _controller.dispose();
     super.dispose();
+  }
+
+  void _armCaptureButton() {
+    if (_showCaptureButton) return; // već vidljivo — ostaje do uspeha
+    _captureButtonTimer?.cancel();
+    _captureButtonTimer = Timer(_captureButtonDelay, () {
+      if (mounted && !_processing) {
+        setState(() => _showCaptureButton = true);
+      }
+    });
+  }
+
+  void _hideCaptureButton() {
+    _captureButtonTimer?.cancel();
+    if (_showCaptureButton && mounted) {
+      setState(() => _showCaptureButton = false);
+    }
   }
 
   Future<void> _onDetect(BarcodeCapture capture) async {
@@ -54,43 +96,82 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     await _processRaw(raw);
   }
 
-  /// Uvoz slike iz galerije: skenira ceo kadar (QR može biti bilo gde na slici).
-  Future<void> _pickFromGallery() async {
+  /// Uvoz slike (galerija ili fotografija): skenira ceo kadar — QR može biti
+  /// bilo gde na slici. Fotografija punom rezolucijom senzora + zxing-cpp
+  /// fallback čita i kodove koje živi skener ne može (gusti, loše štampani).
+  Future<void> _importImage(ImageSource source) async {
     if (_processing) return;
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
 
-    final picked =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (picked == null) return; // korisnik odustao
+    // Sistemska kamera ne može da se otvori dok naš skener drži uređaj.
+    await _controller.stop();
+
+    final picked = await ImagePicker().pickImage(source: source);
+    if (picked == null) {
+      // korisnik odustao
+      if (mounted) {
+        await _controller.start();
+        _armCaptureButton();
+      }
+      return;
+    }
+    if (!mounted) return;
 
     setState(() => _processing = true);
-    await _controller.stop();
 
     // analyzeImage ume da baci (npr. nije podržano na iOS simulatoru, ili
     // neispravna slika) — bez catch-a bi UI ostao zaglavljen u _processing.
     BarcodeCapture? capture;
     try {
-      capture = await _controller.analyzeImage(picked.path);
+      capture = await _controller.analyzeImage(
+        picked.path,
+        formats: const [BarcodeFormat.qrCode],
+      );
     } catch (_) {
       if (mounted) {
         messenger.showSnackBar(SnackBar(content: Text(l10n.scanImageFailed)));
         setState(() => _processing = false);
         await _controller.start();
+        _armCaptureButton();
       }
       return;
     }
 
-    final raw = capture?.barcodes.firstOrNull?.rawValue;
-    if (raw == null || raw.isEmpty) {
+    var candidates = capture?.barcodes
+            .map((b) => b.rawValue)
+            .whereType<String>()
+            .where((v) => v.isNotEmpty)
+            .toList() ??
+        const <String>[];
+
+    // ML Kit često ne detektuje gust fiskalni QR (verzija ~40) na statičnoj
+    // slici iako ga kamera čita — probaj ZXing pre nego što odustanemo.
+    if (candidates.isEmpty) {
+      final fallback = await QrImageDecoder.decode(picked.path);
+      if (fallback != null && fallback.isNotEmpty) candidates = [fallback];
+    }
+
+    if (candidates.isEmpty) {
       if (mounted) {
         messenger
             .showSnackBar(SnackBar(content: Text(l10n.scanNoQrInImage)));
         setState(() => _processing = false);
         await _controller.start();
+        _armCaptureButton();
       }
       return;
     }
+
+    // Na slici može biti više QR kodova — prednost ima onaj koji je
+    // fiskalni URL ili IPS nalog; tek ako nijedan ne prolazi, prvi nađeni.
+    final raw = candidates.firstWhere(
+      (v) =>
+          IpsQrParser.tryParse(v) != null ||
+          const VerificationUrlValidator().validate(v)
+              is ValidVerificationUrl,
+      orElse: () => candidates.first,
+    );
 
     await _processRaw(raw, alreadyProcessing: true);
   }
@@ -110,6 +191,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
 
     switch (outcome) {
       case ScanSaved(:final receiptId, :final wasDuplicate, :final parsed):
+        _hideCaptureButton(); // skeniranje je uspelo — ponuda više ne treba
         if (wasDuplicate) {
           messenger.showSnackBar(
               SnackBar(content: Text(l10n.resultDuplicateOpened)));
@@ -131,6 +213,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     if (mounted) {
       setState(() => _processing = false);
       await _controller.start();
+      _armCaptureButton();
     }
   }
 
@@ -148,6 +231,32 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     return Stack(
       children: [
         MobileScanner(controller: _controller, onDetect: _onDetect),
+        // Izlaz za kodove koje živi skener ne očitava (gusti, loše
+        // štampani): fotografija punog senzora + zxing-cpp fallback.
+        // Pojavljuje se tek posle par sekundi skeniranja bez pogotka.
+        Positioned(
+          top: 12,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: IgnorePointer(
+              ignoring: !_showCaptureButton,
+              child: AnimatedOpacity(
+                opacity: _showCaptureButton ? 1 : 0,
+                duration: const Duration(milliseconds: 300),
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.black54,
+                    foregroundColor: Colors.white,
+                  ),
+                  icon: const Icon(Icons.photo_camera_outlined),
+                  label: Text(l10n.scanCapturePhoto),
+                  onPressed: () => _importImage(ImageSource.camera),
+                ),
+              ),
+            ),
+          ),
+        ),
         if (_processing)
           const ColoredBox(
             color: Colors.black45,
@@ -177,7 +286,8 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
                         label: Text(l10n.scanFromGallery,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis),
-                        onPressed: _pickFromGallery,
+                        onPressed: () =>
+                            _importImage(ImageSource.gallery),
                       ),
                     ),
                     const SizedBox(width: 8),

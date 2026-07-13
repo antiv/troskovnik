@@ -30,6 +30,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanFromGallery => 'From gallery';
 
   @override
+  String get scanCapturePhoto => 'Won\'t scan? Take a photo';
+
+  @override
   String get scanNoQrInImage => 'No readable QR code in the image';
 
   @override
@@ -390,6 +393,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutTitle => 'About';
+
+  @override
+  String get moreAppsLabel => 'More apps';
 
   @override
   String get aboutVersionLabel => 'VERSION';

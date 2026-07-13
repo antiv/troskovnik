@@ -9,6 +9,7 @@
   "scanHint": "Point the camera at the fiscal receipt QR code",
   "scanManualEntry": "Enter URL",
   "scanFromGallery": "From gallery",
+  "scanCapturePhoto": "Won't scan? Take a photo",
   "scanNoQrInImage": "No readable QR code in the image",
   "scanImageFailed": "Could not analyze the image. Try again or scan with the camera.",
   "scanBatchMode": "Scan several in a row",
@@ -139,6 +140,7 @@
   "languageEnglish": "English",
 
   "aboutTitle": "About",
+  "moreAppsLabel": "More apps",
   "aboutVersionLabel": "VERSION",
   "aboutPoweredBy": "POWERED BY",
   "aboutClose": "Close",
