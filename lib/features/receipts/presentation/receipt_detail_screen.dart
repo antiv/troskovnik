@@ -50,14 +50,15 @@ Future<void> _pickCategory(
   WidgetRef ref,
   LineItemRow item,
 ) async {
-  final categoryId = await CategoryPickerSheet.show(
+  final picked = await CategoryPickerSheet.show(
     context,
     currentCategoryId: item.categoryId,
   );
+  if (picked == null) return; // odustao
   final repo = await ref.read(receiptRepositoryProvider.future);
   await (repo.db.update(repo.db.lineItems)..where((i) => i.id.equals(item.id)))
       .write(LineItemsCompanion(
-    categoryId: Value(categoryId),
+    categoryId: Value(picked == CategoryPickerSheet.noneId ? null : picked),
   ));
 }
 
@@ -67,10 +68,11 @@ Future<void> _categorizeAll(
   WidgetRef ref,
   int receiptId,
 ) async {
-  final categoryId = await CategoryPickerSheet.show(context);
-  if (categoryId == null) return;
+  final picked = await CategoryPickerSheet.show(context);
+  if (picked == null) return; // odustao
   final catRepo = await ref.read(categoryRepositoryProvider.future);
-  await catRepo.assignToReceipt(receiptId, categoryId);
+  await catRepo.assignToReceipt(
+      receiptId, picked == CategoryPickerSheet.noneId ? null : picked);
 }
 
 /// Detalj računa: zaglavlje, porez, stavke ili „u obradi" + Osveži (sekcija 7, ekran 4).

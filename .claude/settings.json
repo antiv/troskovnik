@@ -7,7 +7,9 @@
       "Bash(brew info *)",
       "Bash(brew install *)",
       "Bash(sips -g pixelWidth -g pixelHeight user_real.jpg)",
-      "Bash(ZXingReader -format QRCode user_real.jpg)"
+      "Bash(ZXingReader -format QRCode user_real.jpg)",
+      "Bash(git checkout *)",
+      "Bash(adb wait-for-device *)"
     ]
   }
 }

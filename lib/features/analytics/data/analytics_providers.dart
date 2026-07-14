@@ -59,3 +59,13 @@ final itemDetailProvider =
   final range = ref.watch(analyticsRangeProvider);
   return repo.itemDetail(name, range);
 });
+
+/// Artikli jedne kategorije (drill-down; 0 = bez kategorije), za izabrani
+/// period i valutu.
+final categoryItemsProvider =
+    FutureProvider.family<List<TopItem>, int>((ref, categoryId) async {
+  final repo = await ref.watch(analyticsRepositoryProvider.future);
+  final range = ref.watch(analyticsRangeProvider);
+  final currency = ref.watch(analyticsCurrencyProvider);
+  return repo.categoryItems(categoryId, range, currency: currency);
+});

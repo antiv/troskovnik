@@ -340,8 +340,25 @@ class AnalyticsRepository {
   static const paymentUnknownKey = _paymentUnknownKey;
   static const _paymentUnknownKey = '__unknown__';
 
+  /// Artikli jedne kategorije (grupisano po nazivu), za drill-down iz
+  /// analitike. `categoryId = 0` znači „bez kategorije" (NULL u bazi) —
+  /// isti sentinel kao u [_byCategory].
+  Future<List<TopItem>> categoryItems(
+    int categoryId,
+    AnalyticsRange range, {
+    DateTime? now,
+    Currency? currency,
+  }) {
+    final since = _since(range, now ?? DateTime.now());
+    return _topItems(since,
+        categoryId: categoryId, currency: currency, limit: null);
+  }
+
   Future<List<TopItem>> _topItems(DateTime? since,
-      {int limit = 10, int? merchantId, Currency? currency}) async {
+      {int? limit = 10,
+      int? merchantId,
+      int? categoryId,
+      Currency? currency}) async {
     final r = _db.receipts;
     final li = _db.lineItems;
     final total = li.total.sum();
@@ -349,6 +366,12 @@ class AnalyticsRepository {
 
     var filter = _validAnd(since, currency: currency) & li.isUnparsed.equals(false);
     if (merchantId != null) filter = filter & r.merchantId.equals(merchantId);
+    if (categoryId != null) {
+      filter = filter &
+          (categoryId == 0
+              ? li.categoryId.isNull()
+              : li.categoryId.equals(categoryId));
+    }
 
     final q = _db.selectOnly(li).join([
       innerJoin(r, r.id.equalsExp(li.receiptId)),
@@ -356,8 +379,8 @@ class AnalyticsRepository {
       ..addColumns([li.name, total, cnt])
       ..where(filter)
       ..groupBy([li.name])
-      ..orderBy([OrderingTerm(expression: total, mode: OrderingMode.desc)])
-      ..limit(limit);
+      ..orderBy([OrderingTerm(expression: total, mode: OrderingMode.desc)]);
+    if (limit != null) q.limit(limit);
 
     final rows = await q.get();
     return rows
