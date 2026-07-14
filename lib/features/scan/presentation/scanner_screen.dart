@@ -148,8 +148,12 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     // ML Kit često ne detektuje gust fiskalni QR (verzija ~40) na statičnoj
     // slici iako ga kamera čita — probaj ZXing pre nego što odustanemo.
     if (candidates.isEmpty) {
-      final fallback = await QrImageDecoder.decode(picked.path);
-      if (fallback != null && fallback.isNotEmpty) candidates = [fallback];
+      try {
+        final fallback = await QrImageDecoder.decode(picked.path);
+        if (fallback != null && fallback.isNotEmpty) candidates = [fallback];
+      } catch (e, stack) {
+        debugPrint('Greška pri dekodiranju pomoću ZXing fallback-a: $e\n$stack');
+      }
     }
 
     if (candidates.isEmpty) {

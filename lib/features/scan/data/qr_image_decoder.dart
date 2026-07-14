@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_zxing/flutter_zxing.dart';
 
@@ -15,7 +17,14 @@ class QrImageDecoder {
   ///
   /// Dart deo (dekodiranje PNG/JPEG u piksele) je CPU-intenzivan za velike
   /// fotografije, pa sve radi u posebnom isolate-u.
-  static Future<String?> decode(String path) => compute(_decode, path);
+  static Future<String?> decode(String path) {
+    if (Platform.isIOS || Platform.isMacOS) {
+      // Izbegavamo compute/isolate na iOS-u jer FFI / DynamicLibrary.process()
+      // u pozadinskom isolate-u dovodi do beskonačnog čekanja/blokade.
+      return _decode(path);
+    }
+    return compute(_decode, path);
+  }
 
   static Future<String?> _decode(String path) async {
     final code = await zx.readBarcodeImagePathString(
