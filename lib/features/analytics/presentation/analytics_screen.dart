@@ -7,8 +7,10 @@ import '../../../core/domain/currency.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/utils/money_format.dart';
 import '../../../core/widgets/currency_picker.dart';
+import '../../categories/data/category_providers.dart';
 import '../../categories/domain/category_models.dart';
 import '../../categories/presentation/categories_screen.dart';
+import '../../categories/presentation/category_picker_sheet.dart';
 import '../../categories/presentation/category_tag.dart';
 import '../../export/data/export_service.dart';
 import '../../export/domain/export_range.dart';
@@ -121,7 +123,12 @@ class AnalyticsScreen extends ConsumerWidget {
                               builder: (_) => const CategoriesScreen()),
                         ),
                       ),
-                      child: _CategoryList(items: s.byCategory, currency: activeCurrency),
+                      child: _CategoryList(
+                        items: s.byCategory,
+                        currency: activeCurrency,
+                        onTap: (c) => _showCategorySheet(
+                            context, c.categoryId, c.categoryName),
+                      ),
                     ),
                   _Section(
                     title: l10n.analyticsTopItems,
@@ -692,9 +699,12 @@ class _TopItemsList extends StatelessWidget {
 }
 
 class _CategoryList extends StatelessWidget {
-  const _CategoryList({required this.items, required this.currency});
+  const _CategoryList({required this.items, required this.currency, this.onTap});
   final List<CategorySpending> items;
   final Currency currency;
+
+  /// Klik na kategoriju (drill-down). Null → red nije interaktivan.
+  final void Function(CategorySpending)? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -707,35 +717,39 @@ class _CategoryList extends StatelessWidget {
     return Column(
       children: [
         for (final c in top)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        CategoryTag(color: c.color, size: 16),
-                        const SizedBox(width: 8),
-                        Text(c.categoryName),
-                      ],
-                    ),
-                    Text(MoneyFormat.fromMinor(c.totalMinor, currency),
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    value: maxV == 0 ? 0 : (c.totalMinor / maxV).clamp(0.0, 1.0),
-                    minHeight: 6,
-                    backgroundColor: scheme.surfaceContainerHighest,
+          InkWell(
+            onTap: onTap == null ? null : () => onTap!(c),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          CategoryTag(color: c.color, size: 16),
+                          const SizedBox(width: 8),
+                          Text(c.categoryName),
+                        ],
+                      ),
+                      Text(MoneyFormat.fromMinor(c.totalMinor, currency),
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 2),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value:
+                          maxV == 0 ? 0 : (c.totalMinor / maxV).clamp(0.0, 1.0),
+                      minHeight: 6,
+                      backgroundColor: scheme.surfaceContainerHighest,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
       ],
@@ -760,6 +774,15 @@ void _showItemSheet(BuildContext context, String name) {
     isScrollControlled: true,
     showDragHandle: true,
     builder: (_) => _ItemDetailSheet(name: name),
+  );
+}
+
+void _showCategorySheet(BuildContext context, int categoryId, String name) {
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder: (_) => _CategoryDetailSheet(categoryId: categoryId, name: name),
   );
 }
 
@@ -928,6 +951,77 @@ class _ItemDetailSheet extends ConsumerWidget {
 
   static String _formatQty(double q) =>
       q == q.roundToDouble() ? q.toInt().toString() : q.toStringAsFixed(2);
+}
+
+/// Artikli jedne kategorije, sa ikonicom za premeštanje artikla u drugu
+/// kategoriju (olakšava raspoređivanje). Tap na red otvara detalje artikla.
+class _CategoryDetailSheet extends ConsumerWidget {
+  const _CategoryDetailSheet({required this.categoryId, required this.name});
+  final int categoryId;
+  final String name;
+
+  Future<void> _changeCategory(
+      BuildContext context, WidgetRef ref, String itemName) async {
+    final picked = await CategoryPickerSheet.show(
+      context,
+      currentCategoryId: categoryId == 0 ? null : categoryId,
+    );
+    if (picked == null) return; // odustao
+    final repo = await ref.read(categoryRepositoryProvider.future);
+    await repo.assignToItemsByName(
+        itemName, picked == CategoryPickerSheet.noneId ? null : picked);
+    // Osveži liste artikala po kategorijama (sažetak se osvežava sam,
+    // preko stream-a koji prati izmene baze).
+    ref.invalidate(categoryItemsProvider);
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final async = ref.watch(categoryItemsProvider(categoryId));
+    final currency = ref.watch(analyticsCurrencyProvider) ?? Currency.rsd;
+    return _SheetScaffold(
+      title: name,
+      child: async.when(
+        loading: () => const Padding(
+            padding: EdgeInsets.all(24),
+            child: Center(child: CircularProgressIndicator())),
+        error: (e, _) => Text('${l10n.errGeneric}\n$e'),
+        data: (items) => items.isEmpty
+            ? Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Text(l10n.analyticsEmpty),
+              )
+            : Column(
+                children: [
+                  for (final it in items)
+                    ListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      onTap: () => _showItemSheet(context, it.name),
+                      title: Text(it.name),
+                      subtitle: Text('×${it.count}'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(MoneyFormat.fromMinor(it.totalMinor, currency),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
+                          IconButton(
+                            icon: const Icon(Icons.drive_file_move_outlined,
+                                size: 20),
+                            tooltip: l10n.categoriesEdit,
+                            onPressed: () =>
+                                _changeCategory(context, ref, it.name),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+      ),
+    );
+  }
 }
 
 class _PriceHistoryChart extends StatelessWidget {

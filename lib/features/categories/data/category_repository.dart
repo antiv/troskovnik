@@ -51,7 +51,16 @@ class CategoryRepository {
         categoryId: Value(categoryId),
       ));
 
-  Future<void> assignToReceipt(int receiptId, int categoryId) =>
+  /// Dodeljuje kategoriju svim stavkama sa datim nazivom artikla (kroz sve
+  /// račune) — analitika grupiše artikle po nazivu, pa promena iz nje važi
+  /// za ceo artikal, ne za pojedinačnu stavku.
+  Future<void> assignToItemsByName(String name, int? categoryId) =>
+      (_db.update(_db.lineItems)..where((i) => i.name.equals(name)))
+          .write(LineItemsCompanion(
+        categoryId: Value(categoryId),
+      ));
+
+  Future<void> assignToReceipt(int receiptId, int? categoryId) =>
       (_db.update(_db.lineItems)..where((i) => i.receiptId.equals(receiptId)))
           .write(LineItemsCompanion(
         categoryId: Value(categoryId),

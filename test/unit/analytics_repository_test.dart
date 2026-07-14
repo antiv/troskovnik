@@ -317,6 +317,43 @@ void main() {
     expect(marchBam.totalMinor, 10000);
   });
 
+  test('categoryItems groups by name within category; 0 = bez kategorije',
+      () async {
+    final m = await merchant('1', 'Maxi');
+    final r1 = await receipt(
+        merchantId: m, total: 0, pfrTime: DateTime(2026, 1, 5), invoice: 'A');
+    final r2 = await receipt(
+        merchantId: m, total: 0, pfrTime: DateTime(2026, 1, 6), invoice: 'B');
+    final cat = await db.into(db.categories).insert(
+          CategoriesCompanion.insert(name: 'Namirnice'),
+        );
+    Future<void> catItem(int rid, String name, int total) =>
+        db.into(db.lineItems).insert(LineItemsCompanion.insert(
+              receiptId: rid,
+              name: name,
+              total: Value(total),
+              categoryId: Value(cat),
+            ));
+    await catItem(r1, 'Mleko', 12000);
+    await catItem(r2, 'Mleko', 6000);
+    await catItem(r1, 'Hleb', 5000);
+    await item(r2, 'Sijalica', 9000); // bez kategorije
+
+    final inCat = await repo.categoryItems(cat, AnalyticsRange.all,
+        now: DateTime(2026, 2, 1));
+    expect(inCat, hasLength(2));
+    expect(inCat.first.name, 'Mleko'); // najveći zbir prvi
+    expect(inCat.first.totalMinor, 18000);
+    expect(inCat.first.count, 2);
+    expect(inCat.any((t) => t.name == 'Sijalica'), isFalse);
+
+    // Sentinel 0 → stavke bez kategorije.
+    final noCat = await repo.categoryItems(0, AnalyticsRange.all,
+        now: DateTime(2026, 2, 1));
+    expect(noCat, hasLength(1));
+    expect(noCat.first.name, 'Sijalica');
+  });
+
   test('existing serbia receipts default to Country.serbia / Currency.rsd',
       () async {
     // Računi bez eksplicitnog country/currency (stari, pre v7) trebaju

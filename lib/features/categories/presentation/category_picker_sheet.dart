@@ -10,6 +10,13 @@ class CategoryPickerSheet extends ConsumerWidget {
 
   final int? currentCategoryId;
 
+  /// Sentinel za izbor „Bez kategorije" — razlikuje se od `null` koji znači
+  /// da je korisnik odustao (zatvorio sheet bez izbora). Bezbedan je jer
+  /// SQLite id-jevi kategorija kreću od 1.
+  static const int noneId = 0;
+
+  /// Vraća id izabrane kategorije, [noneId] za „Bez kategorije",
+  /// ili `null` ako je korisnik odustao.
   static Future<int?> show(BuildContext context, {int? currentCategoryId}) {
     return showModalBottomSheet<int>(
       context: context,
@@ -41,7 +48,7 @@ class CategoryPickerSheet extends ConsumerWidget {
                 leading: const Icon(Icons.clear_all),
                 title: Text(l10n.categoryNone),
                 selected: currentCategoryId == null,
-                onTap: () => Navigator.pop(context, null),
+                onTap: () => Navigator.pop(context, noneId),
               ),
               for (final cat in categories)
                 ListTile(
