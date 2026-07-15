@@ -7,10 +7,37 @@ import 'package:troskovnik/core/db/database.dart';
 import 'package:troskovnik/core/db/enums.dart';
 import 'package:troskovnik/core/db/providers.dart';
 import 'package:troskovnik/core/l10n/gen/app_localizations.dart';
+import 'package:troskovnik/core/domain/currency.dart';
+import 'package:troskovnik/core/providers/last_currency_controller.dart';
+import 'package:troskovnik/features/analytics/data/analytics_providers.dart';
 import 'package:troskovnik/features/analytics/presentation/analytics_screen.dart';
 
+class FakeAnalyticsCurrencyNotifier extends AnalyticsCurrencyNotifier {
+  @override
+  Future<Currency?> build() async => Currency.rsd;
+
+  @override
+  Future<void> set(Currency? c) async {
+    state = AsyncData(c);
+  }
+}
+
+class FakeLastCurrencyController extends LastCurrencyController {
+  @override
+  Future<Currency> build() async => Currency.rsd;
+
+  @override
+  Future<void> setCurrency(Currency currency) async {
+    state = AsyncData(currency);
+  }
+}
+
 Widget _wrap(AppDatabase db) => ProviderScope(
-      overrides: [appDatabaseProvider.overrideWith((ref) async => db)],
+      overrides: [
+        appDatabaseProvider.overrideWith((ref) async => db),
+        analyticsCurrencyProvider.overrideWith(() => FakeAnalyticsCurrencyNotifier()),
+        lastCurrencyControllerProvider.overrideWith(() => FakeLastCurrencyController()),
+      ],
       child: const MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
