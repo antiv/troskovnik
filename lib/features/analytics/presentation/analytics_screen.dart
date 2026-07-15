@@ -26,7 +26,7 @@ class AnalyticsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final summaryAsync = ref.watch(analyticsSummaryProvider);
-    final selectedCurrency = ref.watch(analyticsCurrencyProvider);
+    final selectedCurrency = ref.watch(analyticsCurrencyProvider).value;
 
     // Dostupne valute (prazno dok se učitava).
     final availableCurrencies = summaryAsync
@@ -845,7 +845,7 @@ class _MerchantDetailSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final async = ref.watch(merchantDetailProvider(merchantId));
-    final currency = ref.watch(analyticsCurrencyProvider) ?? Currency.rsd;
+    final currency = ref.watch(analyticsCurrencyProvider).value ?? Currency.rsd;
     return _SheetScaffold(
       title: name,
       child: async.when(
@@ -902,7 +902,7 @@ class _ItemDetailSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final async = ref.watch(itemDetailProvider(name));
-    final currency = ref.watch(analyticsCurrencyProvider) ?? Currency.rsd;
+    final currency = ref.watch(analyticsCurrencyProvider).value ?? Currency.rsd;
     return _SheetScaffold(
       title: name,
       child: async.when(
@@ -979,7 +979,7 @@ class _CategoryDetailSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final async = ref.watch(categoryItemsProvider(categoryId));
-    final currency = ref.watch(analyticsCurrencyProvider) ?? Currency.rsd;
+    final currency = ref.watch(analyticsCurrencyProvider).value ?? Currency.rsd;
     return _SheetScaffold(
       title: name,
       child: async.when(

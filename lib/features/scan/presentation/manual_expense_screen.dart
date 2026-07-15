@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/domain/currency.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
+import '../../../core/providers/last_currency_controller.dart';
 import '../../../core/utils/money_format.dart';
 import '../../receipts/data/receipt_providers.dart';
 import '../../receipts/presentation/receipt_detail_screen.dart';
@@ -78,7 +79,20 @@ class _ManualExpenseScreenState extends ConsumerState<ManualExpenseScreen> {
         item.amountController.addListener(_onAmountChanged);
         _items.add(item);
       }
+    } else {
+      _loadLastCurrency();
     }
+  }
+
+  Future<void> _loadLastCurrency() async {
+    final last = await ref.read(lastCurrencyControllerProvider.future);
+    if (mounted) setState(() => _currency = last);
+  }
+
+  void _onCurrencyChanged(Currency? value) {
+    final currency = value ?? Currency.rsd;
+    setState(() => _currency = currency);
+    ref.read(lastCurrencyControllerProvider.notifier).setCurrency(currency);
   }
 
   @override
@@ -262,8 +276,7 @@ class _ManualExpenseScreenState extends ConsumerState<ManualExpenseScreen> {
                               child: Text(c.isoCode),
                             ))
                         .toList(),
-                    onChanged: (v) =>
-                        setState(() => _currency = v ?? Currency.rsd),
+                    onChanged: _onCurrencyChanged,
                   ),
                 ),
                 const SizedBox(width: 8),

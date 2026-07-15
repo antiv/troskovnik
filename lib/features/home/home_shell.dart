@@ -10,6 +10,7 @@ import '../about/about_app_dialog.dart';
 import '../backup/presentation/backup_sheet.dart';
 import '../analytics/presentation/analytics_screen.dart';
 import '../receipts/presentation/receipt_list_screen.dart';
+import '../scan/presentation/manual_expense_screen.dart';
 import '../scan/presentation/scanner_screen.dart';
 import '../warranties/presentation/warranty_list_screen.dart';
 
@@ -142,6 +143,16 @@ class _HomeShellState extends ConsumerState<HomeShell> {
           const AnalyticsScreen(),
         ],
       ),
+      floatingActionButton: _index == 1
+          ? FloatingActionButton(
+              tooltip: l10n.scanAddExpense,
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                    builder: (_) => const ManualExpenseScreen()),
+              ),
+              child: const Icon(Icons.add),
+            )
+          : null,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),

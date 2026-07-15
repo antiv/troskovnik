@@ -1,20 +1,45 @@
+import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../../core/db/providers.dart';
 import '../../../core/domain/currency.dart';
+import '../../../core/providers/last_currency_controller.dart';
 import '../domain/analytics_models.dart';
 import 'analytics_repository.dart';
 
-/// Izabrana valuta za prikaz analitike. `null` = prikazuje prvu dostupnu.
-class AnalyticsCurrencyNotifier extends Notifier<Currency?> {
-  @override
-  Currency? build() => null;
+/// Izabrana valuta za prikaz analitike. Pamti eksplicitan izbor korisnika
+/// (flutter_secure_storage — isti pristup kao [LastCurrencyController]).
+/// Dok korisnik ne promeni filter na ovom ekranu, koristi se poslednja
+/// valuta izabrana pri ručnom unosu; `null` = nema ni jedno ni drugo,
+/// prikazuje se prva dostupna valuta.
+class AnalyticsCurrencyNotifier extends AsyncNotifier<Currency?> {
+  static const _key = 'analytics_currency_v1';
+  final _storage = const FlutterSecureStorage();
 
-  void set(Currency? c) => state = c;
+  @override
+  Future<Currency?> build() async {
+    final stored = await _storage.read(key: _key);
+    if (stored != null) {
+      final explicit =
+          Currency.values.firstWhereOrNull((c) => c.name == stored);
+      if (explicit != null) return explicit;
+    }
+    return ref.watch(lastCurrencyControllerProvider.future);
+  }
+
+  Future<void> set(Currency? c) async {
+    state = AsyncData(c);
+    if (c == null) {
+      await _storage.delete(key: _key);
+    } else {
+      await _storage.write(key: _key, value: c.name);
+    }
+  }
 }
 
 final analyticsCurrencyProvider =
-    NotifierProvider<AnalyticsCurrencyNotifier, Currency?>(
+    AsyncNotifierProvider<AnalyticsCurrencyNotifier, Currency?>(
         AnalyticsCurrencyNotifier.new);
 
 /// Izabrani period analitike.
@@ -40,7 +65,7 @@ final analyticsSummaryProvider =
     StreamProvider<AnalyticsSummary>((ref) async* {
   final repo = await ref.watch(analyticsRepositoryProvider.future);
   final range = ref.watch(analyticsRangeProvider);
-  final currency = ref.watch(analyticsCurrencyProvider);
+  final currency = await ref.watch(analyticsCurrencyProvider.future);
   yield* repo.watchSummary(range, currency: currency);
 });
 
@@ -66,6 +91,6 @@ final categoryItemsProvider =
     FutureProvider.family<List<TopItem>, int>((ref, categoryId) async {
   final repo = await ref.watch(analyticsRepositoryProvider.future);
   final range = ref.watch(analyticsRangeProvider);
-  final currency = ref.watch(analyticsCurrencyProvider);
+  final currency = await ref.watch(analyticsCurrencyProvider.future);
   return repo.categoryItems(categoryId, range, currency: currency);
 });
