@@ -47,7 +47,21 @@ class ReceiptQuery {
 /// Drži parametre pretrage/sortiranja/filtriranja liste računa.
 class ReceiptQueryNotifier extends Notifier<ReceiptQuery> {
   @override
-  ReceiptQuery build() => const ReceiptQuery();
+  ReceiptQuery build() {
+    // Ako valuta na koju je filter postavljen više ne postoji među računima
+    // (npr. obrisan je poslednji račun u toj valuti), ili je preostala samo
+    // jedna valuta (pa se selektor uopšte ne prikazuje), filter se poništava
+    // — inače lista ostane trajno prazna dok se app ne restartuje.
+    ref.listen<AsyncValue<List<Currency>>>(receiptCurrenciesProvider,
+        (previous, next) {
+      final currencies = next.value;
+      if (currencies == null || state.currency == null) return;
+      if (currencies.length <= 1 || !currencies.contains(state.currency)) {
+        state = state.copyWith(clearCurrency: true);
+      }
+    });
+    return const ReceiptQuery();
+  }
 
   void setSearch(String search) => state = state.copyWith(search: search);
   void setSort(ReceiptSort sort) => state = state.copyWith(sort: sort);

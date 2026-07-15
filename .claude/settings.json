@@ -9,7 +9,8 @@
       "Bash(sips -g pixelWidth -g pixelHeight user_real.jpg)",
       "Bash(ZXingReader -format QRCode user_real.jpg)",
       "Bash(git checkout *)",
-      "Bash(adb wait-for-device *)"
+      "Bash(adb wait-for-device *)",
+      "Bash(echo \"started with pid $!\")"
     ]
   }
 }
