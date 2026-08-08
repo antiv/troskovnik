@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -58,6 +59,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
   Timer? _captureButtonTimer;
   bool _showCloserHint = false;
   bool _showCaptureButton = false;
+  bool _closeRangeLensTried = false;
 
   @override
   void initState() {
@@ -94,6 +96,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
       _closerHintTimer = Timer(_closerHintDelay, () {
         if (mounted && !_processing) {
           setState(() => _showCloserHint = true);
+          _tryCloseRangeLens();
         }
       });
     }
@@ -104,6 +107,29 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
         setState(() => _showCaptureButton = true);
       }
     });
+  }
+
+  /// iOS nema `cameraResolution` — plugin drži `AVCaptureSession.Preset.high`
+  /// i dekodira Apple Vision-om, koji je na gustim kodovima slabiji od ML
+  /// Kit-a. Jedina poluga koja ostaje je objektiv koji fokusira bliže (na
+  /// novijim iPhone-ima ultra-wide), jer minimalna daljina fokusa je upravo
+  /// zid na koji se naleće kad se prilazi da QR ispuni okvir.
+  ///
+  /// Namerno se uključuje tek kad kadriranje očigledno ne prolazi: širi ugao
+  /// smanjuje udeo QR-a u kadru, pa bi stalno uključen mogao da pokvari
+  /// slučajeve koji sad rade. Pokušava se jednom po životu ekrana.
+  Future<void> _tryCloseRangeLens() async {
+    if (_closeRangeLensTried || !Platform.isIOS) return;
+    _closeRangeLensTried = true;
+    try {
+      final best = await _controller.getBestCloseRangeScanningLens();
+      if (best == null || !mounted) return;
+      final supported = await _controller.getSupportedLenses();
+      if (!supported.contains(best) || !mounted) return;
+      await _controller.switchCamera(SelectCamera(lensType: best));
+    } catch (_) {
+      // Objektiv je pomoć, a ne uslov — nikad ne sme da obori skeniranje.
+    }
   }
 
   void _hideHints() {
