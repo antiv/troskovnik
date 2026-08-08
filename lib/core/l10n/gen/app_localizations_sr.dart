@@ -21,7 +21,11 @@ class AppLocalizationsSr extends AppLocalizations {
   String get scanTitle => 'Skeniraj račun';
 
   @override
-  String get scanHint => 'Usmeri kameru na QR kod fiskalnog računa';
+  String get scanHint => 'Postavi QR kod fiskalnog računa u okvir';
+
+  @override
+  String get scanHintCloser =>
+      'Približi telefon — QR kod treba da ispuni okvir';
 
   @override
   String get scanManualEntry => 'Unesi URL';
@@ -587,7 +591,11 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
   String get scanTitle => 'Скенирај рачун';
 
   @override
-  String get scanHint => 'Усмери камеру на QR код фискалног рачуна';
+  String get scanHint => 'Постави QR код фискалног рачуна у оквир';
+
+  @override
+  String get scanHintCloser =>
+      'Приближи телефон — QR код треба да испуни оквир';
 
   @override
   String get scanManualEntry => 'Унеси URL';

@@ -126,8 +126,14 @@ abstract class AppLocalizations {
   /// No description provided for @scanHint.
   ///
   /// In sr, this message translates to:
-  /// **'Usmeri kameru na QR kod fiskalnog računa'**
+  /// **'Postavi QR kod fiskalnog računa u okvir'**
   String get scanHint;
+
+  /// No description provided for @scanHintCloser.
+  ///
+  /// In sr, this message translates to:
+  /// **'Približi telefon — QR kod treba da ispuni okvir'**
+  String get scanHintCloser;
 
   /// No description provided for @scanManualEntry.
   ///

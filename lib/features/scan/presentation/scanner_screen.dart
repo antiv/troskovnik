@@ -14,6 +14,7 @@ import '../domain/verification_url.dart';
 import 'manual_entry_screen.dart';
 import 'manual_expense_screen.dart';
 import 'scan_controller.dart';
+import 'scan_framing_overlay.dart';
 
 /// Skener QR koda (sekcija 7, ekran 1). Posle skeniranja obrađuje rezultat i
 /// vodi na detalj ili prikazuje stanje greške/„u obradi".
@@ -30,18 +31,32 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
   // Samo QR: ML Kit na statičnim slikama (galerija) ume da „prepozna" lažne
   // 1D barkodove u linijama razdvajanja računa (====/----), pa bi se
   // validirao pogrešan sadržaj. Fiskalni i IPS kodovi su uvek QR.
+  //
+  // cameraResolution: bez nje Android analizira 640×480. Fiskalni QR je
+  // verzija ~40 = 177 modula po stranici, pa i kad ispuni ceo kadar to daje
+  // 480/177 ≈ 2,7 px po modulu — na samoj granici čitljivosti, a preko pola
+  // kadra 1,4 px, što je nemoguće. Na 1080p pola kadra daje ~3 px/modul.
+  // Podešavanje važi samo za Android; iOS ignoriše ovaj parametar i drži
+  // AVCaptureSession.Preset.high.
   final _controller = MobileScannerController(
     autoStart: false,
     formats: const [BarcodeFormat.qrCode],
+    cameraResolution: const Size(1920, 1080),
   );
   bool _processing = false;
 
-  /// „Uslikaj kod" se nudi tek kad živo skeniranje očigledno ne prolazi:
-  /// ML Kit javlja samo uspehe, pa je jedini signal proteklo vreme bez
-  /// detekcije. Jednom prikazano dugme ostaje do uspešnog skena (bez
-  /// treperenja), a sklanja se pri napuštanju taba.
+  /// Pomoć se stepenuje po proteklom vremenu bez pogotka: dekoder javlja samo
+  /// uspehe, pa je vreme jedini signal da kadriranje ne valja.
+  ///
+  /// Prvo se traži da korisnik priđe bliže (najčešći uzrok — QR premali u
+  /// kadru), pa tek ako ni to ne pomogne nudi se fotografija punom
+  /// rezolucijom. Oba, jednom prikazana, ostaju do uspešnog skena da ne bi
+  /// treperila, a sklanjaju se pri napuštanju taba.
+  static const _closerHintDelay = Duration(milliseconds: 2500);
   static const _captureButtonDelay = Duration(seconds: 5);
+  Timer? _closerHintTimer;
   Timer? _captureButtonTimer;
+  bool _showCloserHint = false;
   bool _showCaptureButton = false;
 
   @override
@@ -49,7 +64,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     super.initState();
     if (widget.isActive) {
       _controller.start();
-      _armCaptureButton();
+      _armHints();
     }
   }
 
@@ -58,21 +73,30 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     super.didUpdateWidget(oldWidget);
     if (widget.isActive && !oldWidget.isActive) {
       _controller.start();
-      _armCaptureButton();
+      _armHints();
     } else if (!widget.isActive && oldWidget.isActive) {
       _controller.stop();
-      _hideCaptureButton();
+      _hideHints();
     }
   }
 
   @override
   void dispose() {
+    _closerHintTimer?.cancel();
     _captureButtonTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
 
-  void _armCaptureButton() {
+  void _armHints() {
+    if (!_showCloserHint) {
+      _closerHintTimer?.cancel();
+      _closerHintTimer = Timer(_closerHintDelay, () {
+        if (mounted && !_processing) {
+          setState(() => _showCloserHint = true);
+        }
+      });
+    }
     if (_showCaptureButton) return; // već vidljivo — ostaje do uspeha
     _captureButtonTimer?.cancel();
     _captureButtonTimer = Timer(_captureButtonDelay, () {
@@ -82,10 +106,14 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     });
   }
 
-  void _hideCaptureButton() {
+  void _hideHints() {
+    _closerHintTimer?.cancel();
     _captureButtonTimer?.cancel();
-    if (_showCaptureButton && mounted) {
-      setState(() => _showCaptureButton = false);
+    if ((_showCloserHint || _showCaptureButton) && mounted) {
+      setState(() {
+        _showCloserHint = false;
+        _showCaptureButton = false;
+      });
     }
   }
 
@@ -112,7 +140,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
       // korisnik odustao
       if (mounted) {
         await _controller.start();
-        _armCaptureButton();
+        _armHints();
       }
       return;
     }
@@ -133,7 +161,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
         messenger.showSnackBar(SnackBar(content: Text(l10n.scanImageFailed)));
         setState(() => _processing = false);
         await _controller.start();
-        _armCaptureButton();
+        _armHints();
       }
       return;
     }
@@ -162,7 +190,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
             .showSnackBar(SnackBar(content: Text(l10n.scanNoQrInImage)));
         setState(() => _processing = false);
         await _controller.start();
-        _armCaptureButton();
+        _armHints();
       }
       return;
     }
@@ -195,7 +223,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
 
     switch (outcome) {
       case ScanSaved(:final receiptId, :final wasDuplicate, :final parsed):
-        _hideCaptureButton(); // skeniranje je uspelo — ponuda više ne treba
+        _hideHints(); // skeniranje je uspelo — ponuda više ne treba
         if (wasDuplicate) {
           messenger.showSnackBar(
               SnackBar(content: Text(l10n.resultDuplicateOpened)));
@@ -217,7 +245,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     if (mounted) {
       setState(() => _processing = false);
       await _controller.start();
-      _armCaptureButton();
+      _armHints();
     }
   }
 
@@ -235,6 +263,10 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     return Stack(
       children: [
         MobileScanner(controller: _controller, onDetect: _onDetect),
+        // Okvir pretvara inače nevidljiv zahtev („QR mora da zauzme oko pola
+        // kadra") u metu koju korisnik vidi. Samo iscrtavanje — ne filtrira
+        // očitavanja, pa QR izvan okvira i dalje prolazi.
+        const Positioned.fill(child: ScanFramingOverlay()),
         // Izlaz za kodove koje živi skener ne očitava (gusti, loše
         // štampani): fotografija punog senzora + zxing-cpp fallback.
         // Pojavljuje se tek posle par sekundi skeniranja bez pogotka.
@@ -276,7 +308,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(l10n.scanHint,
+                Text(_showCloserHint ? l10n.scanHintCloser : l10n.scanHint,
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.white)),
                 const SizedBox(height: 8),
