@@ -83,3 +83,6 @@ test/fixtures/invoice-verify.js
 
 # FVM Version Cache
 .fvm/
+
+# Generisani store screenshot-ovi (marketing/screenshots/make_screenshots.py)
+marketing/screenshots/out/

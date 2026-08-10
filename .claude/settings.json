@@ -10,7 +10,8 @@
       "Bash(ZXingReader -format QRCode user_real.jpg)",
       "Bash(git checkout *)",
       "Bash(adb wait-for-device *)",
-      "Bash(echo \"started with pid $!\")"
+      "Bash(echo \"started with pid $!\")",
+      "Bash(python3 -c \"import PIL; print\\(PIL.__version__\\)\")"
     ]
   }
 }
