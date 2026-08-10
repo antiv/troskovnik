@@ -47,9 +47,6 @@ app.*.map.json
 # FVM (Flutter Version Management)
 # Ignore the cached SDK symlink, but KEEP .fvmrc and .fvm/fvm_config.json in VCS
 # so everyone uses the pinned Flutter version (instrukcije.md, sekcija 2).
-.fvm/flutter_sdk
-.fvm/versions
-.fvm/release
 
 # Generated code (drift / build_runner) — generated locally, not committed
 *.g.dart
@@ -83,3 +80,6 @@ test/fixtures/*.specifications.json
 test/fixtures/*.specifications.txt
 test/fixtures/*.meta.json
 test/fixtures/invoice-verify.js
+
+# FVM Version Cache
+.fvm/

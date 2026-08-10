@@ -65,6 +65,8 @@ dependencies:
   archive: ^4.0.9
   file_picker: ^12.0.0-beta.7
   flutter_zxing: ^2.3.0
+  # Ocena u prodavnici (Play In-App Review API / iOS SKStoreReviewController).
+  in_app_review: ^2.0.12
 dev_dependencies:
   flutter_test:
     sdk: flutter

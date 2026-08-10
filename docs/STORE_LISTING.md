@@ -6,17 +6,27 @@
 
 ---
 
+> **Note:** Google Play has **no keywords field** (that is an App Store concept).
+> Only the *title, short description and full description* are indexed, so target
+> terms must appear in the text itself. For the App Store see
+> `STORE_LISTING_APPSTORE.md`.
+
 ## App name (max 30 chars)
 
 ```
-Troškovnik
+Troškovnik: fiscal receipts
 ```
+
+27/30. The bare brand name is not something anyone searches for, and the title is
+the heaviest-ranked field — it has to carry a term.
 
 ## Short description (max 80 chars)
 
 ```
-Scan fiscal receipts, track spending & warranties — fully private, on-device.
+Fiscal receipt & warranty scanner. No account, no cloud — all on your phone.
 ```
+
+76/80.
 
 ## Full description (max 4000 chars)
 
@@ -24,10 +34,13 @@ Scan fiscal receipts, track spending & warranties — fully private, on-device.
 Troškovnik turns the paper receipts you already get into a private, searchable
 expense log — without sending your data anywhere.
 
-Scan the QR code on any Serbian fiscal receipt and Troškovnik fetches the full
-details straight from the Tax Administration portal (suf.purs.gov.rs): merchant,
-date, items, taxes and total. Everything is saved locally in an encrypted
-database on your phone. No account, no cloud, no tracking.
+Scan the QR code on a fiscal receipt and Troškovnik fetches the full details
+straight from the Tax Administration portal: merchant, date, items, taxes and
+total. Everything is saved locally in an encrypted database on your phone.
+No account, no cloud, no tracking.
+
+Works with receipts from Serbia, Republika Srpska and Montenegro — in dinars,
+convertible marks and euros.
 
 WHY TROŠKOVNIK
 
@@ -49,8 +62,11 @@ KEY FEATURES
 • Keep the receipt as proof of purchase (the journal, the official verification
   link, and an optional photo) — because paper receipts fade
 • View and share your proof photos
-• Spending analytics — totals, by month, by merchant, business/personal split,
-  most frequent items and estimated VAT
+• Expense categories, plus business vs. personal tagging
+• Spending analytics — totals, by month, by category, by merchant,
+  business/personal split, most frequent items and estimated VAT
+• Backup and restore (ZIP), CSV export
+• Works with receipts from Serbia, Republika Srpska and Montenegro
 • Serbian (Cyrillic and Latin) and English
 
 PRIVACY
@@ -66,11 +82,16 @@ Serbian Tax Administration (Poreska uprava).
 
 ---
 
-## Category & tags
+## Category & distribution
 
 - **Category:** Finance (alternative: Productivity)
-- **Tags / keywords:** receipts, expenses, fiscal receipt, warranty, budget,
-  spending, Serbia, PURS
+- **Countries/regions:** must include **Serbia, Bosnia and Herzegovina and
+  Montenegro** — all three are supported in code
+  (`lib/core/domain/country.dart`). Supported functionality with the market
+  switched off has nobody to show itself to.
+
+> There is deliberately no keywords list here: Google Play has no such field.
+> Terms belong in the title, short description and full description.
 
 ## Contact details (Play Console)
 
