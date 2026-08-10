@@ -7,6 +7,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../core/db/enums.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
+import '../../../core/providers/review_prompt_controller.dart';
 import '../../receipts/presentation/receipt_detail_screen.dart';
 import '../data/qr_image_decoder.dart';
 import '../domain/ips_qr.dart';
@@ -206,6 +207,14 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
         await navigator.push(MaterialPageRoute<void>(
           builder: (_) => ReceiptDetailScreen(receiptId: receiptId),
         ));
+        // Ocena se traži tek pošto korisnik pogleda račun i vrati se — dakle
+        // kad je posao završen, a ne usred toka. Duplikati i računi sačuvani
+        // bez mreže (fetchStatus.pending) se ne broje: to nisu uspesi.
+        if (mounted &&
+            !wasDuplicate &&
+            parsed.fetchStatus != FetchStatus.pending) {
+          await _recordScanForReview();
+        }
       case ScanNotFiscal():
         messenger
             .showSnackBar(SnackBar(content: Text(l10n.scanNotFiscal)));
@@ -218,6 +227,22 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
       setState(() => _processing = false);
       await _controller.start();
       _armCaptureButton();
+    }
+  }
+
+  /// Zabeleži uspešno skeniranje za brojač ocene.
+  ///
+  /// Prvo se čeka `.future` da bi brojač bio učitan iz skladišta — `.notifier`
+  /// sam po sebi tek pokreće `build()`, pa bi bez ovoga prvo skeniranje uvek
+  /// ispalo neizbrojano. Greška ovde ne sme da utiče na tok skeniranja.
+  Future<void> _recordScanForReview() async {
+    try {
+      await ref.read(reviewPromptControllerProvider.future);
+      await ref
+          .read(reviewPromptControllerProvider.notifier)
+          .recordSuccessfulScan();
+    } catch (_) {
+      // Ocena je sporedna — nikad ne sme da obori skeniranje.
     }
   }
 
