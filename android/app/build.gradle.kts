@@ -18,7 +18,11 @@ if (hasReleaseSigning) {
 
 android {
     namespace = "rs.antonijevic.troskovnik"
-    compileSdk = flutter.compileSdkVersion
+    // compileSdk 37 umesto Flutter-ovog podrazumevanog 36: flutter_secure_storage
+    // 11 se gradi protiv 37 (vidi android/build.gradle u tom paketu), a AGP
+    // traži da aplikacija kompajlira bar protiv najviše verzije svojih
+    // zavisnosti. Vratiti na flutter.compileSdkVersion kad Flutter stigne na 37.
+    compileSdk = maxOf(flutter.compileSdkVersion, 37)
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -30,8 +34,11 @@ android {
 
     defaultConfig {
         applicationId = "rs.antonijevic.troskovnik"
-        // minSdk 23: zahtevi SQLCipher-a i lokalnih notifikacija.
-        minSdk = maxOf(flutter.minSdkVersion, 23)
+        // SQLCipher i lokalne notifikacije traže 23, flutter_secure_storage 11
+        // traži 24 — merodavan je najviši. Flutter na 3.44.x i sam podrazumeva
+        // 24, pa je efektivni minSdk i pre ove izmene bio 24, a ne 23; maxOf
+        // stoji da prag ostane izričit ako se Flutter ikad spusti.
+        minSdk = maxOf(flutter.minSdkVersion, 24)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

@@ -21,7 +21,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanTitle => 'Scan receipt';
 
   @override
-  String get scanHint => 'Point the camera at the fiscal receipt QR code';
+  String get scanHint => 'Place the fiscal receipt QR code inside the frame';
+
+  @override
+  String get scanHintCloser =>
+      'Move closer — the QR code should fill the frame';
 
   @override
   String get scanManualEntry => 'Enter URL';

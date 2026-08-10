@@ -6,7 +6,8 @@
   "navReceipts": "Receipts",
 
   "scanTitle": "Scan receipt",
-  "scanHint": "Point the camera at the fiscal receipt QR code",
+  "scanHint": "Place the fiscal receipt QR code inside the frame",
+  "scanHintCloser": "Move closer — the QR code should fill the frame",
   "scanManualEntry": "Enter URL",
   "scanFromGallery": "From gallery",
   "scanCapturePhoto": "Won't scan? Take a photo",

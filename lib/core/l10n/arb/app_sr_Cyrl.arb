@@ -6,7 +6,8 @@
   "navReceipts": "Рачуни",
 
   "scanTitle": "Скенирај рачун",
-  "scanHint": "Усмери камеру на QR код фискалног рачуна",
+  "scanHint": "Постави QR код фискалног рачуна у оквир",
+  "scanHintCloser": "Приближи телефон — QR код треба да испуни оквир",
   "scanManualEntry": "Унеси URL",
   "scanFromGallery": "Из галерије",
   "scanCapturePhoto": "Не очитава се? Усликај код",
