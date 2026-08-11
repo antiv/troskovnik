@@ -76,12 +76,66 @@ Nezavisna aplikacija; nije povezana sa Poreskom upravom niti je ona podržava.
 
 ## Promotional text (maks. 170)
 
-Stoji iznad opisa i **menja se bez novog build-a** — koristi za najave:
+Stoji iznad opisa i **menja se bez novog build-a** — jedino polje koje se može
+promeniti dok je verzija „Ready for Sale". Ne indeksira se za pretragu, pa nema
+smisla trpati ključne reči; služi za najavu ili za jednu rečenicu koja zadržava
+posetioca dok ne klikne „more".
+
+Tri ugla, u paru EN/SR — bira se jedan, prema tome šta je aktuelno.
+
+**A — privatnost** (podrazumevani, ne zastareva)
 
 ```
-Sada radi i sa računima iz Republike Srpske i Crne Gore. Skeniraj QR kod, a
-svi podaci ostaju na tvom telefonu — bez naloga i bez clouda.
+Scan the QR code on a fiscal receipt: merchant, items, taxes and total land in an encrypted log on your phone. No account, no cloud, no tracking.
 ```
+
+145/170.
+
+```
+Skeniraj QR kod sa fiskalnog računa: prodavac, artikli, porezi i iznos idu u enkriptovan dnevnik na tvom telefonu. Bez naloga, bez clouda, bez praćenja.
+```
+
+152/170. Ćirilična varijanta istog teksta (151/170):
+
+```
+Скенирај QR код са фискалног рачуна: продавац, артикли, порези и износ иду у енкриптован дневник на твом телефону. Без налога, без клауда, без праћења.
+```
+
+**B — regioni** (za period dok je proširenje na RS i CG novost)
+
+```
+Now works with receipts from Serbia, Republika Srpska and Montenegro. Scan the QR code — everything stays on your phone, encrypted. No account needed.
+```
+
+150/170.
+
+```
+Sada radi i sa računima iz Republike Srpske i Crne Gore. Skeniraj QR kod — svi podaci ostaju na tvom telefonu, enkriptovani. Bez naloga i bez clouda.
+```
+
+149/170.
+
+**C — garancije** (jedina funkcija koju konkurencija uglavnom nema)
+
+```
+Paper fades. Troškovnik keeps the receipt, its items and the warranty date, and reminds you 30 and 7 days before the warranty runs out.
+```
+
+135/170.
+
+```
+Papir izbledi. Troškovnik čuva račun, njegove stavke i rok garancije, i podseti te 30 i 7 dana pre nego što garancija istekne.
+```
+
+126/170.
+
+> **Gde koji ide.** Tekstovi se u App Store-u vezuju za **jezik, ne za
+> storefront**, a srpski Apple (bar do sad) nije nudio kao lokalizaciju — proveri
+> listu u App Store Connect → App Information. Ako srpskog nema, srpska verzija
+> ide u primarni jezik aplikacije, a engleska u dodatnu englesku lokalizaciju
+> (npr. English (U.K.) uz English (U.S.) kao primarni). Na Google Play-u ovo polje
+> **ne postoji** — tamo isti posao radi prvi red kratkog opisa
+> (`STORE_LISTING_sr.md`).
 
 ---
 
