@@ -1,5 +1,5 @@
-# Minimalni iOS: 14.0 (zahtev plugina workmanager_apple).
-platform :ios, '14.0'
+# Minimalni iOS: 15.0 (Apple App Store zahtev za 2027+, kompatibilno sa svim pluginovima).
+platform :ios, '15.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'

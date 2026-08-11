@@ -29,7 +29,8 @@ class ScannerScreen extends ConsumerStatefulWidget {
   ConsumerState<ScannerScreen> createState() => _ScannerScreenState();
 }
 
-class _ScannerScreenState extends ConsumerState<ScannerScreen> {
+class _ScannerScreenState extends ConsumerState<ScannerScreen>
+    with WidgetsBindingObserver {
   // Samo QR: ML Kit na statičnim slikama (galerija) ume da „prepozna" lažne
   // 1D barkodove u linijama razdvajanja računa (====/----), pa bi se
   // validirao pogrešan sadržaj. Fiskalni i IPS kodovi su uvek QR.
@@ -62,11 +63,23 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
   bool _showCaptureButton = false;
   bool _closeRangeLensTried = false;
 
+  /// Kamera se pali i gasi iz tri nezavisna izvora — lifecycle, promena taba i
+  /// obrada rezultata — pa se pozivi mogu preklopiti. `start()` baca
+  /// `controllerInitializing` ako naleti na start koji je još u toku, zato sve
+  /// ide kroz jedan lanac.
+  Future<void> _cameraOps = Future<void>.value();
+
+  /// Dok je otvoren `ImagePicker`, kameru vodi `_importImage`. Otvaranje
+  /// pickera samo po sebi gura app u `inactive`, a povratak u `resumed` — bez
+  /// ovog flega bi lifecycle upalio kameru ispod tuđeg ekrana.
+  bool _pickerOpen = false;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     if (widget.isActive) {
-      _controller.start();
+      _startCamera();
       _armHints();
     }
   }
@@ -75,20 +88,84 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
   void didUpdateWidget(ScannerScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.isActive && !oldWidget.isActive) {
-      _controller.start();
+      _startCamera();
       _armHints();
     } else if (!widget.isActive && oldWidget.isActive) {
-      _controller.stop();
+      _stopCamera();
       _hideHints();
     }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _closerHintTimer?.cancel();
     _captureButtonTimer?.cancel();
     _controller.dispose();
     super.dispose();
+  }
+
+  /// `MobileScanner` sam prati lifecycle samo kad mu se ne prosledi kontroler
+  /// (`useAppLifecycleState` — „only applicable if no controller is passed").
+  /// Naš kontroler nosi `cameraResolution` i `formats`, koji se internom ne
+  /// mogu zadati, pa ostajemo pri svom — i sami gasimo kameru u pozadini.
+  ///
+  /// Bez ovoga sesija ostaje otvorena dok je app u pozadini: sistem je oduzme
+  /// (Android blokira kameru aplikaciji u pozadini, iOS prekine
+  /// `AVCaptureSession`), a Dart strana i dalje misli da radi — preview po
+  /// povratku ostane zamrznut, a prvi sledeći poziv ka platformi puca.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_pickerOpen) return;
+    // Dok kontroler nije spreman nema šta ni da se pali ni da se gasi —
+    // sistemski dijalog za dozvolu i sam pravi lifecycle promenu, pre nego što
+    // je kamera uopšte inicijalizovana.
+    if (!_controller.value.hasCameraPermission) return;
+
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.detached:
+        // Tajmeri se otkazuju da ne bi stajali celo vreme u pozadini i opalili
+        // svi odjednom u trenutku povratka, nad sesijom koje više nema.
+        _hideHints();
+        _stopCamera();
+      case AppLifecycleState.resumed:
+        // `_processing` znači da je u toku obrada rezultata — ona sama vraća
+        // kameru kad završi.
+        if (widget.isActive && !_processing) {
+          _startCamera();
+          _armHints();
+        }
+    }
+  }
+
+  /// Pokretanje ide preko `stop()`: posle pozadine kontroler ume da veruje da
+  /// kamera i dalje radi (`isRunning` ostane `true`, jer nam niko nije javio da
+  /// je sesija oduzeta), a tada `start()` odmah izađe i preview ostane crn.
+  /// `stop()` je bez efekta ako kamera već stoji.
+  Future<void> _startCamera() => _runCameraOp(() async {
+        await _controller.stop();
+        await _controller.start();
+      });
+
+  Future<void> _stopCamera() => _runCameraOp(_controller.stop);
+
+  /// Greške se namerno gutaju: kad sistem oduzme sesiju, i gašenje i paljenje
+  /// mogu da bace, a to je stanje od kog se oporavljamo — ne razlog da app
+  /// padne na neuhvaćenoj async grešci (nema globalnog `onError`).
+  Future<void> _runCameraOp(Future<void> Function() op) {
+    final chained = _cameraOps.then((_) async {
+      if (!mounted) return;
+      try {
+        await op();
+      } catch (e, stack) {
+        debugPrint('Greška pri radu sa kamerom: $e\n$stack');
+      }
+    });
+    _cameraOps = chained;
+    return chained;
   }
 
   void _armHints() {
@@ -97,7 +174,9 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
       _closerHintTimer = Timer(_closerHintDelay, () {
         if (mounted && !_processing) {
           setState(() => _showCloserHint = true);
-          _tryCloseRangeLens();
+          // Kroz isti lanac kao start/stop — zamena objektiva ne sme da se
+          // preklopi sa pokretanjem kamere.
+          _runCameraOp(_tryCloseRangeLens);
         }
       });
     }
@@ -121,6 +200,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
   /// slučajeve koji sad rade. Pokušava se jednom po životu ekrana.
   Future<void> _tryCloseRangeLens() async {
     if (_closeRangeLensTried || !Platform.isIOS) return;
+    if (!_controller.value.isRunning) return;
     _closeRangeLensTried = true;
     try {
       final best = await _controller.getBestCloseRangeScanningLens();
@@ -160,20 +240,37 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     final messenger = ScaffoldMessenger.of(context);
 
     // Sistemska kamera ne može da se otvori dok naš skener drži uređaj.
-    await _controller.stop();
+    await _stopCamera();
 
-    final picked = await ImagePicker().pickImage(source: source);
-    if (picked == null) {
-      // korisnik odustao
-      if (mounted) {
-        await _controller.start();
-        _armHints();
+    // Predaja kamere lifecycle-u ide preko `_processing`, koji se postavi pre
+    // nego što se `_pickerOpen` skine — da između njih ne ostane procep u kom
+    // bi observer upalio kameru.
+    XFile? picked;
+    var pickerFailed = false;
+    _pickerOpen = true;
+    try {
+      picked = await ImagePicker().pickImage(source: source);
+      if (picked != null && mounted) {
+        setState(() => _processing = true);
       }
-      return;
+    } catch (e, stack) {
+      pickerFailed = true;
+      debugPrint('Greška pri otvaranju slike: $e\n$stack');
+    } finally {
+      _pickerOpen = false;
     }
+
     if (!mounted) return;
 
-    setState(() => _processing = true);
+    if (picked == null) {
+      // korisnik odustao — ili se picker uopšte nije otvorio
+      if (pickerFailed) {
+        messenger.showSnackBar(SnackBar(content: Text(l10n.scanImageFailed)));
+      }
+      await _startCamera();
+      _armHints();
+      return;
+    }
 
     // analyzeImage ume da baci (npr. nije podržano na iOS simulatoru, ili
     // neispravna slika) — bez catch-a bi UI ostao zaglavljen u _processing.
@@ -187,7 +284,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
       if (mounted) {
         messenger.showSnackBar(SnackBar(content: Text(l10n.scanImageFailed)));
         setState(() => _processing = false);
-        await _controller.start();
+        await _startCamera();
         _armHints();
       }
       return;
@@ -216,7 +313,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
         messenger
             .showSnackBar(SnackBar(content: Text(l10n.scanNoQrInImage)));
         setState(() => _processing = false);
-        await _controller.start();
+        await _startCamera();
         _armHints();
       }
       return;
@@ -242,7 +339,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
 
     if (!alreadyProcessing) {
       setState(() => _processing = true);
-      await _controller.stop();
+      await _stopCamera();
     }
 
     final outcome = await ref.read(scanControllerProvider).process(raw);
@@ -279,8 +376,13 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
 
     if (mounted) {
       setState(() => _processing = false);
-      await _controller.start();
-      _armHints();
+      // Ako je app u međuvremenu otišao u pozadinu (npr. korisnik je zatvorio
+      // app dok se račun preuzimao), kameru ne diramo — lifecycle će je vratiti.
+      if (widget.isActive &&
+          WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
+        await _startCamera();
+        _armHints();
+      }
     }
   }
 
@@ -300,6 +402,43 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     }
   }
 
+  /// Kamera može da otkaže i van našeg toka: sistem oduzme sesiju dok smo u
+  /// pozadini, drugi app je zauzme, dozvola bude povučena. Podrazumevani prikaz
+  /// pluginu je crn pravougaonik sa ikonom greške iz kog nema izlaza — ovde
+  /// korisnik bar može da pokuša ponovo bez restarta aplikacije.
+  Widget _buildCameraError(BuildContext context, MobileScannerException error) {
+    final l10n = AppLocalizations.of(context);
+    final permissionDenied =
+        error.errorCode == MobileScannerErrorCode.permissionDenied;
+    return ColoredBox(
+      color: Colors.black,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, color: Colors.white70, size: 48),
+              const SizedBox(height: 12),
+              Text(
+                permissionDenied ? l10n.scanPermissionDenied : l10n.errGeneric,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white),
+              ),
+              if (!permissionDenied) ...[
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: () => _startCamera(),
+                  child: Text(l10n.retry),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   String _errorText(AppLocalizations l10n, ScanErrorKind kind) =>
       switch (kind) {
         ScanErrorKind.noNetwork => l10n.errNoNetwork,
@@ -313,7 +452,11 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     final l10n = AppLocalizations.of(context);
     return Stack(
       children: [
-        MobileScanner(controller: _controller, onDetect: _onDetect),
+        MobileScanner(
+          controller: _controller,
+          onDetect: _onDetect,
+          errorBuilder: _buildCameraError,
+        ),
         // Okvir pretvara inače nevidljiv zahtev („QR mora da zauzme oko pola
         // kadra") u metu koju korisnik vidi. Samo iscrtavanje — ne filtrira
         // očitavanja, pa QR izvan okvira i dalje prolazi.
