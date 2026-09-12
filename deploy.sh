@@ -72,7 +72,7 @@ fi
 
 # --- Build ---
 # Dart obfuskacija + native debug simboli (čitljivi crash izveštaji na Play
-# Console; rešava upozorenje "no deobfuscation file"). NE dira R8 (ostaje isključen).
+# Console; rešava upozorenje "no deobfuscation file"). R8 DEX obfuskacija je u build.gradle.kts.
 SYMBOLS_DIR="build/debug-symbols/${new_name}"
 mkdir -p "$SYMBOLS_DIR"
 OBFUSCATE_ARGS=(--obfuscate --split-debug-info="$SYMBOLS_DIR")

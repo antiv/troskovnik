@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/l10n/gen/app_localizations.dart';
 import 'core/l10n/locale_controller.dart';
 import 'core/theme/app_theme.dart';
+import 'features/home/database_gate.dart';
 import 'features/home/home_shell.dart';
 
 /// Root widget: wires up theme and SR (latinica/ćirilica) / EN localization.
@@ -26,7 +27,8 @@ class TroskovnikApp extends ConsumerWidget {
       // Kad je uređaj na srpskom bez skripta, podrazumevaj ćirilicu (tržište).
       localeResolutionCallback:
           language == AppLanguage.system ? _resolveLocale : null,
-      home: const HomeShell(),
+      // Ako se baza ne može dešifrovati, DatabaseGate preuzima ekran.
+      home: const DatabaseGate(child: HomeShell()),
     );
   }
 

@@ -1461,6 +1461,36 @@ abstract class AppLocalizations {
   /// **'Došlo je do greške. Pokušajte ponovo.'**
   String get backupError;
 
+  /// No description provided for @dbRecoveryTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Podaci se ne mogu otvoriti'**
+  String get dbRecoveryTitle;
+
+  /// No description provided for @dbRecoveryBody.
+  ///
+  /// In sr, this message translates to:
+  /// **'Baza je šifrovana ključem koji više nije dostupan na ovom uređaju, pa se sačuvani podaci ne mogu pročitati. Najčešće se dešava posle prenosa na novi telefon ili vraćanja iz sistemske rezervne kopije. Podaci se ne mogu povratiti, ali možete početi ispočetka.'**
+  String get dbRecoveryBody;
+
+  /// No description provided for @dbRecoveryReset.
+  ///
+  /// In sr, this message translates to:
+  /// **'Obriši podatke i počni ispočetka'**
+  String get dbRecoveryReset;
+
+  /// No description provided for @dbRecoveryConfirmBody.
+  ///
+  /// In sr, this message translates to:
+  /// **'Svi sačuvani računi i garancije biće trajno obrisani. Ova akcija se ne može poništiti.'**
+  String get dbRecoveryConfirmBody;
+
+  /// No description provided for @dbRecoveryError.
+  ///
+  /// In sr, this message translates to:
+  /// **'Brisanje nije uspelo. Pokušajte ponovo.'**
+  String get dbRecoveryError;
+
   /// No description provided for @detailDiscrepancyWarning.
   ///
   /// In sr, this message translates to:

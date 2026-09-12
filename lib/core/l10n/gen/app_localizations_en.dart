@@ -725,6 +725,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupError => 'An error occurred. Please try again.';
 
   @override
+  String get dbRecoveryTitle => 'Unable to open your data';
+
+  @override
+  String get dbRecoveryBody =>
+      'The database is encrypted with a key that is no longer available on this device, so the saved data cannot be read. This usually happens after moving to a new phone or restoring from a system backup. The data cannot be recovered, but you can start over.';
+
+  @override
+  String get dbRecoveryReset => 'Delete data and start over';
+
+  @override
+  String get dbRecoveryConfirmBody =>
+      'All saved receipts and warranties will be permanently deleted. This cannot be undone.';
+
+  @override
+  String get dbRecoveryError => 'Deleting failed. Please try again.';
+
+  @override
   String get detailDiscrepancyWarning =>
       'Warning: parsed data does not match fiscal server data. Please verify this receipt.';
 }

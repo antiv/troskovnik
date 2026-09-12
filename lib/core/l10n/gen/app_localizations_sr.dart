@@ -726,6 +726,23 @@ class AppLocalizationsSr extends AppLocalizations {
   String get backupError => 'Došlo je do greške. Pokušajte ponovo.';
 
   @override
+  String get dbRecoveryTitle => 'Podaci se ne mogu otvoriti';
+
+  @override
+  String get dbRecoveryBody =>
+      'Baza je šifrovana ključem koji više nije dostupan na ovom uređaju, pa se sačuvani podaci ne mogu pročitati. Najčešće se dešava posle prenosa na novi telefon ili vraćanja iz sistemske rezervne kopije. Podaci se ne mogu povratiti, ali možete početi ispočetka.';
+
+  @override
+  String get dbRecoveryReset => 'Obriši podatke i počni ispočetka';
+
+  @override
+  String get dbRecoveryConfirmBody =>
+      'Svi sačuvani računi i garancije biće trajno obrisani. Ova akcija se ne može poništiti.';
+
+  @override
+  String get dbRecoveryError => 'Brisanje nije uspelo. Pokušajte ponovo.';
+
+  @override
   String get detailDiscrepancyWarning =>
       'Upozorenje: parsirani podaci se ne slažu sa podacima fiskalnog servera. Proverite račun.';
 }
@@ -1450,6 +1467,23 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get backupError => 'Дошло је до грешке. Покушајте поново.';
+
+  @override
+  String get dbRecoveryTitle => 'Подаци се не могу отворити';
+
+  @override
+  String get dbRecoveryBody =>
+      'База је шифрована кључем који више није доступан на овом уређају, па се сачувани подаци не могу прочитати. Најчешће се дешава после преноса на нови телефон или враћања из системске резервне копије. Подаци се не могу повратити, али можете почети испочетка.';
+
+  @override
+  String get dbRecoveryReset => 'Обриши податке и почни испочетка';
+
+  @override
+  String get dbRecoveryConfirmBody =>
+      'Сви сачувани рачуни и гаранције биће трајно обрисани. Ова акција се не може поништити.';
+
+  @override
+  String get dbRecoveryError => 'Брисање није успело. Покушајте поново.';
 
   @override
   String get detailDiscrepancyWarning =>

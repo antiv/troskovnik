@@ -72,22 +72,16 @@ class AppDatabase extends _$AppDatabase {
                 'ALTER TABLE receipts ADD COLUMN country INTEGER NOT NULL DEFAULT 0');
             await customStatement(
                 'ALTER TABLE receipts ADD COLUMN currency INTEGER NOT NULL DEFAULT 0');
+            await customStatement(
+                "UPDATE receipts SET country = 1, currency = 1 WHERE verification_url LIKE '%poreskaupravars.org%'");
+            await customStatement(
+                "UPDATE receipts SET country = 2, currency = 2 WHERE verification_url LIKE '%tax.gov.me%'");
           }
           // v8: flag za nepodudaranje parsiranih podataka sa invoiceResult.
           if (from < 8) {
             await customStatement(
                 'ALTER TABLE receipts ADD COLUMN has_discrepancy INTEGER NOT NULL DEFAULT 0');
           }
-        },
-        beforeOpen: (details) async {
-          await customStatement(
-              "UPDATE receipts SET country = 1, currency = 1 WHERE verification_url LIKE '%poreskaupravars.org%'");
-          await customStatement(
-              "UPDATE receipts SET country = 2, currency = 2 WHERE verification_url LIKE '%tax.gov.me%'");
-          await customStatement(
-              'UPDATE receipts SET currency = 0 WHERE currency IS NULL');
-          await customStatement(
-              'UPDATE receipts SET country = 0 WHERE country IS NULL');
         },
       );
 
@@ -130,6 +124,16 @@ class AppDatabase extends _$AppDatabase {
   }
 }
 
+/// Ime fajla šifrovane baze u aplikacionom „documents" direktorijumu.
+const _dbFileName = 'troskovnik.db.enc';
+
+/// Fajl šifrovane baze. Deli ga otvaranje baze i provera da li ključ sme da se
+/// generiše (`DbKeyManager.keyForDatabase`).
+Future<File> encryptedDbFile() async {
+  final dir = await getApplicationDocumentsDirectory();
+  return File(p.join(dir.path, _dbFileName));
+}
+
 LazyDatabase _openEncrypted(String key) {
   return LazyDatabase(() async {
     // Na Androidu treba ranija inicijalizacija da bi se učitao SQLCipher.
@@ -137,8 +141,7 @@ LazyDatabase _openEncrypted(String key) {
       await applyWorkaroundToOpenSqlCipherOnOldAndroidVersions();
     }
 
-    final dir = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dir.path, 'troskovnik.db.enc'));
+    final file = await encryptedDbFile();
 
     return NativeDatabase.createInBackground(
       file,

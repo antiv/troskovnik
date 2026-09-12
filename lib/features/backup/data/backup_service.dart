@@ -251,9 +251,12 @@ class BackupService {
         for (final r in manifest['receipts'] as List<dynamic>) {
           final j = r as Map<String, dynamic>;
           final zipImagePath = j['imagePath'] as String?;
-          final imagePath = zipImagePath == null
+          // Samo ime fajla iz ZIP-a — putanje iz manifesta se ne veruju.
+          final imageName =
+              zipImagePath == null ? null : safeArchiveFileName(zipImagePath);
+          final imagePath = imageName == null
               ? null
-              : p.join(appDocDir, zipImagePath);
+              : p.join(appDocDir, 'images', 'receipts', imageName);
           await _db.into(_db.receipts).insert(
                 ReceiptsCompanion(
                   id: Value(j['id'] as int),
@@ -332,10 +335,11 @@ class BackupService {
           final j = w as Map<String, dynamic>;
           final zipProofPath = j['proofImagePath'] as String?;
           // Warranty proofs live in {appDocDir}/warranty_proofs/ by convention.
-          final proofImagePath = zipProofPath == null
+          final proofName =
+              zipProofPath == null ? null : safeArchiveFileName(zipProofPath);
+          final proofImagePath = proofName == null
               ? null
-              : p.join(appDocDir, 'warranty_proofs',
-                  p.basename(zipProofPath));
+              : p.join(appDocDir, 'warranty_proofs', proofName);
           await _db.into(_db.warranties).insert(
                 WarrantiesCompanion(
                   id: Value(j['id'] as int),
@@ -385,12 +389,13 @@ class BackupService {
       if (!entry.isFile) continue;
       try {
         final content = entry.content;
+        final name = safeArchiveFileName(entry.name);
+        if (name == null) continue;
         if (entry.name.startsWith('images/receipts/')) {
-          final dest = File(p.join(appDocDir, entry.name));
+          final dest = File(p.join(appDocDir, 'images', 'receipts', name));
           await dest.writeAsBytes(content);
         } else if (entry.name.startsWith('images/warranty_proofs/')) {
-          final dest = File(
-              p.join(appDocDir, 'warranty_proofs', p.basename(entry.name)));
+          final dest = File(p.join(appDocDir, 'warranty_proofs', name));
           await dest.writeAsBytes(content);
         }
       } catch (_) {
@@ -419,4 +424,16 @@ class BackupService {
     }
     return _detectCountry(j).currency;
   }
+}
+
+/// Ime fajla iz ZIP unosa, bez ikakvog dela putanje — ili `null` ako unos nema
+/// upotrebljivo ime.
+///
+/// Zaštita od „zip slip": `images/receipts/../../troskovnik.db.enc` prolazi
+/// proveru prefiksa, a `File` bi `..` razrešio izvan ciljnog direktorijuma i
+/// prepisao bazu (posle čega se više ne otvara: „file is not a database").
+String? safeArchiveFileName(String entryName) {
+  final name = p.basename(entryName.replaceAll('\\', '/'));
+  if (name.isEmpty || name == '.' || name == '..') return null;
+  return name;
 }

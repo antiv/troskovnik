@@ -255,5 +255,10 @@
   "backupSuccess": "Backup restored successfully.",
   "backupErrorCorrupt": "File is corrupted or not a valid backup.",
   "backupError": "An error occurred. Please try again.",
+  "dbRecoveryTitle": "Unable to open your data",
+  "dbRecoveryBody": "The database is encrypted with a key that is no longer available on this device, so the saved data cannot be read. This usually happens after moving to a new phone or restoring from a system backup. The data cannot be recovered, but you can start over.",
+  "dbRecoveryReset": "Delete data and start over",
+  "dbRecoveryConfirmBody": "All saved receipts and warranties will be permanently deleted. This cannot be undone.",
+  "dbRecoveryError": "Deleting failed. Please try again.",
   "detailDiscrepancyWarning": "Warning: parsed data does not match fiscal server data. Please verify this receipt."
 }
