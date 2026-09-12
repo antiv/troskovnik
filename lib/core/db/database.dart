@@ -120,6 +120,16 @@ class AppDatabase extends _$AppDatabase {
   }
 }
 
+/// Ime fajla šifrovane baze u aplikacionom „documents" direktorijumu.
+const _dbFileName = 'troskovnik.db.enc';
+
+/// Fajl šifrovane baze. Deli ga otvaranje baze i provera da li ključ sme da se
+/// generiše (`DbKeyManager.keyForDatabase`).
+Future<File> encryptedDbFile() async {
+  final dir = await getApplicationDocumentsDirectory();
+  return File(p.join(dir.path, _dbFileName));
+}
+
 LazyDatabase _openEncrypted(String key) {
   return LazyDatabase(() async {
     // Na Androidu treba ranija inicijalizacija da bi se učitao SQLCipher.
@@ -127,8 +137,7 @@ LazyDatabase _openEncrypted(String key) {
       await applyWorkaroundToOpenSqlCipherOnOldAndroidVersions();
     }
 
-    final dir = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dir.path, 'troskovnik.db.enc'));
+    final file = await encryptedDbFile();
 
     return NativeDatabase.createInBackground(
       file,

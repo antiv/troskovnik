@@ -204,5 +204,10 @@
   "backupSuccess": "Backup je uspešno uvezen.",
   "backupErrorCorrupt": "Fajl je oštećen ili nije ispravan backup.",
   "backupError": "Došlo je do greške. Pokušajte ponovo.",
+  "dbRecoveryTitle": "Podaci se ne mogu otvoriti",
+  "dbRecoveryBody": "Baza je šifrovana ključem koji više nije dostupan na ovom uređaju, pa se sačuvani podaci ne mogu pročitati. Najčešće se dešava posle prenosa na novi telefon ili vraćanja iz sistemske rezervne kopije. Podaci se ne mogu povratiti, ali možete početi ispočetka.",
+  "dbRecoveryReset": "Obriši podatke i počni ispočetka",
+  "dbRecoveryConfirmBody": "Svi sačuvani računi i garancije biće trajno obrisani. Ova akcija se ne može poništiti.",
+  "dbRecoveryError": "Brisanje nije uspelo. Pokušajte ponovo.",
   "detailDiscrepancyWarning": "Upozorenje: parsirani podaci se ne slažu sa podacima fiskalnog servera. Proverite račun."
 }

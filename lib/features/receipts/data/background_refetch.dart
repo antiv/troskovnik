@@ -39,7 +39,12 @@ void callbackDispatcher() {
   Workmanager().executeTask((task, _) async {
     if (task != BackgroundRefetch.taskName) return true;
 
-    final key = await DbKeyManager().getOrCreateKey();
+    // Ključ SAMO čitamo: pravi ga isključivo glavni izolat u main(). Da ga
+    // pravimo i ovde, dva izolata bi mogla da naprave dva različita ključa i
+    // baza bi ostala nečitljiva (SqliteException(26), „file is not a
+    // database"). Ako ključa nema, nema šta da se obrađuje.
+    final key = await DbKeyManager().readKey();
+    if (key == null) return true;
     final db = AppDatabase.encrypted(key);
     try {
       final service = RefetchService(MultiSourceRegistry(), ReceiptRepository(db));

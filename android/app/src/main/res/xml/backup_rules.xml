@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Auto Backup pravila za API 30 i niže (android:fullBackupContent).
+
+  Šifrovana baza (app_flutter/troskovnik.db.enc) se NE bekapuje, kao ni ključevi
+  iz flutter_secure_storage. Razlog: RSA ključ iz Android Keystore-a nikad ne
+  napušta uređaj, pa bi na novom telefonu baza bila vraćena bez ključa kojim je
+  šifrovana — i aplikacija bi trajno padala sa „file is not a database"
+  (SqliteException 26). Bez bekapa novi uređaj kreće od prazne baze, a korisnik
+  podatke prenosi ZIP backupom iz same aplikacije (meni → Backup).
+-->
+<full-backup-content>
+    <exclude domain="root" path="app_flutter" />
+    <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
+    <exclude domain="sharedpref" path="FlutterSecureKeyStorage.xml" />
+</full-backup-content>

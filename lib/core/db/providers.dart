@@ -10,9 +10,15 @@ final dbKeyManagerProvider = Provider<DbKeyManager>((ref) => DbKeyManager());
 ///
 /// Koristi se preko `ref.watch(appDatabaseProvider.future)` ili
 /// `ref.watch(appDatabaseProvider).valueOrNull`.
+///
+/// Ako baza postoji a ključa nema, [DbKeyManager.keyForDatabase] baca
+/// [DbKeyMissingException] umesto da napravi nov ključ; `DatabaseGate` tu
+/// grešku prikazuje kao ekran za oporavak.
 final appDatabaseProvider = FutureProvider<AppDatabase>((ref) async {
   final keyManager = ref.watch(dbKeyManagerProvider);
-  final key = await keyManager.getOrCreateKey();
+  final file = await encryptedDbFile();
+  final key =
+      await keyManager.keyForDatabase(databaseExists: file.existsSync());
   final db = AppDatabase.encrypted(key);
   ref.onDispose(db.close);
   return db;
