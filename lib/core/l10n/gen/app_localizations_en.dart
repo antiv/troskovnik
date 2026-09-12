@@ -378,6 +378,161 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get advancedAnalyticsTooltip => 'Advanced analytics';
+
+  @override
+  String get advancedAnalyticsTitle => 'Advanced Analytics';
+
+  @override
+  String get advancedTabOverview => 'Trends';
+
+  @override
+  String get advancedTabCategories => 'Categories';
+
+  @override
+  String get advancedTabMerchants => 'Stores & Prices';
+
+  @override
+  String get advancedTabTax => 'VAT & Business';
+
+  @override
+  String get advancedFilterAll => 'All receipts';
+
+  @override
+  String get advancedFilterPersonal => 'Personal';
+
+  @override
+  String get advancedFilterBusiness => 'Business';
+
+  @override
+  String get advancedPresetThisMonth => 'This month';
+
+  @override
+  String get advancedPresetLastMonth => 'Last month';
+
+  @override
+  String get advancedPresetLast30Days => '30 days';
+
+  @override
+  String get advancedPresetLast90Days => '90 days';
+
+  @override
+  String get advancedPresetThisYear => 'This year';
+
+  @override
+  String get advancedPresetLastYear => 'Last year';
+
+  @override
+  String get advancedPresetAll => 'All time';
+
+  @override
+  String get advancedPresetCustom => 'Custom';
+
+  @override
+  String get advancedMomTitle => 'Month-over-month comparison';
+
+  @override
+  String advancedMomVsPrev(String month) {
+    return 'vs $month';
+  }
+
+  @override
+  String get advancedPacingTitle => 'Monthly spending pacing';
+
+  @override
+  String get advancedPacingCurrent => 'Current month';
+
+  @override
+  String get advancedPacingPrevious => 'Previous month';
+
+  @override
+  String get advancedDayOfWeekTitle => 'Spending by day of week';
+
+  @override
+  String get advancedTimeOfDayTitle => 'Time of day spending';
+
+  @override
+  String get advancedTimeMorning => 'Morning (06-12h)';
+
+  @override
+  String get advancedTimeAfternoon => 'Afternoon (12-18h)';
+
+  @override
+  String get advancedTimeEvening => 'Evening (18-24h)';
+
+  @override
+  String get advancedTimeNight => 'Night (00-06h)';
+
+  @override
+  String get advancedBasketTitle => 'Receipt sizes';
+
+  @override
+  String get advancedBasketSmall => 'Small receipts';
+
+  @override
+  String get advancedBasketMedium => 'Medium receipts';
+
+  @override
+  String get advancedBasketLarge => 'Large receipts';
+
+  @override
+  String get advancedCategoryTrendsTitle => 'Monthly category trends';
+
+  @override
+  String get advancedCategoryMoversTitle => 'Biggest category shifts';
+
+  @override
+  String get advancedCategoryMoversIncrease => 'Increase';
+
+  @override
+  String get advancedCategoryMoversDecrease => 'Decrease';
+
+  @override
+  String get advancedParetoTitle => 'Store concentration';
+
+  @override
+  String advancedParetoTop3(String percent) {
+    return 'Top 3 stores account for $percent% of spending';
+  }
+
+  @override
+  String get advancedMerchantMatrixTitle => 'Visit frequency & average basket';
+
+  @override
+  String get advancedPriceInflationTitle => 'Price changes & inflation';
+
+  @override
+  String get advancedPriceInflationEmpty =>
+      'Not enough repeated items for price trend analysis.';
+
+  @override
+  String get advancedTaxTitle => 'VAT breakdown by tax rate';
+
+  @override
+  String get advancedTaxBase => 'Tax base';
+
+  @override
+  String get advancedTaxVat => 'VAT amount';
+
+  @override
+  String get advancedTaxTotal => 'Total with VAT';
+
+  @override
+  String get advancedBusinessDeductibleTitle => 'Business vs. personal';
+
+  @override
+  String get advancedBusinessRatio => 'Period ratio';
+
+  @override
+  String get advancedVatDeductibleBadge => 'Deductible VAT (Business)';
+
+  @override
+  String get advancedVatAllBadge => 'Total VAT (All receipts)';
+
+  @override
+  String get advancedVatPersonalBadge => 'Personal VAT';
+
+  @override
   String get settingsTitle => 'Settings';
 
   @override

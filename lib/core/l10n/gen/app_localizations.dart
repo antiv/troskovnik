@@ -789,6 +789,306 @@ abstract class AppLocalizations {
   /// **'{count} kupovina'**
   String analyticsPurchaseCount(int count);
 
+  /// No description provided for @advancedAnalyticsTooltip.
+  ///
+  /// In sr, this message translates to:
+  /// **'Napredna analitika'**
+  String get advancedAnalyticsTooltip;
+
+  /// No description provided for @advancedAnalyticsTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Napredna analitika'**
+  String get advancedAnalyticsTitle;
+
+  /// No description provided for @advancedTabOverview.
+  ///
+  /// In sr, this message translates to:
+  /// **'Trendovi'**
+  String get advancedTabOverview;
+
+  /// No description provided for @advancedTabCategories.
+  ///
+  /// In sr, this message translates to:
+  /// **'Kategorije'**
+  String get advancedTabCategories;
+
+  /// No description provided for @advancedTabMerchants.
+  ///
+  /// In sr, this message translates to:
+  /// **'Prodavci i cene'**
+  String get advancedTabMerchants;
+
+  /// No description provided for @advancedTabTax.
+  ///
+  /// In sr, this message translates to:
+  /// **'PDV i poslovno'**
+  String get advancedTabTax;
+
+  /// No description provided for @advancedFilterAll.
+  ///
+  /// In sr, this message translates to:
+  /// **'Svi računi'**
+  String get advancedFilterAll;
+
+  /// No description provided for @advancedFilterPersonal.
+  ///
+  /// In sr, this message translates to:
+  /// **'Lični'**
+  String get advancedFilterPersonal;
+
+  /// No description provided for @advancedFilterBusiness.
+  ///
+  /// In sr, this message translates to:
+  /// **'Poslovni'**
+  String get advancedFilterBusiness;
+
+  /// No description provided for @advancedPresetThisMonth.
+  ///
+  /// In sr, this message translates to:
+  /// **'Ovaj mesec'**
+  String get advancedPresetThisMonth;
+
+  /// No description provided for @advancedPresetLastMonth.
+  ///
+  /// In sr, this message translates to:
+  /// **'Prošli mesec'**
+  String get advancedPresetLastMonth;
+
+  /// No description provided for @advancedPresetLast30Days.
+  ///
+  /// In sr, this message translates to:
+  /// **'30 dana'**
+  String get advancedPresetLast30Days;
+
+  /// No description provided for @advancedPresetLast90Days.
+  ///
+  /// In sr, this message translates to:
+  /// **'90 dana'**
+  String get advancedPresetLast90Days;
+
+  /// No description provided for @advancedPresetThisYear.
+  ///
+  /// In sr, this message translates to:
+  /// **'Ova godina'**
+  String get advancedPresetThisYear;
+
+  /// No description provided for @advancedPresetLastYear.
+  ///
+  /// In sr, this message translates to:
+  /// **'Prošla godina'**
+  String get advancedPresetLastYear;
+
+  /// No description provided for @advancedPresetAll.
+  ///
+  /// In sr, this message translates to:
+  /// **'Sve'**
+  String get advancedPresetAll;
+
+  /// No description provided for @advancedPresetCustom.
+  ///
+  /// In sr, this message translates to:
+  /// **'Period'**
+  String get advancedPresetCustom;
+
+  /// No description provided for @advancedMomTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Poređenje sa prethodnim mesecom'**
+  String get advancedMomTitle;
+
+  /// No description provided for @advancedMomVsPrev.
+  ///
+  /// In sr, this message translates to:
+  /// **'u odnosu na {month}'**
+  String advancedMomVsPrev(String month);
+
+  /// No description provided for @advancedPacingTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Tempo mesečne potrošnje'**
+  String get advancedPacingTitle;
+
+  /// No description provided for @advancedPacingCurrent.
+  ///
+  /// In sr, this message translates to:
+  /// **'Tekući mesec'**
+  String get advancedPacingCurrent;
+
+  /// No description provided for @advancedPacingPrevious.
+  ///
+  /// In sr, this message translates to:
+  /// **'Prethodni mesec'**
+  String get advancedPacingPrevious;
+
+  /// No description provided for @advancedDayOfWeekTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Potrošnja po danu u nedelji'**
+  String get advancedDayOfWeekTitle;
+
+  /// No description provided for @advancedTimeOfDayTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Doba dana kupovine'**
+  String get advancedTimeOfDayTitle;
+
+  /// No description provided for @advancedTimeMorning.
+  ///
+  /// In sr, this message translates to:
+  /// **'Jutro (06-12h)'**
+  String get advancedTimeMorning;
+
+  /// No description provided for @advancedTimeAfternoon.
+  ///
+  /// In sr, this message translates to:
+  /// **'Popodne (12-18h)'**
+  String get advancedTimeAfternoon;
+
+  /// No description provided for @advancedTimeEvening.
+  ///
+  /// In sr, this message translates to:
+  /// **'Veče (18-24h)'**
+  String get advancedTimeEvening;
+
+  /// No description provided for @advancedTimeNight.
+  ///
+  /// In sr, this message translates to:
+  /// **'Noć (00-06h)'**
+  String get advancedTimeNight;
+
+  /// No description provided for @advancedBasketTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Veličina računa'**
+  String get advancedBasketTitle;
+
+  /// No description provided for @advancedBasketSmall.
+  ///
+  /// In sr, this message translates to:
+  /// **'Mali računi'**
+  String get advancedBasketSmall;
+
+  /// No description provided for @advancedBasketMedium.
+  ///
+  /// In sr, this message translates to:
+  /// **'Srednji računi'**
+  String get advancedBasketMedium;
+
+  /// No description provided for @advancedBasketLarge.
+  ///
+  /// In sr, this message translates to:
+  /// **'Veliki računi'**
+  String get advancedBasketLarge;
+
+  /// No description provided for @advancedCategoryTrendsTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Mesečni trend po kategorijama'**
+  String get advancedCategoryTrendsTitle;
+
+  /// No description provided for @advancedCategoryMoversTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Najveće promene kategorija'**
+  String get advancedCategoryMoversTitle;
+
+  /// No description provided for @advancedCategoryMoversIncrease.
+  ///
+  /// In sr, this message translates to:
+  /// **'Rast'**
+  String get advancedCategoryMoversIncrease;
+
+  /// No description provided for @advancedCategoryMoversDecrease.
+  ///
+  /// In sr, this message translates to:
+  /// **'Pad'**
+  String get advancedCategoryMoversDecrease;
+
+  /// No description provided for @advancedParetoTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Koncentracija prodavaca'**
+  String get advancedParetoTitle;
+
+  /// No description provided for @advancedParetoTop3.
+  ///
+  /// In sr, this message translates to:
+  /// **'Top 3 prodavca čine {percent}% ukupne potrošnje'**
+  String advancedParetoTop3(String percent);
+
+  /// No description provided for @advancedMerchantMatrixTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Učestalost poseta i prosečan račun'**
+  String get advancedMerchantMatrixTitle;
+
+  /// No description provided for @advancedPriceInflationTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Praćenje cena i inflacije'**
+  String get advancedPriceInflationTitle;
+
+  /// No description provided for @advancedPriceInflationEmpty.
+  ///
+  /// In sr, this message translates to:
+  /// **'Nema dovoljno ponovljenih artikala za analizu kretanja cena.'**
+  String get advancedPriceInflationEmpty;
+
+  /// No description provided for @advancedTaxTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Struktura PDV-a po stopama'**
+  String get advancedTaxTitle;
+
+  /// No description provided for @advancedTaxBase.
+  ///
+  /// In sr, this message translates to:
+  /// **'Osnovica'**
+  String get advancedTaxBase;
+
+  /// No description provided for @advancedTaxVat.
+  ///
+  /// In sr, this message translates to:
+  /// **'Iznos PDV-a'**
+  String get advancedTaxVat;
+
+  /// No description provided for @advancedTaxTotal.
+  ///
+  /// In sr, this message translates to:
+  /// **'Ukupno sa PDV-om'**
+  String get advancedTaxTotal;
+
+  /// No description provided for @advancedBusinessDeductibleTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Poslovno vs. lično'**
+  String get advancedBusinessDeductibleTitle;
+
+  /// No description provided for @advancedBusinessRatio.
+  ///
+  /// In sr, this message translates to:
+  /// **'Odnos u periodu'**
+  String get advancedBusinessRatio;
+
+  /// No description provided for @advancedVatDeductibleBadge.
+  ///
+  /// In sr, this message translates to:
+  /// **'Odbitni PDV (Poslovni)'**
+  String get advancedVatDeductibleBadge;
+
+  /// No description provided for @advancedVatAllBadge.
+  ///
+  /// In sr, this message translates to:
+  /// **'Ukupan PDV (Svi računi)'**
+  String get advancedVatAllBadge;
+
+  /// No description provided for @advancedVatPersonalBadge.
+  ///
+  /// In sr, this message translates to:
+  /// **'Lični PDV'**
+  String get advancedVatPersonalBadge;
+
   /// No description provided for @settingsTitle.
   ///
   /// In sr, this message translates to:
