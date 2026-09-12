@@ -105,7 +105,12 @@ final receiptListProvider =
   }
 
   if (query.currency != null) {
-    select.where(db.receipts.currency.equals(query.currency!.index));
+    if (query.currency == Currency.rsd) {
+      select.where(db.receipts.currency.equals(Currency.rsd.index) |
+          db.receipts.currency.isNull());
+    } else {
+      select.where(db.receipts.currency.equals(query.currency!.index));
+    }
   }
 
   switch (query.sort) {

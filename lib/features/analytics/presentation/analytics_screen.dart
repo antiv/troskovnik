@@ -17,6 +17,7 @@ import '../../export/domain/export_range.dart';
 import '../data/analytics_providers.dart';
 import '../data/analytics_repository.dart' show AnalyticsRepository;
 import '../domain/analytics_models.dart';
+import 'advanced_analytics_screen.dart';
 
 /// Ekran analitike potrošnje (MVP, nad postojećim podacima — bez kategorija).
 class AnalyticsScreen extends ConsumerWidget {
@@ -42,6 +43,7 @@ class AnalyticsScreen extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.only(top: 12),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(child: _RangeSelector()),
               if (availableCurrencies.length > 1)
@@ -53,6 +55,7 @@ class AnalyticsScreen extends ConsumerWidget {
                       ref.read(analyticsCurrencyProvider.notifier).set(c),
                 ),
               const _ExportButton(),
+              const _AdvancedAnalyticsButton(),
             ],
           ),
         ),
@@ -154,18 +157,38 @@ class _RangeSelector extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final range = ref.watch(analyticsRangeProvider);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+      padding: const EdgeInsets.only(left: 12, right: 4),
       child: SegmentedButton<AnalyticsRange>(
         showSelectedIcon: false,
+        style: SegmentedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          textStyle: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500),
+        ),
         segments: [
           ButtonSegment(
-              value: AnalyticsRange.last3Months,
-              label: Text(l10n.analyticsRange3m)),
+            value: AnalyticsRange.last3Months,
+            label: Text(
+              l10n.analyticsRange3m,
+              maxLines: 1,
+              softWrap: false,
+            ),
+          ),
           ButtonSegment(
-              value: AnalyticsRange.last12Months,
-              label: Text(l10n.analyticsRange12m)),
+            value: AnalyticsRange.last12Months,
+            label: Text(
+              l10n.analyticsRange12m,
+              maxLines: 1,
+              softWrap: false,
+            ),
+          ),
           ButtonSegment(
-              value: AnalyticsRange.all, label: Text(l10n.analyticsRangeAll)),
+            value: AnalyticsRange.all,
+            label: Text(
+              l10n.analyticsRangeAll,
+              maxLines: 1,
+              softWrap: false,
+            ),
+          ),
         ],
         selected: {range},
         onSelectionChanged: (s) =>
@@ -182,12 +205,33 @@ class _ExportButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    return IconButton(
+      visualDensity: VisualDensity.compact,
+      icon: const Icon(Icons.file_download_outlined),
+      tooltip: l10n.exportCsv,
+      onPressed: () => _showExportSheet(context, ref),
+    );
+  }
+}
+
+/// Dugme za otvaranje detaljne / napredne analitike.
+class _AdvancedAnalyticsButton extends StatelessWidget {
+  const _AdvancedAnalyticsButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.only(right: 4),
       child: IconButton(
-        icon: const Icon(Icons.file_download_outlined),
-        tooltip: l10n.exportCsv,
-        onPressed: () => _showExportSheet(context, ref),
+        visualDensity: VisualDensity.compact,
+        icon: const Icon(Icons.insights_outlined),
+        tooltip: l10n.advancedAnalyticsTooltip,
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => const AdvancedAnalyticsScreen(),
+          ),
+        ),
       ),
     );
   }

@@ -378,6 +378,162 @@ class AppLocalizationsSr extends AppLocalizations {
   }
 
   @override
+  String get advancedAnalyticsTooltip => 'Napredna analitika';
+
+  @override
+  String get advancedAnalyticsTitle => 'Napredna analitika';
+
+  @override
+  String get advancedTabOverview => 'Trendovi';
+
+  @override
+  String get advancedTabCategories => 'Kategorije';
+
+  @override
+  String get advancedTabMerchants => 'Prodavci i cene';
+
+  @override
+  String get advancedTabTax => 'PDV i poslovno';
+
+  @override
+  String get advancedFilterAll => 'Svi računi';
+
+  @override
+  String get advancedFilterPersonal => 'Lični';
+
+  @override
+  String get advancedFilterBusiness => 'Poslovni';
+
+  @override
+  String get advancedPresetThisMonth => 'Ovaj mesec';
+
+  @override
+  String get advancedPresetLastMonth => 'Prošli mesec';
+
+  @override
+  String get advancedPresetLast30Days => '30 dana';
+
+  @override
+  String get advancedPresetLast90Days => '90 dana';
+
+  @override
+  String get advancedPresetThisYear => 'Ova godina';
+
+  @override
+  String get advancedPresetLastYear => 'Prošla godina';
+
+  @override
+  String get advancedPresetAll => 'Sve';
+
+  @override
+  String get advancedPresetCustom => 'Period';
+
+  @override
+  String get advancedMomTitle => 'Poređenje sa prethodnim mesecom';
+
+  @override
+  String advancedMomVsPrev(String month) {
+    return 'u odnosu na $month';
+  }
+
+  @override
+  String get advancedPacingTitle => 'Tempo mesečne potrošnje';
+
+  @override
+  String get advancedPacingCurrent => 'Tekući mesec';
+
+  @override
+  String get advancedPacingPrevious => 'Prethodni mesec';
+
+  @override
+  String get advancedDayOfWeekTitle => 'Potrošnja po danu u nedelji';
+
+  @override
+  String get advancedTimeOfDayTitle => 'Doba dana kupovine';
+
+  @override
+  String get advancedTimeMorning => 'Jutro (06-12h)';
+
+  @override
+  String get advancedTimeAfternoon => 'Popodne (12-18h)';
+
+  @override
+  String get advancedTimeEvening => 'Veče (18-24h)';
+
+  @override
+  String get advancedTimeNight => 'Noć (00-06h)';
+
+  @override
+  String get advancedBasketTitle => 'Veličina računa';
+
+  @override
+  String get advancedBasketSmall => 'Mali računi';
+
+  @override
+  String get advancedBasketMedium => 'Srednji računi';
+
+  @override
+  String get advancedBasketLarge => 'Veliki računi';
+
+  @override
+  String get advancedCategoryTrendsTitle => 'Mesečni trend po kategorijama';
+
+  @override
+  String get advancedCategoryMoversTitle => 'Najveće promene kategorija';
+
+  @override
+  String get advancedCategoryMoversIncrease => 'Rast';
+
+  @override
+  String get advancedCategoryMoversDecrease => 'Pad';
+
+  @override
+  String get advancedParetoTitle => 'Koncentracija prodavaca';
+
+  @override
+  String advancedParetoTop3(String percent) {
+    return 'Top 3 prodavca čine $percent% ukupne potrošnje';
+  }
+
+  @override
+  String get advancedMerchantMatrixTitle =>
+      'Učestalost poseta i prosečan račun';
+
+  @override
+  String get advancedPriceInflationTitle => 'Praćenje cena i inflacije';
+
+  @override
+  String get advancedPriceInflationEmpty =>
+      'Nema dovoljno ponovljenih artikala za analizu kretanja cena.';
+
+  @override
+  String get advancedTaxTitle => 'Struktura PDV-a po stopama';
+
+  @override
+  String get advancedTaxBase => 'Osnovica';
+
+  @override
+  String get advancedTaxVat => 'Iznos PDV-a';
+
+  @override
+  String get advancedTaxTotal => 'Ukupno sa PDV-om';
+
+  @override
+  String get advancedBusinessDeductibleTitle => 'Poslovno vs. lično';
+
+  @override
+  String get advancedBusinessRatio => 'Odnos u periodu';
+
+  @override
+  String get advancedVatDeductibleBadge => 'Odbitni PDV (Poslovni)';
+
+  @override
+  String get advancedVatAllBadge => 'Ukupan PDV (Svi računi)';
+
+  @override
+  String get advancedVatPersonalBadge => 'Lični PDV';
+
+  @override
   String get settingsTitle => 'Podešavanja';
 
   @override
@@ -963,6 +1119,162 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
   String analyticsPurchaseCount(int count) {
     return '$count куповина';
   }
+
+  @override
+  String get advancedAnalyticsTooltip => 'Напредна аналитика';
+
+  @override
+  String get advancedAnalyticsTitle => 'Напредна аналитика';
+
+  @override
+  String get advancedTabOverview => 'Трендови';
+
+  @override
+  String get advancedTabCategories => 'Категорије';
+
+  @override
+  String get advancedTabMerchants => 'Продавци и цене';
+
+  @override
+  String get advancedTabTax => 'ПДВ и пословно';
+
+  @override
+  String get advancedFilterAll => 'Сви рачуни';
+
+  @override
+  String get advancedFilterPersonal => 'Лични';
+
+  @override
+  String get advancedFilterBusiness => 'Пословни';
+
+  @override
+  String get advancedPresetThisMonth => 'Овај месец';
+
+  @override
+  String get advancedPresetLastMonth => 'Прошли месец';
+
+  @override
+  String get advancedPresetLast30Days => '30 дана';
+
+  @override
+  String get advancedPresetLast90Days => '90 дана';
+
+  @override
+  String get advancedPresetThisYear => 'Ова година';
+
+  @override
+  String get advancedPresetLastYear => 'Прошла година';
+
+  @override
+  String get advancedPresetAll => 'Све';
+
+  @override
+  String get advancedPresetCustom => 'Период';
+
+  @override
+  String get advancedMomTitle => 'Поређење са претходним месецом';
+
+  @override
+  String advancedMomVsPrev(String month) {
+    return 'у односу на $month';
+  }
+
+  @override
+  String get advancedPacingTitle => 'Темпо месечне потрошње';
+
+  @override
+  String get advancedPacingCurrent => 'Текући месец';
+
+  @override
+  String get advancedPacingPrevious => 'Претходни месец';
+
+  @override
+  String get advancedDayOfWeekTitle => 'Потрошња по дану у недељи';
+
+  @override
+  String get advancedTimeOfDayTitle => 'Доба дана куповине';
+
+  @override
+  String get advancedTimeMorning => 'Јутро (06-12h)';
+
+  @override
+  String get advancedTimeAfternoon => 'Поподне (12-18h)';
+
+  @override
+  String get advancedTimeEvening => 'Вече (18-24h)';
+
+  @override
+  String get advancedTimeNight => 'Ноћ (00-06h)';
+
+  @override
+  String get advancedBasketTitle => 'Величина рачуна';
+
+  @override
+  String get advancedBasketSmall => 'Мали рачуни';
+
+  @override
+  String get advancedBasketMedium => 'Средњи рачуни';
+
+  @override
+  String get advancedBasketLarge => 'Велики рачуни';
+
+  @override
+  String get advancedCategoryTrendsTitle => 'Месечни тренд по категоријама';
+
+  @override
+  String get advancedCategoryMoversTitle => 'Највеће промене категорија';
+
+  @override
+  String get advancedCategoryMoversIncrease => 'Раст';
+
+  @override
+  String get advancedCategoryMoversDecrease => 'Пад';
+
+  @override
+  String get advancedParetoTitle => 'Концентрација продаваца';
+
+  @override
+  String advancedParetoTop3(String percent) {
+    return 'Топ 3 продавца чине $percent% укупне потрошње';
+  }
+
+  @override
+  String get advancedMerchantMatrixTitle =>
+      'Учесталост посета и просечан рачун';
+
+  @override
+  String get advancedPriceInflationTitle => 'Праћење цена и инфлације';
+
+  @override
+  String get advancedPriceInflationEmpty =>
+      'Нема довољно поновљених артикала за анализу кретања цена.';
+
+  @override
+  String get advancedTaxTitle => 'Структура ПДВ-а по стопама';
+
+  @override
+  String get advancedTaxBase => 'Основица';
+
+  @override
+  String get advancedTaxVat => 'Износ ПДВ-а';
+
+  @override
+  String get advancedTaxTotal => 'Укупно са ПДВ-ом';
+
+  @override
+  String get advancedBusinessDeductibleTitle => 'Пословно vs. лично';
+
+  @override
+  String get advancedBusinessRatio => 'Однос у периоду';
+
+  @override
+  String get advancedVatDeductibleBadge => 'Одбитни ПДВ (Пословни)';
+
+  @override
+  String get advancedVatAllBadge => 'Укупан ПДВ (Сви рачуни)';
+
+  @override
+  String get advancedVatPersonalBadge => 'Лични ПДВ';
 
   @override
   String get settingsTitle => 'Подешавања';

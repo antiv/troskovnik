@@ -6,6 +6,7 @@ import 'package:troskovnik/core/db/enums.dart';
 import 'package:troskovnik/core/domain/country.dart';
 import 'package:troskovnik/core/domain/currency.dart';
 import 'package:troskovnik/features/analytics/data/analytics_repository.dart';
+import 'package:troskovnik/features/analytics/domain/advanced_analytics_models.dart';
 import 'package:troskovnik/features/analytics/domain/analytics_models.dart';
 
 void main() {
@@ -366,4 +367,90 @@ void main() {
     expect(s.totalsByCurrency[Currency.rsd], 30000);
     expect(s.totalsByCurrency.containsKey(Currency.bam), isFalse);
   });
+
+  group('AdvancedAnalytics', () {
+    test('MoM comparison, pacing, day-of-week and basket sizes', () async {
+      final m = await merchant('100', 'Maxi');
+      // Januar: 10.000 RSD (subota) i 5.000 RSD
+      final r1 = await receipt(merchantId: m, total: 10000, pfrTime: DateTime(2026, 1, 10, 10)); // subota
+      final r2 = await receipt(merchantId: m, total: 5000, pfrTime: DateTime(2026, 1, 15, 14)); // četvrtak
+      // Decembar: 12.000 RSD
+      await receipt(merchantId: m, total: 12000, pfrTime: DateTime(2025, 12, 5, 9));
+
+      await item(r1, 'Mleko 1L', 5000, rate: 20);
+      await item(r2, 'Mleko 1L', 5000, rate: 20);
+
+      final filter = const AdvancedAnalyticsFilter(
+        preset: AdvancedAnalyticsDatePreset.thisMonth,
+        currency: Currency.rsd,
+      );
+      final s = await repo.loadAdvancedSummary(filter, now: DateTime(2026, 1, 20));
+
+      expect(s.totalMinor, 15000);
+      expect(s.receiptCount, 2);
+      expect(s.averageReceiptMinor, 7500);
+
+      // MoM
+      expect(s.momComparison, isNotNull);
+      expect(s.momComparison!.currentTotalMinor, 15000);
+      expect(s.momComparison!.previousTotalMinor, 12000);
+      expect(s.momComparison!.deltaMinor, 3000);
+      expect(s.momComparison!.percentageChange, closeTo(25.0, 0.01));
+
+      // Day of week
+      final sat = s.dayOfWeek.firstWhere((d) => d.dayOfWeek == 6);
+      expect(sat.totalMinor, 10000);
+
+      // Pacing
+      expect(s.pacing, isNotEmpty);
+      expect(s.pacing.firstWhere((p) => p.day == 10).currentCumulativeMinor, 10000);
+      expect(s.pacing.firstWhere((p) => p.day == 15).currentCumulativeMinor, 15000);
+
+      // Basket sizes (sve su < 100.000 para = < 1.000 RSD)
+      expect(s.basketSizes.smallCount, 2);
+
+      // Pareto
+      expect(s.pareto.top3Percentage, 100.0);
+
+      // Tax breakdown
+      expect(s.taxBreakdown, hasLength(1));
+      expect(s.taxBreakdown.first.taxRate, 20.0);
+      expect(s.taxBreakdown.first.totalMinor, 10000);
+    });
+
+    test('Item price inflation tracker calculates price change', () async {
+      final m = await merchant('101', 'Lidl');
+      final r1 = await receipt(merchantId: m, total: 300, pfrTime: DateTime(2026, 1, 1));
+      final r2 = await receipt(merchantId: m, total: 360, pfrTime: DateTime(2026, 3, 1));
+
+      // Mleko poskupelo sa 150 na 180 para (20%)
+      final li = db.lineItems;
+      await db.into(li).insert(LineItemsCompanion.insert(
+            receiptId: r1,
+            name: 'Mleko',
+            unitPrice: const Value(150),
+            total: const Value(150),
+          ));
+      await db.into(li).insert(LineItemsCompanion.insert(
+            receiptId: r2,
+            name: 'Mleko',
+            unitPrice: const Value(180),
+            total: const Value(180),
+          ));
+
+      final filter = const AdvancedAnalyticsFilter(
+        preset: AdvancedAnalyticsDatePreset.all,
+        currency: Currency.rsd,
+      );
+      final s = await repo.loadAdvancedSummary(filter, now: DateTime(2026, 3, 15));
+
+      expect(s.priceInflation, hasLength(1));
+      final item = s.priceInflation.first;
+      expect(item.name, 'Mleko');
+      expect(item.firstPriceMinor, 150);
+      expect(item.latestPriceMinor, 180);
+      expect(item.percentChange, closeTo(20.0, 0.01));
+    });
+  });
 }
+

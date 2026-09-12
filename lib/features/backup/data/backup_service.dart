@@ -10,6 +10,8 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../../core/db/database.dart';
 import '../../../core/db/enums.dart';
+import '../../../core/domain/country.dart';
+import '../../../core/domain/currency.dart';
 
 class BackupException implements Exception {
   const BackupException(this.code);
@@ -123,6 +125,8 @@ class BackupService {
             'isBusiness': r.isBusiness,
             'imagePath': receiptImageZipPaths[r.id],
             'note': r.note,
+            'country': r.country.index,
+            'currency': r.currency.index,
             'createdAt': r.createdAt.toIso8601String(),
             'updatedAt': r.updatedAt.toIso8601String(),
           },
@@ -289,6 +293,8 @@ class BackupService {
                       ? null
                       : DateTime.parse(j['nextRetryAt'] as String)),
                   isBusiness: Value(j['isBusiness'] as bool),
+                  country: Value(_detectCountry(j)),
+                  currency: Value(_detectCurrency(j)),
                   imagePath: Value(imagePath),
                   note: Value(j['note'] as String?),
                   createdAt:
@@ -354,6 +360,14 @@ class BackupService {
               );
         }
       });
+
+      // Dopunski backfill za starije baze
+      await _db.customStatement(
+          "UPDATE receipts SET country = 1, currency = 1 WHERE verification_url LIKE '%poreskaupravars.org%'");
+      await _db.customStatement(
+          "UPDATE receipts SET country = 2, currency = 2 WHERE verification_url LIKE '%tax.gov.me%'");
+      await _db.customStatement(
+          "UPDATE receipts SET country = 0, currency = 0 WHERE country IS NULL OR currency IS NULL");
     } catch (e) {
       if (e is BackupException) rethrow;
       throw const BackupException('io_error');
@@ -388,6 +402,27 @@ class BackupService {
         // Skip images that fail; the DB row will have a dangling path.
       }
     }
+  }
+
+  static Country _detectCountry(Map<String, dynamic> j) {
+    if (j['country'] != null) {
+      return Country.values[j['country'] as int];
+    }
+    final url = (j['verificationUrl'] as String?) ?? '';
+    if (url.contains('poreskaupravars.org')) {
+      return Country.republikaSrpska;
+    }
+    if (url.contains('tax.gov.me')) {
+      return Country.montenegro;
+    }
+    return Country.serbia;
+  }
+
+  static Currency _detectCurrency(Map<String, dynamic> j) {
+    if (j['currency'] != null) {
+      return Currency.values[j['currency'] as int];
+    }
+    return _detectCountry(j).currency;
   }
 }
 
