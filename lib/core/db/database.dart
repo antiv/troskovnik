@@ -72,22 +72,16 @@ class AppDatabase extends _$AppDatabase {
                 'ALTER TABLE receipts ADD COLUMN country INTEGER NOT NULL DEFAULT 0');
             await customStatement(
                 'ALTER TABLE receipts ADD COLUMN currency INTEGER NOT NULL DEFAULT 0');
+            await customStatement(
+                "UPDATE receipts SET country = 1, currency = 1 WHERE verification_url LIKE '%poreskaupravars.org%'");
+            await customStatement(
+                "UPDATE receipts SET country = 2, currency = 2 WHERE verification_url LIKE '%tax.gov.me%'");
           }
           // v8: flag za nepodudaranje parsiranih podataka sa invoiceResult.
           if (from < 8) {
             await customStatement(
                 'ALTER TABLE receipts ADD COLUMN has_discrepancy INTEGER NOT NULL DEFAULT 0');
           }
-        },
-        beforeOpen: (details) async {
-          await customStatement(
-              "UPDATE receipts SET country = 1, currency = 1 WHERE verification_url LIKE '%poreskaupravars.org%'");
-          await customStatement(
-              "UPDATE receipts SET country = 2, currency = 2 WHERE verification_url LIKE '%tax.gov.me%'");
-          await customStatement(
-              'UPDATE receipts SET currency = 0 WHERE currency IS NULL');
-          await customStatement(
-              'UPDATE receipts SET country = 0 WHERE country IS NULL');
         },
       );
 

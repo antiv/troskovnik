@@ -64,12 +64,14 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
-            // R8/shrink ISKLJUČEN: minify je strip-ovao native kod plugina
-            // (SQLCipher/FFI) pa je release crashovao pri pokretanju na uređaju.
-            // Dart kod je AOT-kompajliran (R8 ga ne dira), pa je dobitak mali,
-            // a rizik veliki. proguard-rules.pro zadržan za eventualno kasnije.
-            isMinifyEnabled = false
+            // R8 DEX optimizacija i obfuskacija (zadovoljava Google Play prag >25%).
+            // Pravila za native kod i pluginove definisana su u proguard-rules.pro.
+            isMinifyEnabled = true
             isShrinkResources = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
             // Upakuj native debug simbole (libflutter.so, libapp.so, SQLCipher…)
             // u AAB radi čitljivih native crash-eva u Play Console-u.
             ndk {
