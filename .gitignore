@@ -58,11 +58,13 @@ app.*.map.json
 .env*
 !.env.example
 
-# Android signing — NIKAD ne commit-ovati tajne/keystore
+# Android signing & deploy — NIKAD ne commit-ovati tajne/keystore
 android/key.properties
+android/deploy.env
 **/*.jks
 **/*.keystore
 !android/key.properties.example
+!android/deploy.env.example
 
 # iOS deploy tajne (App Store Connect API ključ) — NIKAD ne commit-ovati
 ios/deploy.env
