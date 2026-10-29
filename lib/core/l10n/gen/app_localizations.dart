@@ -1496,6 +1496,36 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'Upozorenje: parsirani podaci se ne slažu sa podacima fiskalnog servera. Proverite račun.'**
   String get detailDiscrepancyWarning;
+
+  /// No description provided for @analyticsByCompany.
+  ///
+  /// In sr, this message translates to:
+  /// **'Po firmama (PIB)'**
+  String get analyticsByCompany;
+
+  /// No description provided for @analyticsCompanyNoTaxId.
+  ///
+  /// In sr, this message translates to:
+  /// **'Poslovno bez PIB-a firme'**
+  String get analyticsCompanyNoTaxId;
+
+  /// No description provided for @analyticsCompanyVat.
+  ///
+  /// In sr, this message translates to:
+  /// **'PDV: {amount}'**
+  String analyticsCompanyVat(String amount);
+
+  /// No description provided for @companyNameTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Naziv firme'**
+  String get companyNameTitle;
+
+  /// No description provided for @companyNameHint.
+  ///
+  /// In sr, this message translates to:
+  /// **'npr. Moja firma d.o.o.'**
+  String get companyNameHint;
 }
 
 class _AppLocalizationsDelegate

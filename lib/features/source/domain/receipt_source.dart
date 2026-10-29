@@ -63,6 +63,7 @@ class ReceiptHeader {
     required this.merchantName,
     required this.merchantTin,
     this.buyerId,
+    this.buyerName,
     this.locationName,
     this.address,
     this.invoiceNumber,
@@ -81,9 +82,13 @@ class ReceiptHeader {
   final String merchantName;
   final String merchantTin;
 
-  /// PIB/ID kupca sa fiskalnog računa ("ИД купца"), sirovo `tip:broj`
-  /// (npr. "10:104318304", gde "10" = PIB firme). Null kad nije upisan.
+  /// PIB/ID kupca sa fiskalnog računa, sirovo `tip:broj`: TaxCore „ИД купца"
+  /// (npr. "10:104318304", gde "10" = PIB firme) ili CG `IDType:IDNum`
+  /// (npr. "TIN:02345678"). Null kad nije upisan. Tumači ga `BuyerIdentity`.
   final String? buyerId;
+
+  /// Naziv kupca, kad ga izvor vraća (CG EFI); TaxCore žurnal ga nema.
+  final String? buyerName;
 
   final String? locationName;
   final String? address;

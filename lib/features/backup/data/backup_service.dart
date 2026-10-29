@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../../core/db/database.dart';
 import '../../../core/db/enums.dart';
+import '../../../core/domain/buyer_identity.dart';
 import '../../../core/domain/country.dart';
 import '../../../core/domain/currency.dart';
 
@@ -31,6 +32,7 @@ class BackupService {
     final receipts = await _db.select(_db.receipts).get();
     final lineItems = await _db.select(_db.lineItems).get();
     final warranties = await _db.select(_db.warranties).get();
+    final companies = await _db.select(_db.companies).get();
 
     final archive = Archive();
 
@@ -95,6 +97,14 @@ class BackupService {
             'locationName': m.locationName,
             'address': m.address,
             'firstSeen': m.firstSeen.toIso8601String(),
+          },
+      ],
+      'companies': [
+        for (final c in companies)
+          {
+            'country': c.country.index,
+            'taxId': c.taxId,
+            'name': c.name,
           },
       ],
       'receipts': [
@@ -215,6 +225,20 @@ class BackupService {
         await _db.delete(_db.receipts).go();
         await _db.delete(_db.merchants).go();
         await _db.delete(_db.categories).go();
+        await _db.delete(_db.companies).go();
+
+        // Firme kupca (nazivi); starije kopije ih nemaju.
+        for (final c in (manifest['companies'] as List<dynamic>?) ?? const []) {
+          final j = c as Map<String, dynamic>;
+          await _db.into(_db.companies).insert(
+                CompaniesCompanion.insert(
+                  country: Value(Country.values[j['country'] as int]),
+                  taxId: j['taxId'] as String,
+                  name: Value(j['name'] as String?),
+                ),
+                mode: InsertMode.insertOrReplace,
+              );
+        }
 
         for (final c in manifest['categories'] as List<dynamic>) {
           final j = c as Map<String, dynamic>;
@@ -257,6 +281,19 @@ class BackupService {
           final imagePath = imageName == null
               ? null
               : p.join(appDocDir, 'images', 'receipts', imageName);
+          // buyerTaxId se ne čuva u kopiji — izvodi se iz buyerId.
+          final country = _detectCountry(j);
+          final buyerTaxId =
+              BuyerIdentity.parse(j['buyerId'] as String?, country)?.taxId;
+          if (buyerTaxId != null) {
+            await _db.into(_db.companies).insert(
+                  CompaniesCompanion.insert(
+                    country: Value(country),
+                    taxId: buyerTaxId,
+                  ),
+                  mode: InsertMode.insertOrIgnore,
+                );
+          }
           await _db.into(_db.receipts).insert(
                 ReceiptsCompanion(
                   id: Value(j['id'] as int),
@@ -264,6 +301,7 @@ class BackupService {
                   invoiceNumber: Value(j['invoiceNumber'] as String?),
                   pfrNumber: Value(j['pfrNumber'] as String?),
                   buyerId: Value(j['buyerId'] as String?),
+                  buyerTaxId: Value(buyerTaxId),
                   pfrTime: Value(j['pfrTime'] == null
                       ? null
                       : DateTime.parse(j['pfrTime'] as String)),
@@ -293,7 +331,7 @@ class BackupService {
                       ? null
                       : DateTime.parse(j['nextRetryAt'] as String)),
                   isBusiness: Value(j['isBusiness'] as bool),
-                  country: Value(_detectCountry(j)),
+                  country: Value(country),
                   currency: Value(_detectCurrency(j)),
                   imagePath: Value(imagePath),
                   note: Value(j['note'] as String?),

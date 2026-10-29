@@ -139,6 +139,84 @@ void main() {
       expect(row.isBusiness, isFalse);
     });
 
+    test('buyer PIB creates company row and buyerTaxId', () async {
+      final res = await repo.saveParsed(
+        verificationUrl: 'u-co',
+        token: 't',
+        parsed: ParsedReceipt(
+          fetchStatus: FetchStatus.complete,
+          itemsStatus: ItemsStatus.fromJournal,
+          itemsSource: ItemsSource.journal,
+          header: _header(buyerId: '12:104318304:12345'),
+        ),
+        now: t0,
+      );
+      final row = await repo.findById(res.receiptId);
+      expect(row!.buyerTaxId, '104318304');
+      expect(row.isBusiness, isTrue);
+      final companies = await db.select(db.companies).get();
+      expect(companies.single.taxId, '104318304');
+      expect(companies.single.name, isNull);
+    });
+
+    test('buyer arriving on refetch auto-marks business', () async {
+      final id = (await repo.saveParsed(
+        verificationUrl: 'u-late',
+        token: 't',
+        parsed: ParsedReceipt(
+          fetchStatus: FetchStatus.headerOnly,
+          itemsStatus: ItemsStatus.pendingServer,
+          itemsSource: ItemsSource.none,
+          header: _header(),
+        ),
+        now: t0,
+      ))
+          .receiptId;
+      expect((await repo.findById(id))!.isBusiness, isFalse);
+      await repo.applyRefetch(
+        id,
+        ParsedReceipt(
+          fetchStatus: FetchStatus.complete,
+          itemsStatus: ItemsStatus.fromJournal,
+          itemsSource: ItemsSource.journal,
+          header: _header(buyerId: '10:104318304'),
+        ),
+        now: t0,
+      );
+      final row = await repo.findById(id);
+      expect(row!.buyerId, '10:104318304');
+      expect(row.buyerTaxId, '104318304');
+      expect(row.isBusiness, isTrue);
+      expect(await db.select(db.companies).get(), hasLength(1));
+    });
+
+    test('refetch keeps manual business choice when buyer was known',
+        () async {
+      final res = await repo.saveParsed(
+        verificationUrl: 'u-manual',
+        token: 't',
+        parsed: ParsedReceipt(
+          fetchStatus: FetchStatus.headerOnly,
+          itemsStatus: ItemsStatus.pendingServer,
+          itemsSource: ItemsSource.none,
+          header: _header(buyerId: '10:104318304'),
+        ),
+        now: t0,
+      );
+      await repo.setBusiness(res.receiptId, false);
+      await repo.applyRefetch(
+        res.receiptId,
+        ParsedReceipt(
+          fetchStatus: FetchStatus.complete,
+          itemsStatus: ItemsStatus.fromJournal,
+          itemsSource: ItemsSource.journal,
+          header: _header(buyerId: '10:104318304'),
+        ),
+        now: t0,
+      );
+      expect((await repo.findById(res.receiptId))!.isBusiness, isFalse);
+    });
+
     test('no buyer id -> not business', () async {
       final res = await repo.saveParsed(
         verificationUrl: 'u-none',

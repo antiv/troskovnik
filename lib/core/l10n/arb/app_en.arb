@@ -260,5 +260,11 @@
   "dbRecoveryReset": "Delete data and start over",
   "dbRecoveryConfirmBody": "All saved receipts and warranties will be permanently deleted. This cannot be undone.",
   "dbRecoveryError": "Deleting failed. Please try again.",
-  "detailDiscrepancyWarning": "Warning: parsed data does not match fiscal server data. Please verify this receipt."
+  "detailDiscrepancyWarning": "Warning: parsed data does not match fiscal server data. Please verify this receipt.",
+  "analyticsByCompany": "By company (tax ID)",
+  "analyticsCompanyNoTaxId": "Business without company tax ID",
+  "analyticsCompanyVat": "VAT: {amount}",
+  "@analyticsCompanyVat": { "placeholders": { "amount": { "type": "String" } } },
+  "companyNameTitle": "Company name",
+  "companyNameHint": "e.g. My Company Ltd."
 }

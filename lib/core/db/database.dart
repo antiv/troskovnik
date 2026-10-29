@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqlcipher_flutter_libs/sqlcipher_flutter_libs.dart';
 import 'package:sqlite3/open.dart';
 
+import '../domain/buyer_identity.dart';
 import '../domain/country.dart';
 import '../domain/currency.dart';
 import 'enums.dart';
@@ -15,7 +16,7 @@ import 'tables.dart';
 part 'database.g.dart';
 
 @DriftDatabase(
-    tables: [Merchants, Receipts, LineItems, Warranties, Categories])
+    tables: [Merchants, Receipts, LineItems, Warranties, Categories, Companies])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
@@ -31,7 +32,7 @@ class AppDatabase extends _$AppDatabase {
       );
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -82,8 +83,36 @@ class AppDatabase extends _$AppDatabase {
             await customStatement(
                 'ALTER TABLE receipts ADD COLUMN has_discrepancy INTEGER NOT NULL DEFAULT 0');
           }
+          // v9: firme kupca (analitika po PIB-u). Postojećim računima se
+          // popunjava buyer_tax_id; oznaka is_business se NE dira (ručni izbor).
+          if (from < 9) {
+            await customStatement(
+                'ALTER TABLE receipts ADD COLUMN buyer_tax_id TEXT');
+            await m.createTable(companies);
+            await _backfillBuyerTaxIds();
+          }
         },
       );
+
+  /// Popuni `buyer_tax_id` i tabelu firmi iz postojećih `buyer_id` (v9).
+  /// Sirov SQL da migracija ne zavisi od budućih kolona tabele `receipts`.
+  Future<void> _backfillBuyerTaxIds() async {
+    final rows = await customSelect(
+            'SELECT id, buyer_id, country FROM receipts WHERE buyer_id IS NOT NULL')
+        .get();
+    for (final row in rows) {
+      final country = Country.values[row.read<int>('country')];
+      final taxId =
+          BuyerIdentity.parse(row.read<String>('buyer_id'), country)?.taxId;
+      if (taxId == null) continue;
+      await customStatement(
+          'UPDATE receipts SET buyer_tax_id = ? WHERE id = ?',
+          [taxId, row.read<int>('id')]);
+      await customStatement(
+          'INSERT OR IGNORE INTO companies (country, tax_id) VALUES (?, ?)',
+          [country.index, taxId]);
+    }
+  }
 
   Future<void> _createIndexes() async {
     // Indeksi za pretragu i sortiranje (instrukcije.md, sekcija 4).

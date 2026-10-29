@@ -261,5 +261,11 @@
   "dbRecoveryReset": "Obriši podatke i počni ispočetka",
   "dbRecoveryConfirmBody": "Svi sačuvani računi i garancije biće trajno obrisani. Ova akcija se ne može poništiti.",
   "dbRecoveryError": "Brisanje nije uspelo. Pokušajte ponovo.",
-  "detailDiscrepancyWarning": "Upozorenje: parsirani podaci se ne slažu sa podacima fiskalnog servera. Proverite račun."
+  "detailDiscrepancyWarning": "Upozorenje: parsirani podaci se ne slažu sa podacima fiskalnog servera. Proverite račun.",
+  "analyticsByCompany": "Po firmama (PIB)",
+  "analyticsCompanyNoTaxId": "Poslovno bez PIB-a firme",
+  "analyticsCompanyVat": "PDV: {amount}",
+  "@analyticsCompanyVat": { "placeholders": { "amount": { "type": "String" } } },
+  "companyNameTitle": "Naziv firme",
+  "companyNameHint": "npr. Moja firma d.o.o."
 }

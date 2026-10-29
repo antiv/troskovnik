@@ -47,6 +47,10 @@ class Receipts extends Table {
   /// (npr. "10:104318304", gde "10" = PIB firme). Null kad nije upisan.
   TextColumn get buyerId => text().nullable()();
 
+  /// Normalizovan PIB/JIB/TIN firme kupca (iz [buyerId]), null kad kupac nije
+  /// firma. Ključ za analitiku po firmama (spaja npr. `10:` i `12:` isti PIB).
+  TextColumn get buyerTaxId => text().nullable()();
+
   /// PFR vreme.
   DateTimeColumn get pfrTime => dateTime().nullable()();
 
@@ -171,6 +175,29 @@ class LineItems extends Table {
   /// Kategorija stavke (nullable — nepoznata kategorija).
   IntColumn get categoryId => integer().nullable()
       .references(Categories, #id, onDelete: KeyAction.setNull)();
+}
+
+/// Firme kupca (PIB/JIB/TIN sa fiskalnih računa) sa korisničkim nazivom.
+@DataClassName('CompanyRow')
+class Companies extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  IntColumn get country =>
+      intEnum<Country>().withDefault(Constant(Country.serbia.index))();
+
+  /// Normalizovan poreski broj (isto što i `receipts.buyer_tax_id`).
+  TextColumn get taxId => text()();
+
+  /// Naziv koji je uneo korisnik (ili stigao sa CG računa); null = prikaži PIB.
+  TextColumn get name => text().nullable()();
+
+  DateTimeColumn get createdAt =>
+      dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+        {country, taxId},
+      ];
 }
 
 /// Kategorije stavki (categories).

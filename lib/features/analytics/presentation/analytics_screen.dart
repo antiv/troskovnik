@@ -18,6 +18,7 @@ import '../data/analytics_providers.dart';
 import '../data/analytics_repository.dart' show AnalyticsRepository;
 import '../domain/analytics_models.dart';
 import 'advanced_analytics_screen.dart';
+import 'widgets/company_spending_list.dart';
 
 /// Ekran analitike potrošnje (MVP, nad postojećim podacima — bez kategorija).
 class AnalyticsScreen extends ConsumerWidget {
@@ -102,6 +103,12 @@ class AnalyticsScreen extends ConsumerWidget {
                     title: l10n.analyticsBusinessSplit,
                     child: _BusinessSplitBar(split: s.businessSplit, currency: activeCurrency),
                   ),
+                  if (s.byCompany.any((c) => c.taxId != null))
+                    _Section(
+                      title: l10n.analyticsByCompany,
+                      child: CompanySpendingList(
+                          items: s.byCompany, currency: activeCurrency),
+                    ),
                   if (s.byPaymentMethod.isNotEmpty)
                     _Section(
                       title: l10n.analyticsByPayment,

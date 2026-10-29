@@ -304,6 +304,7 @@ class AdvancedAnalyticsSummary {
     required this.priceInflation,
     required this.taxBreakdown,
     required this.businessSplit,
+    this.companySpending = const [],
   });
 
   final int totalMinor;
@@ -322,6 +323,9 @@ class AdvancedAnalyticsSummary {
   final List<ItemPriceInflation> priceInflation;
   final List<TaxRateBreakdown> taxBreakdown;
   final BusinessSplit businessSplit;
+
+  /// Poslovna potrošnja po firmi kupca (PIB) u filtriranoj valuti.
+  final List<CompanySpending> companySpending;
 
   bool get isEmpty => receiptCount == 0;
 }
