@@ -38,9 +38,14 @@ class AnalyticsScreen extends ConsumerWidget {
             .whenData((s) => s.totalsByCurrency.keys.toList())
             .value ??
         const <Currency>[];
-    final activeCurrency = availableCurrencies.contains(selectedCurrency)
-        ? selectedCurrency!
-        : (availableCurrencies.isNotEmpty ? availableCurrencies.first : Currency.rsd);
+    // Valutu razrešava repozitorijum (iste brojke i oznaka); ovde samo dok se
+    // sažetak učitava.
+    final activeCurrency = summaryAsync.value?.currency ??
+        (availableCurrencies.contains(selectedCurrency)
+            ? selectedCurrency!
+            : (availableCurrencies.isNotEmpty
+                ? availableCurrencies.first
+                : Currency.rsd));
 
     return Column(
       children: [

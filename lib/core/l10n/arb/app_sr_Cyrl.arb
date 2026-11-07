@@ -303,5 +303,11 @@
   "analyticsCompanyVat": "ПДВ: {amount}",
   "@analyticsCompanyVat": { "placeholders": { "amount": { "type": "String" } } },
   "companyNameTitle": "Назив фирме",
-  "companyNameHint": "нпр. Моја фирма д.о.о."
+  "companyNameHint": "нпр. Моја фирма д.о.о.",
+  "buyerIdPib": "ПИБ",
+  "buyerIdJib": "ЈИБ",
+  "buyerIdTin": "ТИН",
+  "buyerIdJmbg": "ЈМБГ",
+  "buyerIdJmb": "ЈМБ",
+  "buyerIdDocument": "Лични документ"
 }

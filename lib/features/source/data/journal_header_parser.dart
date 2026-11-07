@@ -15,8 +15,14 @@ class JournalHeaderParser {
   static final _pibLine = RegExp(r'^\s*(\d{8,13})\s*$');
   // ИД купца (PIB/ID kupca): npr. "ИД купца:        10:104318304".
   // Grupa 1 = tip ("10" = PIB firme), grupa 2 = broj.
-  static final _buyerId =
-      RegExp(r'ИД\s+купца\s*:?\s*(\d{1,2})\s*:\s*(\d{6,})', unicode: true);
+  // Vrednost: kod + broj; broj može imati slova, razmake i crtice (strani
+  // poreski broj `40:ATU12345678`, `12:PIB:JBKJS`), pa uzimamo ceo ostatak.
+  static final _buyerId = RegExp(
+      r'ИД\s+купца\s*:?\s*(\d{1,2})\s*:\s*([0-9A-Za-z][0-9A-Za-z .\-/:]*[0-9A-Za-z])',
+      unicode: true);
+  // Linija kupca nikad ne ide u naziv/adresu prodavca, i kad vrednost nije
+  // prepoznata.
+  static final _buyerLabel = RegExp(r'ИД\s+купца', unicode: true);
   static final _cashier = RegExp(r'Касир\s*:?\s*(.*)$', unicode: true);
   static final _esir = RegExp(r'ЕСИР\s+број\s*:?\s*(.*)$', unicode: true);
   static final _pfrTime =
@@ -118,7 +124,7 @@ class JournalHeaderParser {
           i > pibIndex &&
           !_cashier.hasMatch(line) &&
           !_esir.hasMatch(line) &&
-          !_buyerId.hasMatch(line) &&
+          !_buyerLabel.hasMatch(line) &&
           trimmed.isNotEmpty &&
           !_isSeparator(trimmed) &&
           nameParts.length < 6 &&

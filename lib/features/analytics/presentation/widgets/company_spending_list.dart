@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/domain/country.dart';
+import '../../../../core/domain/buyer_identity.dart';
 import '../../../../core/domain/currency.dart';
+import '../../../../core/l10n/buyer_id_label_text.dart';
 import '../../../../core/l10n/gen/app_localizations.dart';
 import '../../../../core/utils/money_format.dart';
 import '../../../companies/data/company_providers.dart';
@@ -44,7 +45,7 @@ class CompanySpendingList extends ConsumerWidget {
                         child: Text(
                           c.taxId == null
                               ? l10n.analyticsCompanyNoTaxId
-                              : (c.name ?? '${_taxIdLabel(c.country)} ${c.taxId}'),
+                              : (c.name ?? _taxIdText(l10n, c)),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -60,7 +61,7 @@ class CompanySpendingList extends ConsumerWidget {
                   Text(
                     [
                       if (c.taxId != null && c.name != null)
-                        '${_taxIdLabel(c.country)} ${c.taxId}',
+                        _taxIdText(l10n, c),
                       l10n.analyticsReceiptCount(c.receiptCount),
                       if (c.vatMinor != 0)
                         l10n.analyticsCompanyVat(
@@ -87,15 +88,20 @@ class CompanySpendingList extends ConsumerWidget {
     );
   }
 
-  static String _taxIdLabel(Country country) =>
-      country == Country.republikaSrpska ? 'JIB' : 'PIB';
+  /// „PIB 104318304" / „JIB …" / „TIN DE123…" — ista oznaka kao na detalju
+  /// računa.
+  static String _taxIdText(AppLocalizations l10n, CompanySpending c) {
+    final label = buyerIdLabelText(
+        l10n, BuyerIdentity.taxIdLabelKind(c.country, c.taxId!));
+    return [?label, c.taxId!].join(' ');
+  }
 
   Future<void> _editName(
       BuildContext context, WidgetRef ref, CompanySpending c) async {
     final name = await showDialog<String>(
       context: context,
       builder: (_) => _CompanyNameDialog(
-        taxIdText: '${_taxIdLabel(c.country)} ${c.taxId}',
+        taxIdText: _taxIdText(AppLocalizations.of(context), c),
         name: c.name ?? '',
       ),
     );

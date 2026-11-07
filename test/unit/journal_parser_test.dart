@@ -214,4 +214,48 @@ $paymentLine
       expect(items.any((i) => i.isUnparsed), isFalse);
     });
   });
+
+  group('ИД купца — formati', () {
+    const parser = JournalHeaderParser();
+    String journal(String buyerLine) => '''
+============ ФИСКАЛНИ РАЧУН ============
+               100833134
+        OLIVA 1286772-Restoran OLIVA
+        "Омладинских бригада 86ј" 3"
+          БЕОГРАД (НОВИ БЕОГРАД)
+$buyerLine
+Касир:                          Milica
+ЕСИР број:                       1060/1.2
+-------------ПРОМЕТ ПРОДАЈА-------------
+========================================
+Укупан износ:                  31.520,00
+Пренос на рачун:               31.520,00
+========================================
+''';
+
+    String merchantFields(dynamic h) =>
+        '${h.merchantName}|${h.address}|${h.locationName}';
+
+    test('strani TIN (alfanumerički) se prepoznaje', () {
+      final h = parser.parse(journal('ИД купца:          40:ATU12345678'));
+      expect(h.buyerId, '40:ATU12345678');
+      expect(merchantFields(h), isNot(contains('купца')));
+    });
+
+    test('strani TIN sa razmakom ostaje ceo', () {
+      final h = parser.parse(journal('ИД купца:       40:DE 123456789'));
+      expect(h.buyerId, '40:DE 123456789');
+    });
+
+    test('12:PIB:JBKJS se čuva ceo', () {
+      final h = parser.parse(journal('ИД купца:     12:107271500:10520'));
+      expect(h.buyerId, '12:107271500:10520');
+    });
+
+    test('neprepoznata vrednost ne curi u naziv/adresu prodavca', () {
+      final h = parser.parse(journal('ИД купца:          ???'));
+      expect(h.buyerId, isNull);
+      expect(merchantFields(h), isNot(contains('купца')));
+    });
+  });
 }

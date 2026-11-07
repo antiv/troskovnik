@@ -74,27 +74,23 @@ class AnalyticsRepository {
     // i screen ih filtrira u Dart-u da bi picker imao sve dostupne valute.
     final monthly = await _monthly(since);
     final byMerchant = await _byMerchant(since);
-    final split = await _businessSplit(since, currency: currency);
-    final byPayment = await _byPaymentMethod(since, currency: currency);
-    final allTopItems = await _topItems(since, currency: currency, limit: null);
+    final totalsByCurrency = await _currencyTotals(byMerchant);
+
+    // Sekcije filtrirane po valuti računaju se u valuti koju ekran prikazuje.
+    // Bez ovoga bi `currency == null` (korisnik još nije birao) sabirao RSD +
+    // BAM + EUR, a ekran bi zbir formatirao kao prvu valutu.
+    final effective = resolveDisplayCurrency(currency, totalsByCurrency.keys);
+    final split = await _businessSplit(since, currency: effective);
+    final byPayment = await _byPaymentMethod(since, currency: effective);
+    final allTopItems =
+        await _topItems(since, currency: effective, limit: null);
     final topItems = allTopItems.take(10).toList();
     final totalUniqueItemsCount =
         allTopItems.where((it) => it.totalMinor > 0).length;
-    final vat = await _estimatedVat(since, currency: currency);
-    final byCategory = await _byCategory(since, currency: currency);
-    final byCompany = await _byCompany(_validAnd(since, currency: currency));
+    final vat = await _estimatedVat(since, currency: effective);
+    final byCategory = await _byCategory(since, currency: effective);
+    final byCompany = await _byCompany(_validAnd(since, currency: effective));
 
-    // Zbir po valuti — nikad ne sabiramo RSD + BAM.
-    final totalsByCurrency = <Currency, int>{};
-    for (final m in byMerchant) {
-      totalsByCurrency[m.currency] =
-          (totalsByCurrency[m.currency] ?? 0) + m.totalMinor;
-    }
-    // Osiguraj da su sve valute iz baze prisutne u mapi kako picker ne bi nestao.
-    final allDbCurrencies = await _distinctCurrencies();
-    for (final c in allDbCurrencies) {
-      totalsByCurrency.putIfAbsent(c, () => 0);
-    }
     final receiptCount =
         byMerchant.fold<int>(0, (a, m) => a + m.receiptCount);
 
@@ -110,8 +106,35 @@ class AnalyticsRepository {
       byCategory: byCategory,
       totalUniqueItemsCount: totalUniqueItemsCount,
       byCompany: byCompany,
+      currency: effective,
     );
   }
+
+  /// Valuta u kojoj se prikazuje analitika: izabrana ako za nju postoje
+  /// računi, inače prva dostupna (isti izbor kao picker na ekranu).
+  static Currency? resolveDisplayCurrency(
+          Currency? selected, Iterable<Currency> available) =>
+      available.contains(selected) ? selected : available.firstOrNull;
+
+  /// Zbir po valuti — nikad ne sabiramo RSD + BAM. Redosled ključeva određuje
+  /// podrazumevanu valutu ([resolveDisplayCurrency]).
+  Future<Map<Currency, int>> _currencyTotals(
+      List<MerchantSpending> byMerchant) async {
+    final totals = <Currency, int>{};
+    for (final m in byMerchant) {
+      totals[m.currency] = (totals[m.currency] ?? 0) + m.totalMinor;
+    }
+    // Sve valute iz baze su u mapi, da picker ne bi nestao.
+    for (final c in await _distinctCurrencies()) {
+      totals.putIfAbsent(c, () => 0);
+    }
+    return totals;
+  }
+
+  /// [resolveDisplayCurrency] za drill-down ekrane (isti period kao sažetak).
+  Future<Currency?> _displayCurrency(DateTime? since, Currency? selected) async =>
+      resolveDisplayCurrency(
+          selected, (await _currencyTotals(await _byMerchant(since))).keys);
 
   /// Detalji za jednog prodavca: zbir/broj računa, mesečni trend i top artikli.
   Future<MerchantDetail> merchantDetail(
@@ -716,7 +739,9 @@ class AnalyticsRepository {
     await _normalizer.ensureNormalized();
     final since = _since(range, now ?? DateTime.now());
     return _topItems(since,
-        categoryId: categoryId, currency: currency, limit: null);
+        categoryId: categoryId,
+        currency: await _displayCurrency(since, currency),
+        limit: null);
   }
 
   Future<List<TopItem>> _topItems(DateTime? since,
@@ -1675,9 +1700,10 @@ class AnalyticsRepository {
     final li = _db.lineItems;
     final ci = _db.canonicalItems;
     final cat = _db.categories;
+    final effective = await _displayCurrency(since, currency);
 
     final filter =
-        _validAnd(since, currency: currency) & li.isUnparsed.equals(false);
+        _validAnd(since, currency: effective) & li.isUnparsed.equals(false);
 
     final q = _db.selectOnly(li).join([
       innerJoin(r, r.id.equalsExp(li.receiptId)),

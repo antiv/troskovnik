@@ -1748,6 +1748,42 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'npr. Moja firma d.o.o.'**
   String get companyNameHint;
+
+  /// No description provided for @buyerIdPib.
+  ///
+  /// In sr, this message translates to:
+  /// **'PIB'**
+  String get buyerIdPib;
+
+  /// No description provided for @buyerIdJib.
+  ///
+  /// In sr, this message translates to:
+  /// **'JIB'**
+  String get buyerIdJib;
+
+  /// No description provided for @buyerIdTin.
+  ///
+  /// In sr, this message translates to:
+  /// **'TIN'**
+  String get buyerIdTin;
+
+  /// No description provided for @buyerIdJmbg.
+  ///
+  /// In sr, this message translates to:
+  /// **'JMBG'**
+  String get buyerIdJmbg;
+
+  /// No description provided for @buyerIdJmb.
+  ///
+  /// In sr, this message translates to:
+  /// **'JMB'**
+  String get buyerIdJmb;
+
+  /// No description provided for @buyerIdDocument.
+  ///
+  /// In sr, this message translates to:
+  /// **'Lični dokument'**
+  String get buyerIdDocument;
 }
 
 class _AppLocalizationsDelegate

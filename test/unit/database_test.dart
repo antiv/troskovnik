@@ -343,4 +343,41 @@ void main() {
       await db.close().catchError((_) {});
     });
   });
+
+  test('v10: stari računi sa PIB-om firme van `10:` postaju poslovni',
+      () async {
+    final dir = Directory.systemTemp.createTempSync('db_v10_biz_');
+    addTearDown(() => dir.deleteSync(recursive: true));
+    final file = File('${dir.path}/app.db');
+    final fresh = AppDatabase(NativeDatabase(file));
+    await fresh.customSelect('SELECT 1').get();
+    await fresh.close();
+    final raw = sqlite3.open(file.path);
+    raw.execute("INSERT INTO merchants (id, tin, name) VALUES (1, '100', 'M')");
+    for (final (id, buyer, biz) in [
+      (1, '12:107271500:10520', 0), // nikad auto-označen → postaje poslovni
+      (2, '10:104318304', 0), // korisnik isključio → ostaje lični
+      (3, '11:0101990800000', 0), // JMBG → ostaje lični
+      (4, '12:104318304', 1), // već poslovni
+    ]) {
+      raw.execute('INSERT INTO receipts (id, merchant_id, verification_url, '
+          "buyer_id, is_business) VALUES ($id, 1, 'u$id', '$buyer', $biz)");
+    }
+    for (final s in [
+      'DROP TABLE companies',
+      'ALTER TABLE receipts DROP COLUMN buyer_tax_id',
+      'PRAGMA user_version = 8',
+    ]) {
+      raw.execute(s);
+    }
+    raw.dispose();
+
+    final upgraded = AppDatabase(NativeDatabase(file));
+    addTearDown(upgraded.close);
+    final rows = await (upgraded.select(upgraded.receipts)
+          ..orderBy([(r) => OrderingTerm.asc(r.id)]))
+        .get();
+    expect(rows.map((r) => r.isBusiness), [true, false, false, true]);
+    expect(rows[0].buyerTaxId, '107271500');
+  });
 }

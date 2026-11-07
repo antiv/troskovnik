@@ -885,4 +885,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get companyNameHint => 'e.g. My Company Ltd.';
+
+  @override
+  String get buyerIdPib => 'PIB';
+
+  @override
+  String get buyerIdJib => 'JIB';
+
+  @override
+  String get buyerIdTin => 'TIN';
+
+  @override
+  String get buyerIdJmbg => 'JMBG';
+
+  @override
+  String get buyerIdJmb => 'JMB';
+
+  @override
+  String get buyerIdDocument => 'ID document';
 }

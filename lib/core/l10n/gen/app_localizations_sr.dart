@@ -889,6 +889,24 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get companyNameHint => 'npr. Moja firma d.o.o.';
+
+  @override
+  String get buyerIdPib => 'PIB';
+
+  @override
+  String get buyerIdJib => 'JIB';
+
+  @override
+  String get buyerIdTin => 'TIN';
+
+  @override
+  String get buyerIdJmbg => 'JMBG';
+
+  @override
+  String get buyerIdJmb => 'JMB';
+
+  @override
+  String get buyerIdDocument => 'Lični dokument';
 }
 
 /// The translations for Serbian, using the Cyrillic script (`sr_Cyrl`).
@@ -1776,4 +1794,22 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
 
   @override
   String get companyNameHint => 'нпр. Моја фирма д.о.о.';
+
+  @override
+  String get buyerIdPib => 'ПИБ';
+
+  @override
+  String get buyerIdJib => 'ЈИБ';
+
+  @override
+  String get buyerIdTin => 'ТИН';
+
+  @override
+  String get buyerIdJmbg => 'ЈМБГ';
+
+  @override
+  String get buyerIdJmb => 'ЈМБ';
+
+  @override
+  String get buyerIdDocument => 'Лични документ';
 }

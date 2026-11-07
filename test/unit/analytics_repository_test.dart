@@ -505,5 +505,42 @@ void main() {
       expect(item.percentChange, closeTo(20.0, 0.01));
     });
   });
-}
 
+  test('bez izabrane valute sekcije se računaju u prikaznoj valuti, ne zbirno',
+      () async {
+    final m = await merchant('100', 'Maxi');
+    final mRs = await merchant('4400000000099', 'Market RS');
+    Future<void> biz(int merchantId, int total, String taxId, Country c) =>
+        db.into(db.receipts).insert(ReceiptsCompanion.insert(
+              merchantId: merchantId,
+              verificationUrl: 'u${DateTime.now().microsecondsSinceEpoch}',
+              pfrTime: Value(DateTime(2026, 3, 1)),
+              totalAmount: Value(total),
+              isBusiness: const Value(true),
+              buyerTaxId: Value(taxId),
+              country: Value(c),
+              currency: Value(c.currency),
+              fetchStatus: const Value(FetchStatus.complete),
+            ));
+    await biz(m, 100000, '104318304', Country.serbia);
+    await biz(mRs, 5000, '4400000000001', Country.republikaSrpska);
+
+    final s = await repo.loadSummary(AnalyticsRange.all,
+        now: DateTime(2026, 4, 1));
+    expect(s.currency, Currency.rsd); // najveća potrošnja = prva valuta
+    expect(s.byCompany.map((c) => c.taxId), ['104318304']);
+    expect(s.businessSplit.businessMinor, 100000);
+
+    // Izabrana valuta bez računa → prva dostupna (isto kao picker).
+    final s2 = await repo.loadSummary(AnalyticsRange.all,
+        now: DateTime(2026, 4, 1), currency: Currency.eur);
+    expect(s2.currency, Currency.rsd);
+    expect(s2.byCompany.single.taxId, '104318304');
+
+    final bam = await repo.loadSummary(AnalyticsRange.all,
+        now: DateTime(2026, 4, 1), currency: Currency.bam);
+    expect(bam.currency, Currency.bam);
+    expect(bam.byCompany.single.taxId, '4400000000001');
+    expect(bam.businessSplit.businessMinor, 5000);
+  });
+}

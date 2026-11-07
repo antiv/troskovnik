@@ -17,6 +17,9 @@ enum BuyerKind {
   unknown,
 }
 
+/// Oznaka vrste broja za prikaz (prevodi se u UI-ju, vidi `buyerIdLabelText`).
+enum BuyerIdLabel { pib, jib, tin, jmbg, jmb, document, none }
+
 /// Tumači sirovu identifikaciju kupca sa fiskalnog računa (`ReceiptRow.buyerId`).
 ///
 /// - **Srbija i Republika Srpska (TaxCore):** „ИД купца" u obliku `kod:broj`.
@@ -52,7 +55,7 @@ class BuyerIdentity {
   /// kad kupac nije firma.
   String? get taxId => isBusiness ? number : null;
 
-  static final _taxCore = RegExp(r'^\s*(\d{1,2})\s*:\s*([0-9A-Za-z]+)');
+  static final _taxCore = RegExp(r'^\s*(\d{1,2})\s*:\s*(\S.*?)\s*$');
   static final _efi = RegExp(r'^\s*([A-Za-z]+)\s*:\s*(\S+)');
 
   /// Parsira sirov `buyerId` za datu zemlju. Null kad nema identifikacije.
@@ -71,7 +74,12 @@ class BuyerIdentity {
           kind: BuyerKind.unknown, code: '', number: raw.trim());
     }
     final code = m.group(1)!;
-    final number = m.group(2)!;
+    final rest = m.group(2)!;
+    // Strani poreski broj (40) ume da ima slova, razmake i crtice — ceo broj,
+    // normalizovan da se ista firma uvek grupiše pod istim ključem. Za ostale
+    // kodove broj je deo do sledeće dvotačke (`12:PIB:JBKJS` → PIB).
+    final number =
+        code == '40' ? normalizeForeignTaxId(rest) : rest.split(':').first.trim();
     final kind = switch (code) {
       '10' || '12' => _companyOrPerson(number, country),
       '11' => BuyerKind.person,
@@ -110,13 +118,30 @@ class BuyerIdentity {
     return BuyerIdentity(kind: kind, code: code, number: m.group(2)!);
   }
 
-  /// Naziv tipa broja za prikaz (PIB, JIB, JMBG, ...).
-  String label(Country country) => switch (kind) {
-        BuyerKind.company => country == Country.republikaSrpska ? 'JIB' : 'PIB',
-        BuyerKind.foreignCompany => 'TIN',
-        BuyerKind.person => country == Country.republikaSrpska ? 'JMB' : 'JMBG',
-        BuyerKind.document || BuyerKind.unknown => code,
+  /// Strani poreski broj bez razmaka/crtica/tačaka, velikim slovima
+  /// (`de 123-456.789` → `DE123456789`).
+  static String normalizeForeignTaxId(String raw) =>
+      raw.replaceAll(RegExp(r'[\s.\-/]'), '').toUpperCase();
+
+  /// Vrsta broja za prikaz (PIB, JIB, JMBG, ...).
+  BuyerIdLabel labelKind(Country country) => switch (kind) {
+        BuyerKind.company =>
+          country == Country.republikaSrpska ? BuyerIdLabel.jib : BuyerIdLabel.pib,
+        BuyerKind.foreignCompany => BuyerIdLabel.tin,
+        BuyerKind.person =>
+          country == Country.republikaSrpska ? BuyerIdLabel.jmb : BuyerIdLabel.jmbg,
+        BuyerKind.document => BuyerIdLabel.document,
+        BuyerKind.unknown => BuyerIdLabel.none,
       };
+
+  /// Vrsta broja za sačuvan poreski broj firme (tabela firmi ne čuva vrstu):
+  /// broj sa slovima je strani TIN, inače PIB (Srbija/CG) odnosno JIB (RS).
+  static BuyerIdLabel taxIdLabelKind(Country country, String taxId) =>
+      RegExp(r'[^0-9]').hasMatch(taxId)
+          ? BuyerIdLabel.tin
+          : (country == Country.republikaSrpska
+              ? BuyerIdLabel.jib
+              : BuyerIdLabel.pib);
 
   /// Broj za prikaz; lični brojevi se maskiraju osim poslednje 4 cifre.
   String get maskedNumber {

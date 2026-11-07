@@ -142,6 +142,15 @@ class AppDatabase extends _$AppDatabase {
             await _addColumnIfMissing('receipts', 'buyer_tax_id', 'TEXT');
             await m.createTable(companies);
             await _backfillBuyerTaxIds();
+            // Stara logika je auto-poslovnim označavala samo `10:` (PIB).
+            // Ostali računi sa PIB-om firme (npr. `12:PIB:JBKJS`) nikad nisu
+            // automatski označeni, pa njihova 0 nije svestan izbor korisnika —
+            // označi ih sada, kao što se radi i za nove račune. `10:` računi
+            // ostaju netaknuti (tamo je 0 = korisnik je isključio „poslovni").
+            await customStatement(
+                'UPDATE receipts SET is_business = 1 '
+                'WHERE buyer_tax_id IS NOT NULL AND is_business = 0 '
+                "AND buyer_id NOT LIKE '10:%'");
           }
         },
       );

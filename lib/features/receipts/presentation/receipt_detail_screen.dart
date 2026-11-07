@@ -11,6 +11,7 @@ import '../../../core/db/database.dart'
 import '../../../core/db/enums.dart';
 import '../../../core/domain/buyer_identity.dart';
 import '../../../core/domain/currency.dart';
+import '../../../core/l10n/buyer_id_label_text.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/utils/money_format.dart';
 import '../../categories/data/category_providers.dart';
@@ -169,11 +170,13 @@ class _DetailBody extends ConsumerWidget {
   const _DetailBody({required this.detail});
   final ReceiptDetail detail;
 
-  /// „PIB 104318304 · Naziv firme"; lični brojevi (JMBG) se maskiraju.
-  static String _buyerText(WidgetRef ref, ReceiptRow r) {
+  /// „PIB 104318304 · Naziv firme"; lični brojevi (JMBG) i nepoznat format se
+  /// maskiraju, a prazna oznaka se izostavlja.
+  static String _buyerText(WidgetRef ref, AppLocalizations l10n, ReceiptRow r) {
     final buyer = BuyerIdentity.parse(r.buyerId, r.country);
     if (buyer == null) return r.buyerId!;
-    final text = '${buyer.label(r.country)} ${buyer.maskedNumber}';
+    final label = buyerIdLabelText(l10n, buyer.labelKind(r.country));
+    final text = [?label, buyer.maskedNumber].join(' ');
     final taxId = buyer.taxId;
     if (taxId == null) return text;
     final name = ref.watch(companyProvider((r.country, taxId))).value?.name;
@@ -198,8 +201,11 @@ class _DetailBody extends ConsumerWidget {
         if (detail.merchant.address != null)
           Text(detail.merchant.address!),
         const SizedBox(height: 4),
-        if (!r.isManual) Text('PIB: ${detail.merchant.tin}'),
-        if (r.buyerId != null) Text('${l10n.detailBuyerId}: ${_buyerText(ref, r)}'),
+        if (!r.isManual)
+          Text('${buyerIdLabelText(l10n, BuyerIdentity.taxIdLabelKind(r.country, detail.merchant.tin))}: '
+              '${detail.merchant.tin}'),
+        if (r.buyerId != null)
+          Text('${l10n.detailBuyerId}: ${_buyerText(ref, l10n, r)}'),
         if (r.pfrNumber != null) Text('${l10n.manualPfrNumber}: ${r.pfrNumber}'),
         if (r.pfrTime != null)
           r.isManual

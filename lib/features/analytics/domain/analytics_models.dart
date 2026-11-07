@@ -124,7 +124,12 @@ class AnalyticsSummary {
     required this.byCategory,
     this.totalUniqueItemsCount = 0,
     this.byCompany = const [],
+    this.currency,
   });
+
+  /// Valuta u kojoj su izračunate sekcije filtrirane po valuti (izabrana ili
+  /// prva dostupna); null samo kad nema računa.
+  final Currency? currency;
 
   /// Ukupan iznos po valuti — nikad se ne sabiraju različite valute.
   final Map<Currency, int> totalsByCurrency;

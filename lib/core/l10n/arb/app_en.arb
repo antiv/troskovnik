@@ -303,5 +303,11 @@
   "analyticsCompanyVat": "VAT: {amount}",
   "@analyticsCompanyVat": { "placeholders": { "amount": { "type": "String" } } },
   "companyNameTitle": "Company name",
-  "companyNameHint": "e.g. My Company Ltd."
+  "companyNameHint": "e.g. My Company Ltd.",
+  "buyerIdPib": "PIB",
+  "buyerIdJib": "JIB",
+  "buyerIdTin": "TIN",
+  "buyerIdJmbg": "JMBG",
+  "buyerIdJmb": "JMB",
+  "buyerIdDocument": "ID document"
 }
