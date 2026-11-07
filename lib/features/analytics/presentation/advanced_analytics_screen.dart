@@ -12,6 +12,7 @@ import 'widgets/advanced_filter_bar.dart';
 import 'widgets/basket_size_card.dart';
 import 'widgets/category_donut_chart.dart';
 import 'widgets/category_trend_chart.dart';
+import 'widgets/company_spending_list.dart';
 import 'widgets/day_of_week_chart.dart';
 import 'widgets/merchant_matrix_view.dart';
 import 'widgets/mom_comparison_card.dart';
@@ -214,6 +215,28 @@ class AdvancedAnalyticsScreen extends ConsumerWidget {
                                 .read(advancedAnalyticsFilterProvider.notifier)
                                 .setBusinessFilter(bf),
                           ),
+                          if (s.companySpending.any((c) => c.taxId != null)) ...[
+                            const SizedBox(height: 16),
+                            Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(l10n.analyticsByCompany,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium),
+                                    const SizedBox(height: 8),
+                                    CompanySpendingList(
+                                      items: s.companySpending,
+                                      currency: filter.currency,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                           const SizedBox(height: 24),
                         ],
                       ),

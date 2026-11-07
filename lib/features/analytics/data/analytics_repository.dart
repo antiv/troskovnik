@@ -5,6 +5,7 @@ import 'package:drift/drift.dart';
 
 import '../../../core/db/database.dart';
 import '../../../core/db/enums.dart';
+import '../../../core/domain/country.dart';
 import '../../../core/domain/currency.dart';
 import '../../categories/domain/category_models.dart';
 import '../domain/advanced_analytics_models.dart';
@@ -43,7 +44,7 @@ class AnalyticsRepository {
         .customSelect(
           'SELECT (SELECT count(*) FROM receipts) AS r, '
           '(SELECT count(*) FROM line_items) AS i',
-          readsFrom: {_db.receipts, _db.lineItems, _db.merchants},
+          readsFrom: {_db.receipts, _db.lineItems, _db.merchants, _db.companies},
         )
         .watch();
     return trigger.asyncMap((_) => loadSummary(range, now: now, currency: currency));
@@ -66,6 +67,7 @@ class AnalyticsRepository {
     final topItems = await _topItems(since, currency: currency);
     final vat = await _estimatedVat(since, currency: currency);
     final byCategory = await _byCategory(since, currency: currency);
+    final byCompany = await _byCompany(_validAnd(since, currency: currency));
 
     // Zbir po valuti — nikad ne sabiramo RSD + BAM.
     final totalsByCurrency = <Currency, int>{};
@@ -91,6 +93,7 @@ class AnalyticsRepository {
       byPaymentMethod: byPayment,
       topItems: topItems,
       byCategory: byCategory,
+      byCompany: byCompany,
     );
   }
 
@@ -491,7 +494,13 @@ class AnalyticsRepository {
           'SELECT (SELECT count(*) FROM receipts) AS r, '
           '(SELECT count(*) FROM line_items) AS i, '
           '(SELECT count(*) FROM categories) AS c',
-          readsFrom: {_db.receipts, _db.lineItems, _db.merchants, _db.categories},
+          readsFrom: {
+            _db.receipts,
+            _db.lineItems,
+            _db.merchants,
+            _db.categories,
+            _db.companies,
+          },
         )
         .watch();
     return trigger.asyncMap((_) => loadAdvancedSummary(filter, now: now));
@@ -546,6 +555,10 @@ class AnalyticsRepository {
     // 9. Poslovno vs Lično.
     final businessSplit = await _loadAdvancedBusinessSplit(from, to, filter.currency);
 
+    // 10. Po firmama kupca (PIB) — nezavisno od filtera poslovno/lično.
+    final companySpending = await _byCompany(_advancedFilterExpr(
+        from, to, filter.copyWith(businessFilter: AnalyticsBusinessFilter.all)));
+
     return AdvancedAnalyticsSummary(
       totalMinor: totalMinor,
       receiptCount: receiptCount,
@@ -563,7 +576,60 @@ class AnalyticsRepository {
       priceInflation: priceInflation,
       taxBreakdown: taxBreakdown,
       businessSplit: businessSplit,
+      companySpending: companySpending,
     );
+  }
+
+  /// Poslovni računi grupisani po firmi kupca (zemlja + PIB), sa procenjenim
+  /// PDV-om iz stavki. Poslovni računi bez PIB-a idu u jedan red (taxId null).
+  Future<List<CompanySpending>> _byCompany(Expression<bool> filter) async {
+    final r = _db.receipts;
+    final li = _db.lineItems;
+    final where = filter & r.isBusiness.equals(true);
+    final countryExpr = r.country.dartCast<int>();
+
+    final total = r.totalAmount.sum();
+    final cnt = r.id.count();
+    final q = _db.selectOnly(r)
+      ..addColumns([countryExpr, r.buyerTaxId, total, cnt])
+      ..where(where)
+      ..groupBy([countryExpr, r.buyerTaxId])
+      ..orderBy([OrderingTerm(expression: total, mode: OrderingMode.desc)]);
+    final rows = await q.get();
+    if (rows.isEmpty) return const [];
+
+    // PDV po firmi: isti obračun kao _loadTaxBreakdown (bruto → osnovica).
+    final vatQ = _db.selectOnly(li).join([
+      innerJoin(r, r.id.equalsExp(li.receiptId)),
+    ])
+      ..addColumns([countryExpr, r.buyerTaxId, li.total, li.taxRate])
+      ..where(where & li.isUnparsed.equals(false) & li.taxRate.isNotNull());
+    final vatByKey = <(int, String?), int>{};
+    for (final row in await vatQ.get()) {
+      final rate = row.read(li.taxRate)!;
+      final itemTotal = row.read(li.total) ?? 0;
+      final key = (row.read(countryExpr) ?? 0, row.read(r.buyerTaxId));
+      final vat = itemTotal - (itemTotal / (1 + rate / 100)).round();
+      vatByKey[key] = (vatByKey[key] ?? 0) + vat;
+    }
+
+    final names = <(int, String), String>{};
+    for (final c in await _db.select(_db.companies).get()) {
+      if (c.name != null) names[(c.country.index, c.taxId)] = c.name!;
+    }
+
+    return rows.map((row) {
+      final countryIdx = row.read(countryExpr) ?? 0;
+      final taxId = row.read(r.buyerTaxId);
+      return CompanySpending(
+        country: Country.values[countryIdx],
+        taxId: taxId,
+        name: taxId == null ? null : names[(countryIdx, taxId)],
+        totalMinor: row.read(total) ?? 0,
+        receiptCount: row.read(cnt) ?? 0,
+        vatMinor: vatByKey[(countryIdx, taxId)] ?? 0,
+      );
+    }).toList();
   }
 
   (DateTime? from, DateTime? to) _advancedRangeBounds(

@@ -1,4 +1,4 @@
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart';
@@ -80,7 +80,7 @@ void main() {
     );
   });
 
-  test('onUpgrade from v6 to v8 backfills country and currency based on verification_url', () async {
+  test('onUpgrade from v6 backfills country/currency and buyer companies', () async {
     final rawDb = sqlite3.openInMemory();
     rawDb.execute('''
       PRAGMA user_version = 6;
@@ -159,7 +159,8 @@ void main() {
       INSERT INTO merchants (id, tin, name) VALUES (1, '123456789', 'Test Merchant');
       INSERT INTO receipts (id, merchant_id, verification_url) VALUES (1, 1, 'https://suf.poreskaupravars.org/v/?vl=RS_TOKEN');
       INSERT INTO receipts (id, merchant_id, verification_url) VALUES (2, 1, 'https://tax.gov.me/v/?vl=ME_TOKEN');
-      INSERT INTO receipts (id, merchant_id, verification_url) VALUES (3, 1, 'https://suf.purs.gov.rs/v/?vl=SR_TOKEN');
+      INSERT INTO receipts (id, merchant_id, verification_url, buyer_id) VALUES (3, 1, 'https://suf.purs.gov.rs/v/?vl=SR_TOKEN', '10:104318304');
+      INSERT INTO receipts (id, merchant_id, verification_url, buyer_id) VALUES (4, 1, 'https://suf.purs.gov.rs/v/?vl=SR_JMBG', '11:0101990800000');
     ''');
 
     // Close db from setUp before opening test upgrade db.
@@ -171,12 +172,20 @@ void main() {
           ..orderBy([(r) => OrderingTerm.asc(r.id)]))
         .get();
 
-    expect(receipts, hasLength(3));
+    expect(receipts, hasLength(4));
     expect(receipts[0].country, Country.republikaSrpska);
     expect(receipts[0].currency, Currency.bam);
     expect(receipts[1].country, Country.montenegro);
     expect(receipts[1].currency, Currency.eur);
     expect(receipts[2].country, Country.serbia);
     expect(receipts[2].currency, Currency.rsd);
+
+    // v9: PIB kupca → buyer_tax_id + firma; JMBG ne. isBusiness se ne dira.
+    expect(receipts[2].buyerTaxId, '104318304');
+    expect(receipts[2].isBusiness, isFalse);
+    expect(receipts[3].buyerTaxId, isNull);
+    final companies = await upgradeDb.select(upgradeDb.companies).get();
+    expect(companies.single.taxId, '104318304');
+    expect(companies.single.country, Country.serbia);
   });
 }

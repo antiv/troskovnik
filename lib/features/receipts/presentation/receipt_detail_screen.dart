@@ -6,14 +6,17 @@ import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/db/database.dart' show LineItemRow, LineItemsCompanion;
+import '../../../core/db/database.dart'
+    show LineItemRow, LineItemsCompanion, ReceiptRow;
 import '../../../core/db/enums.dart';
+import '../../../core/domain/buyer_identity.dart';
 import '../../../core/domain/currency.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/utils/money_format.dart';
 import '../../categories/data/category_providers.dart';
 import '../../categories/presentation/category_picker_sheet.dart';
 import '../../categories/presentation/category_tag.dart';
+import '../../companies/data/company_providers.dart';
 import '../../scan/presentation/manual_expense_screen.dart';
 import '../../warranties/presentation/add_warranty_sheet.dart';
 import '../data/receipt_providers.dart';
@@ -166,6 +169,17 @@ class _DetailBody extends ConsumerWidget {
   const _DetailBody({required this.detail});
   final ReceiptDetail detail;
 
+  /// „PIB 104318304 · Naziv firme"; lični brojevi (JMBG) se maskiraju.
+  static String _buyerText(WidgetRef ref, ReceiptRow r) {
+    final buyer = BuyerIdentity.parse(r.buyerId, r.country);
+    if (buyer == null) return r.buyerId!;
+    final text = '${buyer.label(r.country)} ${buyer.maskedNumber}';
+    final taxId = buyer.taxId;
+    if (taxId == null) return text;
+    final name = ref.watch(companyProvider((r.country, taxId))).value?.name;
+    return name == null ? text : '$text · $name';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
@@ -185,8 +199,7 @@ class _DetailBody extends ConsumerWidget {
           Text(detail.merchant.address!),
         const SizedBox(height: 4),
         if (!r.isManual) Text('PIB: ${detail.merchant.tin}'),
-        if (r.buyerId != null)
-          Text('${l10n.detailBuyerId}: ${r.buyerId}'),
+        if (r.buyerId != null) Text('${l10n.detailBuyerId}: ${_buyerText(ref, r)}'),
         if (r.pfrNumber != null) Text('${l10n.manualPfrNumber}: ${r.pfrNumber}'),
         if (r.pfrTime != null)
           r.isManual

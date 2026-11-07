@@ -744,4 +744,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get detailDiscrepancyWarning =>
       'Warning: parsed data does not match fiscal server data. Please verify this receipt.';
+
+  @override
+  String get analyticsByCompany => 'By company (tax ID)';
+
+  @override
+  String get analyticsCompanyNoTaxId => 'Business without company tax ID';
+
+  @override
+  String analyticsCompanyVat(String amount) {
+    return 'VAT: $amount';
+  }
+
+  @override
+  String get companyNameTitle => 'Company name';
+
+  @override
+  String get companyNameHint => 'e.g. My Company Ltd.';
 }

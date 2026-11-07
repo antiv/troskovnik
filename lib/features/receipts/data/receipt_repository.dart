@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import '../../../core/db/database.dart';
 import '../../../core/db/enums.dart';
+import '../../../core/domain/buyer_identity.dart';
 import '../../../core/domain/country.dart';
 import '../../../core/domain/currency.dart';
 import '../../scan/domain/ips_qr.dart';
@@ -27,11 +28,6 @@ class ReceiptRepository {
 
   /// Pristup bazi za jednostavna ažuriranja iz UI-ja (npr. oznaka „poslovni", beleška).
   AppDatabase get db => _db;
-
-  /// Račun je „poslovni" ako je kupac identifikovan PIB-om firme (tip „10").
-  /// JMBG/lična dokumenta (drugi tipovi) se ne računaju kao poslovni.
-  static bool isBusinessFromBuyer(String? buyerId) =>
-      buyerId?.startsWith('10:') ?? false;
 
   /// Postavi/oslobodi oznaku „poslovni račun".
   Future<void> setBusiness(int receiptId, bool value, {DateTime? now}) =>
@@ -83,6 +79,9 @@ class ReceiptRepository {
           ? _retryPolicy.nextRetryAt(0, from: ts)
           : null;
 
+      final buyer = BuyerIdentity.parse(header?.buyerId, country);
+      await _upsertCompany(buyer, country, header?.buyerName);
+
       final receiptId = await _db.into(_db.receipts).insert(
             ReceiptsCompanion.insert(
               merchantId: merchantId,
@@ -91,7 +90,8 @@ class ReceiptRepository {
               invoiceNumber: Value(header?.invoiceNumber),
               pfrNumber: Value(header?.pfrNumber),
               buyerId: Value(header?.buyerId),
-              isBusiness: Value(isBusinessFromBuyer(header?.buyerId)),
+              buyerTaxId: Value(buyer?.taxId),
+              isBusiness: Value(buyer?.isBusiness ?? false),
               pfrTime: Value(header?.pfrTime),
               invoiceCounter: Value(header?.invoiceCounter),
               transactionType:
@@ -147,9 +147,16 @@ class ReceiptRepository {
       final header = parsed.header;
 
       // Žurnal (sa PIB-om kupca) stiže tek na refetch-u: popuni buyerId ako
-      // je još prazan. NE diramo isBusiness — auto-postavka važi samo pri prvom
-      // upisu, da se poštuje eventualni ručni izbor korisnika.
+      // je još prazan. Tada i auto-označi „poslovni" — dok kupac nije bio
+      // poznat korisnik nije mogao svesno da bira. Kad je buyerId već postojao,
+      // isBusiness se ne dira (poštuje se ručni izbor).
       final newBuyerId = current.buyerId ?? header?.buyerId;
+      final lateBuyer = current.buyerId == null
+          ? BuyerIdentity.parse(header?.buyerId, current.country)
+          : null;
+      if (lateBuyer != null) {
+        await _upsertCompany(lateBuyer, current.country, header?.buyerName);
+      }
       final newPaymentMethod = current.paymentMethod ?? header?.paymentMethod;
       final newPaymentsJson = current.paymentsJson ?? header?.paymentsJson;
 
@@ -192,6 +199,12 @@ class ReceiptRepository {
         taxJson:
             needsHeaderBackfill ? Value(header.taxJson) : const Value.absent(),
         buyerId: Value(newBuyerId),
+        buyerTaxId: lateBuyer != null
+            ? Value(lateBuyer.taxId)
+            : const Value.absent(),
+        isBusiness: lateBuyer?.isBusiness == true
+            ? const Value(true)
+            : const Value.absent(),
         paymentMethod: Value(newPaymentMethod),
         paymentsJson: Value(newPaymentsJson),
         journalText: Value(parsed.journalText ?? current.journalText),
@@ -333,6 +346,26 @@ class ReceiptRepository {
         );
       }
     });
+  }
+
+  /// Upiši firmu kupca ako ne postoji; naziv (CG) popunjava samo prazan naziv.
+  Future<void> _upsertCompany(
+      BuyerIdentity? buyer, Country country, String? name) async {
+    final taxId = buyer?.taxId;
+    if (taxId == null) return;
+    final existing = await (_db.select(_db.companies)
+          ..where((c) => c.country.equalsValue(country) & c.taxId.equals(taxId)))
+        .getSingleOrNull();
+    if (existing == null) {
+      await _db.into(_db.companies).insert(CompaniesCompanion.insert(
+            country: Value(country),
+            taxId: taxId,
+            name: Value(name),
+          ));
+    } else if (existing.name == null && name != null) {
+      await (_db.update(_db.companies)..where((c) => c.id.equals(existing.id)))
+          .write(CompaniesCompanion(name: Value(name)));
+    }
   }
 
   Future<int> _upsertMerchant(ReceiptHeader header, DateTime ts) async {

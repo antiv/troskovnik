@@ -9,7 +9,8 @@ import '../../../core/db/enums.dart';
 ///
 /// URL format: https://mapr.tax.gov.me/ic/#/verify?iic=...&tin=...&crtd=...
 /// API: POST /ic/api/verifyInvoice sa form-data iic/tin/dateTimeCreated.
-/// Odgovor: JSON s `seller`, `items[]`, `paymentMethod[]`, `totalPrice` (EUR).
+/// Odgovor: JSON s `seller`, `buyer` (samo B2B), `items[]`, `paymentMethod[]`,
+/// `totalPrice` (EUR).
 class MneClient implements ReceiptSource {
   MneClient({Dio? dio})
       : _dio = dio ??
@@ -104,9 +105,23 @@ class MneClient implements ReceiptSource {
 
     final sign = transactionType == TransactionType.refund ? -1 : 1;
 
+    // Kupac (obavezan na bezgotovinskim B2B računima): EFI `IDType` + `IDNum`.
+    final buyer = json['buyer'] as Map<String, dynamic>?;
+    final buyerIdType = (buyer?['idType'] as String?)?.trim();
+    final buyerIdNum = (buyer?['idNum'] as String?)?.trim();
+    final buyerName = (buyer?['name'] as String?)?.trim();
+    final hasBuyer = buyerIdType != null &&
+        buyerIdType.isNotEmpty &&
+        buyerIdNum != null &&
+        buyerIdNum.isNotEmpty;
+
     final header = ReceiptHeader(
       merchantTin: tin,
       merchantName: name,
+      buyerId: hasBuyer ? '$buyerIdType:$buyerIdNum' : null,
+      buyerName: hasBuyer && buyerName != null && buyerName.isNotEmpty
+          ? buyerName
+          : null,
       pfrNumber: invoiceNumber,
       pfrTime: pfrTime,
       totalAmount: sign * _toCents(totalEur),
