@@ -265,4 +265,82 @@ void main() {
       ]));
     });
   });
+
+  group('pozadinski izolat ne migrira', () {
+    Future<File> v8File() async {
+      final dir = Directory.systemTemp.createTempSync('db_guard_');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      final file = File('${dir.path}/app.db');
+      final fresh = AppDatabase(NativeDatabase(file));
+      await fresh.customSelect('SELECT 1').get();
+      await fresh.close();
+      final raw = sqlite3.open(file.path);
+      raw.execute('PRAGMA user_version = 8');
+      raw.dispose();
+      return file;
+    }
+
+    AppDatabase guarded(File f) =>
+        AppDatabase(NativeDatabase(f, setup: throwIfMigrationPending));
+
+    test('stara šema: baca DatabaseMigrationPendingException i ne dira bazu',
+        () async {
+      final file = await v8File();
+      final worker = guarded(file);
+      Object? error;
+      try {
+        await worker.customSelect('SELECT 1').get();
+      } catch (e) {
+        error = e;
+      }
+      await worker.close().catchError((_) {});
+      expect(error, isNotNull);
+      expect(isMigrationPendingError(error!), isTrue);
+      expect(shouldSkipBackgroundRun(error), isTrue);
+      final raw = sqlite3.open(file.path);
+      addTearDown(raw.dispose);
+      expect(raw.select('PRAGMA user_version').first.values.first, 8);
+    });
+
+    test('posle migracije aplikacije worker normalno radi', () async {
+      final file = await v8File();
+      final app = await openAppDatabaseWithRetry(
+          () => AppDatabase(NativeDatabase(file)));
+      await app.close();
+      final worker = guarded(file);
+      addTearDown(worker.close);
+      expect(await worker.select(worker.receipts).get(), isEmpty);
+    });
+  });
+
+  group('openAppDatabaseWithRetry', () {
+    test('ponavlja posle prolazne greške', () async {
+      var calls = 0;
+      final db = await openAppDatabaseWithRetry(() {
+        calls++;
+        return AppDatabase(NativeDatabase.memory(setup: (d) {
+          if (calls == 1) {
+            throw SqliteException(5, 'database is locked');
+          }
+        }));
+      }, delay: Duration.zero);
+      addTearDown(db.close);
+      expect(calls, 2);
+      expect(await db.select(db.receipts).get(), isEmpty);
+    });
+
+    test('druga greška: vraća neotvorenu instancu (greška na prvom upitu)',
+        () async {
+      var calls = 0;
+      final db = await openAppDatabaseWithRetry(() {
+        calls++;
+        return AppDatabase(NativeDatabase.memory(setup: (d) {
+          throw SqliteException(26, 'file is not a database');
+        }));
+      }, delay: Duration.zero);
+      expect(calls, 2); // jedan pokušaj + sveža lenja instanca
+      await expectLater(db.select(db.receipts).get(), throwsA(anything));
+      await db.close().catchError((_) {});
+    });
+  });
 }

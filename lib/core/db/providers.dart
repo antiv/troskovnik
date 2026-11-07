@@ -19,7 +19,9 @@ final appDatabaseProvider = FutureProvider<AppDatabase>((ref) async {
   final file = await encryptedDbFile();
   final key =
       await keyManager.keyForDatabase(databaseExists: file.existsSync());
-  final db = AppDatabase.encrypted(key);
+  // Otvori (i migriraj) odmah, uz ponovni pokušaj ako se baš tada sudari sa
+  // pozadinskim izolatom.
+  final db = await openAppDatabaseWithRetry(() => AppDatabase.encrypted(key));
   ref.onDispose(db.close);
   return db;
 });

@@ -7,6 +7,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlcipher_flutter_libs/sqlcipher_flutter_libs.dart';
 import 'package:sqlite3/open.dart';
+import 'package:sqlite3/sqlite3.dart' show Database, SqliteException;
 
 import '../domain/buyer_identity.dart';
 import '../domain/country.dart';
@@ -33,9 +34,19 @@ class AppDatabase extends _$AppDatabase {
   bool _dictionarySeeded = false;
   Future<void>? _normalizationLock;
 
+  /// Trenutna verzija šeme (vidi [schemaVersion]).
+  static const int currentSchemaVersion = 10;
+
   /// Otvara enkriptovanu bazu sa datim ključem (iz secure storage).
-  factory AppDatabase.encrypted(String encryptionKey) =>
-      AppDatabase(_openEncrypted(encryptionKey));
+  ///
+  /// [allowMigration] = false za pozadinski izolat (WorkManager): ako baza još
+  /// nije na [currentSchemaVersion], otvaranje baca
+  /// [DatabaseMigrationPendingException] umesto da migrira — migraciju radi
+  /// isključivo aplikacija, pa se dva izolata nikad ne sudare u njoj.
+  factory AppDatabase.encrypted(String encryptionKey,
+          {bool allowMigration = true}) =>
+      AppDatabase(
+          _openEncrypted(encryptionKey, allowMigration: allowMigration));
 
   /// In-memory baza za testove, sa uključenim FK kaskadama (#7).
   factory AppDatabase.forTesting() => AppDatabase(
@@ -45,7 +56,7 @@ class AppDatabase extends _$AppDatabase {
       );
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => currentSchemaVersion;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -310,7 +321,83 @@ Future<File> encryptedDbFile() async {
   return File(p.join(dir.path, _dbFileName));
 }
 
-LazyDatabase _openEncrypted(String key) {
+/// Baza još nije migrirana na [AppDatabase.currentSchemaVersion], a konekcija
+/// je otvorena bez prava na migraciju (pozadinski izolat).
+class DatabaseMigrationPendingException implements Exception {
+  const DatabaseMigrationPendingException();
+
+  @override
+  String toString() => 'DatabaseMigrationPendingException: database schema is '
+      'older than ${AppDatabase.currentSchemaVersion}; migration is left to '
+      'the app';
+}
+
+/// Da li je greška [DatabaseMigrationPendingException] (i kad stigne umotana
+/// sa izolata baze, npr. kao DriftRemoteException — tada ostaje samo tekst).
+bool isMigrationPendingError(Object error) =>
+    error is DatabaseMigrationPendingException ||
+    error.toString().contains('DatabaseMigrationPendingException');
+
+/// `setup` korak za konekciju bez prava na migraciju: baci ako je šema
+/// starija od trenutne (0 = baza još nije ni napravljena).
+void throwIfMigrationPending(Database db) {
+  final version = db.select('PRAGMA user_version').first.values.first as int;
+  if (version < AppDatabase.currentSchemaVersion) {
+    throw const DatabaseMigrationPendingException();
+  }
+}
+
+/// Prolazna greška pri otvaranju: drugi izolat istovremeno migrira istu bazu
+/// (zaključana baza ili kolonu je upravo dodao drugi izolat). Ponovni pokušaj
+/// je bezbedan jer su koraci migracije idempotentni.
+bool isTransientOpenError(Object error) {
+  if (error is SqliteException) {
+    return error.resultCode == 5 || // SQLITE_BUSY
+        error.resultCode == 6 || // SQLITE_LOCKED
+        error.message.contains('duplicate column name');
+  }
+  final text = error.toString();
+  return text.contains('SqliteException(5)') ||
+      text.contains('SqliteException(6)') ||
+      text.contains('database is locked') ||
+      text.contains('duplicate column name');
+}
+
+/// Da li pozadinski krug treba tiho preskočiti: baza čeka migraciju (radi je
+/// aplikacija) ili ju je drugi izolat baš tada zaključao (npr. prvi prelazak
+/// na WAL ili migracija u toku). Sledeći periodični krug pokušava ponovo.
+bool shouldSkipBackgroundRun(Object error) =>
+    isMigrationPendingError(error) || isTransientOpenError(error);
+
+/// Otvori bazu (i odradi migraciju) odmah, uz do [attempts] pokušaja kad
+/// otvaranje padne zbog [isTransientOpenError].
+///
+/// Za svaku drugu grešku (i kad se pokušaji potroše) vraća novu, još
+/// neotvorenu instancu — greška se tada pojavi na prvom upitu, isto kao bez
+/// ovog omotača, pa se ponašanje `DatabaseGate`-a ne menja.
+Future<AppDatabase> openAppDatabaseWithRetry(
+  AppDatabase Function() open, {
+  int attempts = 3,
+  Duration delay = const Duration(milliseconds: 300),
+}) async {
+  for (var attempt = 1;; attempt++) {
+    final db = open();
+    try {
+      await db.customSelect('SELECT 1').get();
+      return db;
+    } catch (e) {
+      try {
+        await db.close();
+      } catch (_) {
+        // Neuspelo otvaranje — nema šta da se zatvori.
+      }
+      if (!isTransientOpenError(e) || attempt >= attempts) return open();
+      await Future<void>.delayed(delay * attempt);
+    }
+  }
+}
+
+LazyDatabase _openEncrypted(String key, {bool allowMigration = true}) {
   return LazyDatabase(() async {
     // Na Androidu treba ranija inicijalizacija da bi se učitao SQLCipher.
     if (Platform.isAndroid) {
@@ -337,6 +424,8 @@ LazyDatabase _openEncrypted(String key) {
         // FK kaskade (van transakcije, ovde u setup-u — ne radi u beforeOpen).
         db.execute('PRAGMA foreign_keys = ON;');
         db.execute('SELECT count(*) FROM sqlite_master;');
+        // Pozadinski izolat ne migrira — prepušta to aplikaciji.
+        if (!allowMigration) throwIfMigrationPending(db);
       },
     );
   });

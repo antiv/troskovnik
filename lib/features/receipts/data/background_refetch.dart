@@ -48,11 +48,18 @@ void callbackDispatcher() {
     // database"). Ako ključa nema, nema šta da se obrađuje.
     final key = await DbKeyManager().readKey();
     if (key == null) return true;
-    final db = AppDatabase.encrypted(key);
+    // Bez prava na migraciju: ako je aplikacija ažurirana a baza još nije
+    // migrirana, ovaj krug se preskače i migraciju radi aplikacija (dva
+    // izolata koja istovremeno migriraju istu bazu se sudare).
+    final db = AppDatabase.encrypted(key, allowMigration: false);
     try {
+      await db.customSelect('SELECT 1').get();
       final service = RefetchService(MultiSourceRegistry(), ReceiptRepository(db));
       await service.processDue();
       return true;
+    } catch (e) {
+      if (shouldSkipBackgroundRun(e)) return true;
+      rethrow;
     } finally {
       await db.close();
     }

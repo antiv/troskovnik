@@ -334,7 +334,7 @@ void main() {
       print('5,000 line_items normalized in ${sw.elapsedMilliseconds} ms');
     });
 
-    test('concurrent v8 -> v9 upgrade across two background isolates does not throw database is locked', () async {
+    test('concurrent v8 -> v10 upgrade: app migrates (with retry), background worker skips instead of colliding', () async {
       final tempDir = await Directory.systemTemp.createTemp('troskovnik_v8_upgrade_');
       final dbFile = File(p.join(tempDir.path, 'test_v8.db'));
 
@@ -429,26 +429,38 @@ void main() {
         ''');
         rawDb.dispose();
 
-        AppDatabase openInBackground() => AppDatabase(
+        AppDatabase openInBackground({bool allowMigration = true}) =>
+            AppDatabase(
               NativeDatabase.createInBackground(
                 dbFile,
                 setup: (d) {
                   d.execute('PRAGMA busy_timeout = 30000;');
                   d.execute('PRAGMA journal_mode = WAL;');
                   d.execute('PRAGMA foreign_keys = ON;');
+                  if (!allowMigration) throwIfMigrationPending(d);
                 },
               ),
             );
 
-        // Otvori DVA nezavisna AppDatabase izolata nad istim v8 fajlom u istoj milisekundi
-        // (simulira glavni UI izolat + Android WorkManager background izolat pri ažuriranju).
-        final dbMain = openInBackground();
-        final dbWorker = openInBackground();
+        // Glavni UI izolat i Android WorkManager izolat otvaraju isti v8 fajl
+        // u istom trenutku (ažuriranje aplikacije). Migraciju sme da radi samo
+        // aplikacija (uz ponovni pokušaj); worker bez prava na migraciju
+        // preskače krug ako baza još nije migrirana.
+        final mainFuture = openAppDatabaseWithRetry(openInBackground);
+        final dbWorker = openInBackground(allowMigration: false);
+        final workerFuture = dbWorker.select(dbWorker.receipts).get().then<List<ReceiptRow>?>(
+              (rows) => rows,
+              // Isto kao background_refetch: preskoči krug, ne ruši se.
+              onError: (Object e) => shouldSkipBackgroundRun(e)
+                  ? null
+                  : throw e,
+            );
+        final dbMain = await mainFuture;
 
         try {
-          final results = await Future.wait([
+          final results = await Future.wait<Object?>([
             dbMain.select(dbMain.receipts).get(),
-            dbWorker.select(dbWorker.receipts).get(),
+            workerFuture,
             AnalyticsRepository(dbMain).loadSummary(
               AnalyticsRange.all,
               now: DateTime(2026, 3, 1),
@@ -456,11 +468,12 @@ void main() {
           ]);
 
           final mainReceipts = results[0] as List<ReceiptRow>;
-          final workerReceipts = results[1] as List<ReceiptRow>;
+          // Worker je ili preskočio krug (null) ili video već migriranu bazu.
+          final workerReceipts = results[1] as List<ReceiptRow>?;
           final summary = results[2] as AnalyticsSummary;
 
           expect(mainReceipts, hasLength(1));
-          expect(workerReceipts, hasLength(1));
+          if (workerReceipts != null) expect(workerReceipts, hasLength(1));
           expect(summary.topItems, hasLength(1));
           expect(summary.topItems.first.name, 'Mleko Moja Kravica');
           expect(summary.topItems.first.count, 2);
