@@ -872,6 +872,23 @@ class AppLocalizationsSr extends AppLocalizations {
   @override
   String get analyticsUnmergeSuccess =>
       'Varijanta je izdvojena u poseban artikal.';
+
+  @override
+  String get analyticsByCompany => 'Po firmama (PIB)';
+
+  @override
+  String get analyticsCompanyNoTaxId => 'Poslovno bez PIB-a firme';
+
+  @override
+  String analyticsCompanyVat(String amount) {
+    return 'PDV: $amount';
+  }
+
+  @override
+  String get companyNameTitle => 'Naziv firme';
+
+  @override
+  String get companyNameHint => 'npr. Moja firma d.o.o.';
 }
 
 /// The translations for Serbian, using the Cyrillic script (`sr_Cyrl`).
@@ -1742,4 +1759,21 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
   @override
   String get analyticsUnmergeSuccess =>
       'Варијанта је издвојена у посебан артикал.';
+
+  @override
+  String get analyticsByCompany => 'По фирмама (ПИБ)';
+
+  @override
+  String get analyticsCompanyNoTaxId => 'Пословно без ПИБ-а фирме';
+
+  @override
+  String analyticsCompanyVat(String amount) {
+    return 'ПДВ: $amount';
+  }
+
+  @override
+  String get companyNameTitle => 'Назив фирме';
+
+  @override
+  String get companyNameHint => 'нпр. Моја фирма д.о.о.';
 }

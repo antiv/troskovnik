@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqlcipher_flutter_libs/sqlcipher_flutter_libs.dart';
 import 'package:sqlite3/open.dart';
 
+import '../domain/buyer_identity.dart';
 import '../domain/country.dart';
 import '../domain/currency.dart';
 import '../normalization/seed_items_data.dart';
@@ -22,6 +23,7 @@ part 'database.g.dart';
   LineItems,
   Warranties,
   Categories,
+  Companies,
   CanonicalItems,
   ItemAliases,
 ])
@@ -43,7 +45,7 @@ class AppDatabase extends _$AppDatabase {
       );
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -96,12 +98,17 @@ class AppDatabase extends _$AppDatabase {
             await _addColumnIfMissing(
                 'receipts', 'has_discrepancy', 'INTEGER NOT NULL DEFAULT 0');
           }
-          // v9: kanonski artikli i keš alijasa za normalizaciju stavki u analitici.
-          // U onUpgrade izvršavamo isključivo brze i idempotentne DDL naredbe (< 2 ms)
-          // kako konkurentni izolati (npr. WorkManager) nikada ne bi čekali ili
-          // zaključali bazu tokom migracije. Punjenje rečnika i normalizacija
-          // postojećih stavki izvršavaju se lenjo pri prvom čitanju/upisu.
-          if (from < 9) {
+          // v9 je postojao u DVE varijante (dve grane su paralelno uzele isti
+          // broj): (a) normalizacija artikala — canonical_items/item_aliases,
+          // (b) firme kupca — companies/buyer_tax_id. Baza na v9 ima samo
+          // jednu od njih, pa v10 idempotentno dodaje SVE što fali iz obe.
+          // Svi koraci su bezbedni za ponavljanje (IF NOT EXISTS / PRAGMA
+          // table_info), pa i prekinuta migracija može ponovo da se izvrši.
+          if (from < 10) {
+            // (a) Kanonski artikli i keš alijasa za normalizaciju stavki.
+            // Samo brze DDL naredbe: punjenje rečnika i normalizacija
+            // postojećih stavki izvršavaju se lenjo pri prvom čitanju/upisu,
+            // da konkurentni izolati (WorkManager) ne čekaju na migraciju.
             await m.createTable(canonicalItems);
             await m.createTable(itemAliases);
             await _addColumnIfMissing(
@@ -118,6 +125,12 @@ class AppDatabase extends _$AppDatabase {
                 'CREATE INDEX IF NOT EXISTS idx_item_aliases_cleaned ON item_aliases(cleaned_raw_name)');
             await customStatement(
                 'CREATE INDEX IF NOT EXISTS idx_line_items_canonical ON line_items(canonical_item_id)');
+
+            // (b) Firme kupca (analitika po PIB-u). Postojećim računima se
+            // popunjava buyer_tax_id; is_business se NE dira (ručni izbor).
+            await _addColumnIfMissing('receipts', 'buyer_tax_id', 'TEXT');
+            await m.createTable(companies);
+            await _backfillBuyerTaxIds();
           }
         },
       );
@@ -162,6 +175,30 @@ class AppDatabase extends _$AppDatabase {
       await _seedCanonicalDictionary();
     }
     _dictionarySeeded = true;
+  }
+
+  /// Popuni `buyer_tax_id` i tabelu firmi iz postojećih `buyer_id` (v10).
+  /// Sirov SQL da migracija ne zavisi od budućih kolona tabele `receipts`.
+  /// Idempotentno: dira samo račune kojima buyer_tax_id još nije popunjen.
+  Future<void> _backfillBuyerTaxIds() async {
+    final rows = await customSelect(
+            'SELECT id, buyer_id, country FROM receipts '
+            'WHERE buyer_id IS NOT NULL AND buyer_tax_id IS NULL')
+        .get();
+    for (final row in rows) {
+      final countryIdx = row.read<int>('country');
+      if (countryIdx < 0 || countryIdx >= Country.values.length) continue;
+      final country = Country.values[countryIdx];
+      final taxId =
+          BuyerIdentity.parse(row.read<String>('buyer_id'), country)?.taxId;
+      if (taxId == null) continue;
+      await customStatement(
+          'UPDATE receipts SET buyer_tax_id = ? WHERE id = ?',
+          [taxId, row.read<int>('id')]);
+      await customStatement(
+          'INSERT OR IGNORE INTO companies (country, tax_id) VALUES (?, ?)',
+          [country.index, taxId]);
+    }
   }
 
   Future<void> _createIndexes() async {

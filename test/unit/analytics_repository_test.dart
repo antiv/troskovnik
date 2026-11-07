@@ -368,6 +368,59 @@ void main() {
     expect(s.totalsByCurrency.containsKey(Currency.bam), isFalse);
   });
 
+  test('byCompany groups business receipts by buyer tax id with VAT',
+      () async {
+    final m = await merchant('100', 'Maxi');
+    Future<int> biz(int total, String? taxId,
+            {Country country = Country.serbia, bool business = true}) =>
+        db.into(db.receipts).insert(ReceiptsCompanion.insert(
+              merchantId: m,
+              verificationUrl: 'u${DateTime.now().microsecondsSinceEpoch}',
+              pfrTime: Value(DateTime(2026, 3, 1)),
+              totalAmount: Value(total),
+              isBusiness: Value(business),
+              buyerTaxId: Value(taxId),
+              country: Value(country),
+              currency: Value(country.currency),
+              fetchStatus: const Value(FetchStatus.complete),
+            ));
+    await db.into(db.companies).insert(CompaniesCompanion.insert(
+        taxId: '104318304', name: const Value('Moja firma')));
+
+    final a1 = await biz(12000, '104318304');
+    await item(a1, 'Papir', 12000, rate: 20);
+    await biz(3000, '104318304');
+    await biz(5000, '100000001');
+    await biz(700, null); // ručno označen poslovni, bez PIB-a
+    await biz(9999, '104318304', business: false); // korisnik isključio
+    await biz(4000, '4400000000001', country: Country.republikaSrpska);
+
+    final s = await repo.loadSummary(AnalyticsRange.all,
+        now: DateTime(2026, 4, 1), currency: Currency.rsd);
+    final byCompany = s.byCompany;
+    expect(byCompany.map((c) => c.taxId),
+        ['104318304', '100000001', null]); // sortirano po iznosu, bez BAM
+    final mine = byCompany.first;
+    expect(mine.name, 'Moja firma');
+    expect(mine.totalMinor, 15000);
+    expect(mine.receiptCount, 2);
+    expect(mine.vatMinor, 2000); // 12.000 bruto sa 20% → 2.000 PDV
+    expect(byCompany[1].name, isNull);
+    // Zbir po firmama + bez PIB-a = ukupno poslovno.
+    expect(byCompany.fold<int>(0, (a, c) => a + c.totalMinor),
+        s.businessSplit.businessMinor);
+
+    final adv = await repo.loadAdvancedSummary(
+        const AdvancedAnalyticsFilter(
+          preset: AdvancedAnalyticsDatePreset.all,
+          currency: Currency.bam,
+          businessFilter: AnalyticsBusinessFilter.personalOnly,
+        ),
+        now: DateTime(2026, 4, 1));
+    expect(adv.companySpending.single.taxId, '4400000000001');
+    expect(adv.companySpending.single.country, Country.republikaSrpska);
+  });
+
   group('AdvancedAnalytics', () {
     test('MoM comparison, pacing, day-of-week and basket sizes', () async {
       final m = await merchant('100', 'Maxi');

@@ -4,6 +4,7 @@
 /// Valute se NIKAD ne sabiraju — svaki model nosi svoju valutu.
 library;
 
+import '../../../core/domain/country.dart';
 import '../../../core/domain/currency.dart';
 import '../../categories/domain/category_models.dart';
 
@@ -68,6 +69,32 @@ class BusinessSplit {
   int get totalMinor => businessMinor + personalMinor;
 }
 
+/// Poslovna potrošnja po firmi kupca (PIB/JIB/TIN) u jednoj valuti.
+///
+/// [taxId] == null je zbirni red za poslovne račune bez PIB-a firme (ručno
+/// označeni ili sa JMBG-om), tako da zbir svih redova = ukupno poslovno.
+class CompanySpending {
+  const CompanySpending({
+    required this.country,
+    required this.taxId,
+    required this.totalMinor,
+    required this.receiptCount,
+    required this.vatMinor,
+    this.name,
+  });
+
+  final Country country;
+  final String? taxId;
+
+  /// Korisnički naziv firme; null = prikaži PIB.
+  final String? name;
+  final int totalMinor;
+  final int receiptCount;
+
+  /// Procenjen PDV iz stavki sa poreskom stopom (pretporez).
+  final int vatMinor;
+}
+
 /// Najčešći/najskuplji artikal (po kanonskom nazivu).
 class TopItem {
   const TopItem({
@@ -96,6 +123,7 @@ class AnalyticsSummary {
     required this.topItems,
     required this.byCategory,
     this.totalUniqueItemsCount = 0,
+    this.byCompany = const [],
   });
 
   /// Ukupan iznos po valuti — nikad se ne sabiraju različite valute.
@@ -115,6 +143,8 @@ class AnalyticsSummary {
 
   /// Ukupan broj jedinstvenih kanonskih artikala u izabranom periodu i valuti.
   final int totalUniqueItemsCount;
+  /// Poslovna potrošnja po firmi kupca (u aktivnoj valuti).
+  final List<CompanySpending> byCompany;
 
   bool get isEmpty => receiptCount == 0;
 }

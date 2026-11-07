@@ -297,5 +297,11 @@
   "analyticsUnmergeConfirmTitle": "Split this variant?",
   "analyticsUnmergeConfirmBody": "Items named \"{rawName}\" will be separated into their own item.",
   "analyticsUnmergeAction": "Split",
-  "analyticsUnmergeSuccess": "Variant separated into its own item."
+  "analyticsUnmergeSuccess": "Variant separated into its own item.",
+  "analyticsByCompany": "By company (tax ID)",
+  "analyticsCompanyNoTaxId": "Business without company tax ID",
+  "analyticsCompanyVat": "VAT: {amount}",
+  "@analyticsCompanyVat": { "placeholders": { "amount": { "type": "String" } } },
+  "companyNameTitle": "Company name",
+  "companyNameHint": "e.g. My Company Ltd."
 }

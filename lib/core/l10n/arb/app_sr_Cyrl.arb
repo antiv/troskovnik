@@ -297,5 +297,11 @@
   "analyticsUnmergeConfirmTitle": "Одвојити ову варијанту?",
   "analyticsUnmergeConfirmBody": "Ставке са називом „{rawName}“ биће издвојене у посебан артикал.",
   "analyticsUnmergeAction": "Одвој",
-  "analyticsUnmergeSuccess": "Варијанта је издвојена у посебан артикал."
+  "analyticsUnmergeSuccess": "Варијанта је издвојена у посебан артикал.",
+  "analyticsByCompany": "По фирмама (ПИБ)",
+  "analyticsCompanyNoTaxId": "Пословно без ПИБ-а фирме",
+  "analyticsCompanyVat": "ПДВ: {amount}",
+  "@analyticsCompanyVat": { "placeholders": { "amount": { "type": "String" } } },
+  "companyNameTitle": "Назив фирме",
+  "companyNameHint": "нпр. Моја фирма д.о.о."
 }

@@ -868,4 +868,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get analyticsUnmergeSuccess => 'Variant separated into its own item.';
+
+  @override
+  String get analyticsByCompany => 'By company (tax ID)';
+
+  @override
+  String get analyticsCompanyNoTaxId => 'Business without company tax ID';
+
+  @override
+  String analyticsCompanyVat(String amount) {
+    return 'VAT: $amount';
+  }
+
+  @override
+  String get companyNameTitle => 'Company name';
+
+  @override
+  String get companyNameHint => 'e.g. My Company Ltd.';
 }
