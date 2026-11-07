@@ -744,4 +744,128 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get detailDiscrepancyWarning =>
       'Warning: parsed data does not match fiscal server data. Please verify this receipt.';
+
+  @override
+  String get analyticsRawVariants => 'Merged receipt names';
+
+  @override
+  String get analyticsMeasureOther => 'Other';
+
+  @override
+  String get analyticsMergeButton => 'Merge with another item';
+
+  @override
+  String get analyticsMergeTitle => 'Merge items';
+
+  @override
+  String get analyticsMergeSubtitle =>
+      'Select items to merge into a single canonical product and customize the shared display name.';
+
+  @override
+  String get analyticsMergeTargetName => 'Shared item name';
+
+  @override
+  String get analyticsMergeSearchHint => 'Search items to merge...';
+
+  @override
+  String get analyticsMergeEmpty => 'No other items available to merge.';
+
+  @override
+  String get analyticsMergeConfirm => 'Merge selected';
+
+  @override
+  String get analyticsMergeSuccess => 'Items merged successfully.';
+
+  @override
+  String analyticsViewAllItems(int count) {
+    return 'All items ($count)';
+  }
+
+  @override
+  String get analyticsAllItemsTitle => 'Item catalog';
+
+  @override
+  String get analyticsSearchItemsHint => 'Search by name or receipt text...';
+
+  @override
+  String get analyticsSortSpent => 'Spent';
+
+  @override
+  String get analyticsSortFrequency => 'Frequency';
+
+  @override
+  String get analyticsSortPriceJump => 'Price jump';
+
+  @override
+  String get analyticsSortName => 'A–Z';
+
+  @override
+  String get analyticsFilterAllCategories => 'All';
+
+  @override
+  String get analyticsPriceRangeTitle => 'Unit price range';
+
+  @override
+  String get analyticsPriceMin => 'Lowest';
+
+  @override
+  String get analyticsPriceAvg => 'Average';
+
+  @override
+  String get analyticsPriceMax => 'Highest';
+
+  @override
+  String get analyticsPriceLatest => 'Latest';
+
+  @override
+  String get analyticsCheapestBadge => 'Cheapest';
+
+  @override
+  String analyticsMerchantAvgPrice(String price) {
+    return 'Avg: $price';
+  }
+
+  @override
+  String analyticsMerchantMinMaxPrice(String min, String latest) {
+    return 'Min: $min • Latest: $latest';
+  }
+
+  @override
+  String get analyticsPackageValueTitle => 'Package value (price per 1L / 1kg)';
+
+  @override
+  String get analyticsBestValueBadge => 'Best value';
+
+  @override
+  String analyticsNormalizedPrice(String price, String unit) {
+    return '$price / $unit';
+  }
+
+  @override
+  String get analyticsHabitTitle => 'Purchase cadence';
+
+  @override
+  String analyticsHabitEveryDays(int days, String monthly) {
+    return 'Every ~$days days • ~$monthly/mo';
+  }
+
+  @override
+  String get analyticsRecentPurchases => 'Recent purchases';
+
+  @override
+  String get analyticsUnmergeTooltip => 'Split into separate item';
+
+  @override
+  String get analyticsUnmergeConfirmTitle => 'Split this variant?';
+
+  @override
+  String analyticsUnmergeConfirmBody(String rawName) {
+    return 'Items named \"$rawName\" will be separated into their own item.';
+  }
+
+  @override
+  String get analyticsUnmergeAction => 'Split';
+
+  @override
+  String get analyticsUnmergeSuccess => 'Variant separated into its own item.';
 }

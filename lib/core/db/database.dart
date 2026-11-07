@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
@@ -9,15 +10,26 @@ import 'package:sqlite3/open.dart';
 
 import '../domain/country.dart';
 import '../domain/currency.dart';
+import '../normalization/seed_items_data.dart';
 import 'enums.dart';
 import 'tables.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(
-    tables: [Merchants, Receipts, LineItems, Warranties, Categories])
+@DriftDatabase(tables: [
+  Merchants,
+  Receipts,
+  LineItems,
+  Warranties,
+  Categories,
+  CanonicalItems,
+  ItemAliases,
+])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
+
+  bool _dictionarySeeded = false;
+  Future<void>? _normalizationLock;
 
   /// Otvara enkriptovanu bazu sa datim ključem (iz secure storage).
   factory AppDatabase.encrypted(String encryptionKey) =>
@@ -31,7 +43,7 @@ class AppDatabase extends _$AppDatabase {
       );
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -39,6 +51,8 @@ class AppDatabase extends _$AppDatabase {
           await m.createAll();
           await _createIndexes();
           await _seedDefaultCategories();
+          await _seedCanonicalDictionary();
+          _dictionarySeeded = true;
         },
         onUpgrade: (m, from, to) async {
           // v2: tabela garancija (warranties).
@@ -49,11 +63,11 @@ class AppDatabase extends _$AppDatabase {
           }
           // v3: PIB/ID kupca na računu (auto-„poslovni").
           if (from < 3) {
-            await m.addColumn(receipts, receipts.buyerId);
+            await _addColumnIfMissing('receipts', 'buyer_id', 'TEXT');
           }
           // v4: strukturirani načini plaćanja sa iznosima (kombinovano).
           if (from < 4) {
-            await m.addColumn(receipts, receipts.paymentsJson);
+            await _addColumnIfMissing('receipts', 'payments_json', 'TEXT');
           }
           // v5: kategorije stavki.
           if (from < 5) {
@@ -62,16 +76,16 @@ class AppDatabase extends _$AppDatabase {
           }
           // v6: ručni unos troška (isManual flag).
           if (from < 6) {
-            await customStatement(
-                'ALTER TABLE receipts ADD COLUMN is_manual INTEGER NOT NULL DEFAULT 0');
+            await _addColumnIfMissing(
+                'receipts', 'is_manual', 'INTEGER NOT NULL DEFAULT 0');
           }
           // v7: zemlja i valuta po računu (Republika Srpska / BAM).
           // DEFAULT 0 = Country.serbia / Currency.rsd (index 0).
           if (from < 7) {
-            await customStatement(
-                'ALTER TABLE receipts ADD COLUMN country INTEGER NOT NULL DEFAULT 0');
-            await customStatement(
-                'ALTER TABLE receipts ADD COLUMN currency INTEGER NOT NULL DEFAULT 0');
+            await _addColumnIfMissing(
+                'receipts', 'country', 'INTEGER NOT NULL DEFAULT 0');
+            await _addColumnIfMissing(
+                'receipts', 'currency', 'INTEGER NOT NULL DEFAULT 0');
             await customStatement(
                 "UPDATE receipts SET country = 1, currency = 1 WHERE verification_url LIKE '%poreskaupravars.org%'");
             await customStatement(
@@ -79,11 +93,76 @@ class AppDatabase extends _$AppDatabase {
           }
           // v8: flag za nepodudaranje parsiranih podataka sa invoiceResult.
           if (from < 8) {
+            await _addColumnIfMissing(
+                'receipts', 'has_discrepancy', 'INTEGER NOT NULL DEFAULT 0');
+          }
+          // v9: kanonski artikli i keš alijasa za normalizaciju stavki u analitici.
+          // U onUpgrade izvršavamo isključivo brze i idempotentne DDL naredbe (< 2 ms)
+          // kako konkurentni izolati (npr. WorkManager) nikada ne bi čekali ili
+          // zaključali bazu tokom migracije. Punjenje rečnika i normalizacija
+          // postojećih stavki izvršavaju se lenjo pri prvom čitanju/upisu.
+          if (from < 9) {
+            await m.createTable(canonicalItems);
+            await m.createTable(itemAliases);
+            await _addColumnIfMissing(
+              'line_items',
+              'canonical_item_id',
+              'INTEGER REFERENCES canonical_items(id) ON DELETE SET NULL',
+            );
+            await _addColumnIfMissing(
+              'line_items',
+              'extracted_measure',
+              'TEXT',
+            );
             await customStatement(
-                'ALTER TABLE receipts ADD COLUMN has_discrepancy INTEGER NOT NULL DEFAULT 0');
+                'CREATE INDEX IF NOT EXISTS idx_item_aliases_cleaned ON item_aliases(cleaned_raw_name)');
+            await customStatement(
+                'CREATE INDEX IF NOT EXISTS idx_line_items_canonical ON line_items(canonical_item_id)');
           }
         },
       );
+
+  Future<void> _addColumnIfMissing(
+    String table,
+    String column,
+    String definition,
+  ) async {
+    final rows = await customSelect('PRAGMA table_info($table)').get();
+    final exists = rows.any((r) => r.read<String>('name') == column);
+    if (!exists) {
+      await customStatement('ALTER TABLE $table ADD COLUMN $column $definition');
+    }
+  }
+
+  /// Serijalizuje operacije punjenja rečnika i normalizacije nad istom
+  /// [AppDatabase] instancom kako se ne bi izvršavale paralelno.
+  Future<T> runSerializedNormalization<T>(Future<T> Function() action) async {
+    while (_normalizationLock != null) {
+      try {
+        await _normalizationLock;
+      } catch (_) {}
+    }
+    final completer = Completer<void>();
+    _normalizationLock = completer.future;
+    try {
+      return await action();
+    } finally {
+      _normalizationLock = null;
+      completer.complete();
+    }
+  }
+
+  /// Osigurava da je početni (seed) rečnik kanonskih artikala učitan u bazu.
+  Future<void> ensureCanonicalDictionarySeeded() async {
+    if (_dictionarySeeded) return;
+    final existing = await customSelect(
+      'SELECT 1 FROM item_aliases WHERE is_user_merged = 0 LIMIT 1',
+    ).getSingleOrNull();
+    if (existing == null) {
+      await _seedCanonicalDictionary();
+    }
+    _dictionarySeeded = true;
+  }
 
   Future<void> _createIndexes() async {
     // Indeksi za pretragu i sortiranje (instrukcije.md, sekcija 4).
@@ -95,6 +174,66 @@ class AppDatabase extends _$AppDatabase {
         'CREATE INDEX IF NOT EXISTS idx_receipts_pfr_time ON receipts(pfr_time)');
     await customStatement(
         'CREATE INDEX IF NOT EXISTS idx_warranties_expiry ON warranties(expiry_date)');
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_item_aliases_cleaned ON item_aliases(cleaned_raw_name)');
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_line_items_canonical ON line_items(canonical_item_id)');
+  }
+
+  Future<void> _seedCanonicalDictionary() async {
+    final entries = await SeedItemsLoader.load();
+    if (entries.isEmpty) return;
+
+    final prepared = <({String key, String displayName, Set<String> aliases})>[];
+    for (final entry in entries) {
+      final canonicalKey = entry.canonicalKey.trim();
+      if (canonicalKey.isEmpty) continue;
+      final aliasKeys = <String>{
+        canonicalKey,
+        for (final a in entry.aliases)
+          if (a.trim().isNotEmpty) a.trim(),
+      };
+      prepared.add((
+        key: canonicalKey,
+        displayName: entry.displayName,
+        aliases: aliasKeys,
+      ));
+    }
+
+    await batch((b) {
+      for (final p in prepared) {
+        b.insert(
+          canonicalItems,
+          CanonicalItemsCompanion.insert(
+            canonicalKey: p.key,
+            displayName: p.displayName,
+          ),
+          mode: InsertMode.insertOrIgnore,
+        );
+      }
+    });
+
+    final allCanonical = await select(canonicalItems).get();
+    final idByKey = <String, int>{
+      for (final row in allCanonical) row.canonicalKey: row.id,
+    };
+
+    await batch((b) {
+      for (final p in prepared) {
+        final cid = idByKey[p.key];
+        if (cid == null) continue;
+        for (final alias in p.aliases) {
+          b.insert(
+            itemAliases,
+            ItemAliasesCompanion.insert(
+              cleanedRawName: alias,
+              canonicalItemId: cid,
+            ),
+            mode: InsertMode.insertOrIgnore,
+          );
+        }
+      }
+    });
   }
 
   Future<void> _seedDefaultCategories() async {
@@ -154,6 +293,10 @@ LazyDatabase _openEncrypted(String key) {
         db.execute("PRAGMA key = '$escaped';");
         // Provera da je ključ ispravan / baza dešifrovana.
         db.execute('PRAGMA cipher_memory_security = ON;');
+        // Sačekaj do 30s ako drugi izolat (npr. WorkManager) trenutno drži lock.
+        db.execute('PRAGMA busy_timeout = 30000;');
+        // WAL režim omogućava konkurentno čitanje i pisanje između izolata.
+        db.execute('PRAGMA journal_mode = WAL;');
         // FK kaskade (van transakcije, ovde u setup-u — ne radi u beforeOpen).
         db.execute('PRAGMA foreign_keys = ON;');
         db.execute('SELECT count(*) FROM sqlite_master;');

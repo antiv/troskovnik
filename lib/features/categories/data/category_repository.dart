@@ -42,6 +42,9 @@ class CategoryRepository {
         await (_db.update(_db.lineItems)
               ..where((i) => i.categoryId.equals(id)))
             .write(const LineItemsCompanion(categoryId: Value(null)));
+        await (_db.update(_db.canonicalItems)
+              ..where((c) => c.defaultCategoryId.equals(id)))
+            .write(const CanonicalItemsCompanion(defaultCategoryId: Value(null)));
         await (_db.delete(_db.categories)..where((c) => c.id.equals(id))).go();
       });
 
@@ -51,14 +54,33 @@ class CategoryRepository {
         categoryId: Value(categoryId),
       ));
 
-  /// Dodeljuje kategoriju svim stavkama sa datim nazivom artikla (kroz sve
-  /// račune) — analitika grupiše artikle po nazivu, pa promena iz nje važi
-  /// za ceo artikal, ne za pojedinačnu stavku.
+  /// Dodeljuje kategoriju svim stavkama sa datim nazivom ili kanonskim artiklom
+  /// (kroz sve račune) — analitika grupiše artikle po kanonskom nazivu, pa
+  /// promena iz nje važi za ceo artikal i sve njegove varijante.
   Future<void> assignToItemsByName(String name, int? categoryId) =>
-      (_db.update(_db.lineItems)..where((i) => i.name.equals(name)))
-          .write(LineItemsCompanion(
-        categoryId: Value(categoryId),
-      ));
+      _db.transaction(() async {
+        final matchedCanonical = await (_db.select(_db.canonicalItems)
+              ..where((c) => c.displayName.equals(name)))
+            .get();
+        final canonicalIds = [for (final c in matchedCanonical) c.id];
+
+        if (canonicalIds.isNotEmpty) {
+          await (_db.update(_db.canonicalItems)
+                ..where((c) => c.id.isIn(canonicalIds)))
+              .write(
+            CanonicalItemsCompanion(defaultCategoryId: Value(categoryId)),
+          );
+          await (_db.update(_db.lineItems)
+                ..where((i) =>
+                    i.name.equals(name) | i.canonicalItemId.isIn(canonicalIds)))
+              .write(LineItemsCompanion(categoryId: Value(categoryId)));
+        } else {
+          await (_db.update(_db.lineItems)..where((i) => i.name.equals(name)))
+              .write(LineItemsCompanion(
+            categoryId: Value(categoryId),
+          ));
+        }
+      });
 
   Future<void> assignToReceipt(int receiptId, int? categoryId) =>
       (_db.update(_db.lineItems)..where((i) => i.receiptId.equals(receiptId)))

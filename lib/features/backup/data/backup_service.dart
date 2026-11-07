@@ -12,6 +12,7 @@ import '../../../core/db/database.dart';
 import '../../../core/db/enums.dart';
 import '../../../core/domain/country.dart';
 import '../../../core/domain/currency.dart';
+import '../../../core/normalization/item_normalization_service.dart';
 
 class BackupException implements Exception {
   const BackupException(this.code);
@@ -29,6 +30,8 @@ class BackupService {
     final categories = await _db.select(_db.categories).get();
     final merchants = await _db.select(_db.merchants).get();
     final receipts = await _db.select(_db.receipts).get();
+    final canonicalItems = await _db.select(_db.canonicalItems).get();
+    final itemAliases = await _db.select(_db.itemAliases).get();
     final lineItems = await _db.select(_db.lineItems).get();
     final warranties = await _db.select(_db.warranties).get();
 
@@ -131,6 +134,26 @@ class BackupService {
             'updatedAt': r.updatedAt.toIso8601String(),
           },
       ],
+      'canonicalItems': [
+        for (final ci in canonicalItems)
+          {
+            'id': ci.id,
+            'canonicalKey': ci.canonicalKey,
+            'displayName': ci.displayName,
+            'defaultCategoryId': ci.defaultCategoryId,
+            'createdAt': ci.createdAt.toIso8601String(),
+          },
+      ],
+      'itemAliases': [
+        for (final ia in itemAliases)
+          {
+            'id': ia.id,
+            'cleanedRawName': ia.cleanedRawName,
+            'canonicalItemId': ia.canonicalItemId,
+            'isUserMerged': ia.isUserMerged,
+            'createdAt': ia.createdAt.toIso8601String(),
+          },
+      ],
       'lineItems': [
         for (final li in lineItems)
           {
@@ -146,6 +169,8 @@ class BackupService {
             'source': li.source.index,
             'isUnparsed': li.isUnparsed,
             'categoryId': li.categoryId,
+            'canonicalItemId': li.canonicalItemId,
+            'extractedMeasure': li.extractedMeasure,
           },
       ],
       'warranties': [
@@ -212,6 +237,8 @@ class BackupService {
         // Delete in reverse FK order to avoid constraint violations.
         await _db.delete(_db.warranties).go();
         await _db.delete(_db.lineItems).go();
+        await _db.delete(_db.itemAliases).go();
+        await _db.delete(_db.canonicalItems).go();
         await _db.delete(_db.receipts).go();
         await _db.delete(_db.merchants).go();
         await _db.delete(_db.categories).go();
@@ -246,6 +273,40 @@ class BackupService {
                 ),
                 mode: InsertMode.insertOrReplace,
               );
+        }
+
+        final canonicalList = manifest['canonicalItems'] as List<dynamic>?;
+        if (canonicalList != null) {
+          for (final ci in canonicalList) {
+            final j = ci as Map<String, dynamic>;
+            await _db.into(_db.canonicalItems).insert(
+                  CanonicalItemsCompanion(
+                    id: Value(j['id'] as int),
+                    canonicalKey: Value(j['canonicalKey'] as String),
+                    displayName: Value(j['displayName'] as String),
+                    defaultCategoryId: Value(j['defaultCategoryId'] as int?),
+                    createdAt: Value(DateTime.parse(j['createdAt'] as String)),
+                  ),
+                  mode: InsertMode.insertOrReplace,
+                );
+          }
+        }
+
+        final aliasesList = manifest['itemAliases'] as List<dynamic>?;
+        if (aliasesList != null) {
+          for (final ia in aliasesList) {
+            final j = ia as Map<String, dynamic>;
+            await _db.into(_db.itemAliases).insert(
+                  ItemAliasesCompanion(
+                    id: Value(j['id'] as int),
+                    cleanedRawName: Value(j['cleanedRawName'] as String),
+                    canonicalItemId: Value(j['canonicalItemId'] as int),
+                    isUserMerged: Value((j['isUserMerged'] as bool?) ?? false),
+                    createdAt: Value(DateTime.parse(j['createdAt'] as String)),
+                  ),
+                  mode: InsertMode.insertOrReplace,
+                );
+          }
         }
 
         for (final r in manifest['receipts'] as List<dynamic>) {
@@ -326,6 +387,8 @@ class BackupService {
                       ItemsSource.values[j['source'] as int]),
                   isUnparsed: Value(j['isUnparsed'] as bool),
                   categoryId: Value(j['categoryId'] as int?),
+                  canonicalItemId: Value(j['canonicalItemId'] as int?),
+                  extractedMeasure: Value(j['extractedMeasure'] as String?),
                 ),
                 mode: InsertMode.insertOrReplace,
               );
@@ -361,13 +424,14 @@ class BackupService {
         }
       });
 
-      // Dopunski backfill za starije baze
+      // Dopunski backfill za starije baze i normalizaciju artikala
       await _db.customStatement(
           "UPDATE receipts SET country = 1, currency = 1 WHERE verification_url LIKE '%poreskaupravars.org%'");
       await _db.customStatement(
           "UPDATE receipts SET country = 2, currency = 2 WHERE verification_url LIKE '%tax.gov.me%'");
       await _db.customStatement(
           "UPDATE receipts SET country = 0, currency = 0 WHERE country IS NULL OR currency IS NULL");
+      await ItemNormalizationService(_db).ensureNormalized();
     } catch (e) {
       if (e is BackupException) rethrow;
       throw const BackupException('io_error');

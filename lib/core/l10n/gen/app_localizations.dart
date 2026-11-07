@@ -1496,6 +1496,228 @@ abstract class AppLocalizations {
   /// In sr, this message translates to:
   /// **'Upozorenje: parsirani podaci se ne slažu sa podacima fiskalnog servera. Proverite račun.'**
   String get detailDiscrepancyWarning;
+
+  /// No description provided for @analyticsRawVariants.
+  ///
+  /// In sr, this message translates to:
+  /// **'Spojeni nazivi sa računa'**
+  String get analyticsRawVariants;
+
+  /// No description provided for @analyticsMeasureOther.
+  ///
+  /// In sr, this message translates to:
+  /// **'Ostalo'**
+  String get analyticsMeasureOther;
+
+  /// No description provided for @analyticsMergeButton.
+  ///
+  /// In sr, this message translates to:
+  /// **'Spoji sa drugim artiklom'**
+  String get analyticsMergeButton;
+
+  /// No description provided for @analyticsMergeTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Spoji artikle'**
+  String get analyticsMergeTitle;
+
+  /// No description provided for @analyticsMergeSubtitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Izaberite artikle koje želite da spojite u jedan kanonski proizvod i uredite zajednički naziv.'**
+  String get analyticsMergeSubtitle;
+
+  /// No description provided for @analyticsMergeTargetName.
+  ///
+  /// In sr, this message translates to:
+  /// **'Zajednički naziv artikla'**
+  String get analyticsMergeTargetName;
+
+  /// No description provided for @analyticsMergeSearchHint.
+  ///
+  /// In sr, this message translates to:
+  /// **'Pretraži artikle za spajanje...'**
+  String get analyticsMergeSearchHint;
+
+  /// No description provided for @analyticsMergeEmpty.
+  ///
+  /// In sr, this message translates to:
+  /// **'Nema drugih artikala za spajanje.'**
+  String get analyticsMergeEmpty;
+
+  /// No description provided for @analyticsMergeConfirm.
+  ///
+  /// In sr, this message translates to:
+  /// **'Spoji izabrane'**
+  String get analyticsMergeConfirm;
+
+  /// No description provided for @analyticsMergeSuccess.
+  ///
+  /// In sr, this message translates to:
+  /// **'Artikli su uspešno spojeni.'**
+  String get analyticsMergeSuccess;
+
+  /// No description provided for @analyticsViewAllItems.
+  ///
+  /// In sr, this message translates to:
+  /// **'Svi artikli ({count})'**
+  String analyticsViewAllItems(int count);
+
+  /// No description provided for @analyticsAllItemsTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Katalog artikala'**
+  String get analyticsAllItemsTitle;
+
+  /// No description provided for @analyticsSearchItemsHint.
+  ///
+  /// In sr, this message translates to:
+  /// **'Pretraži po nazivu ili tekstu sa računa...'**
+  String get analyticsSearchItemsHint;
+
+  /// No description provided for @analyticsSortSpent.
+  ///
+  /// In sr, this message translates to:
+  /// **'Potrošnja'**
+  String get analyticsSortSpent;
+
+  /// No description provided for @analyticsSortFrequency.
+  ///
+  /// In sr, this message translates to:
+  /// **'Učestalost'**
+  String get analyticsSortFrequency;
+
+  /// No description provided for @analyticsSortPriceJump.
+  ///
+  /// In sr, this message translates to:
+  /// **'Rast cene'**
+  String get analyticsSortPriceJump;
+
+  /// No description provided for @analyticsSortName.
+  ///
+  /// In sr, this message translates to:
+  /// **'A–Š'**
+  String get analyticsSortName;
+
+  /// No description provided for @analyticsFilterAllCategories.
+  ///
+  /// In sr, this message translates to:
+  /// **'Sve'**
+  String get analyticsFilterAllCategories;
+
+  /// No description provided for @analyticsPriceRangeTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Raspon jedinične cene'**
+  String get analyticsPriceRangeTitle;
+
+  /// No description provided for @analyticsPriceMin.
+  ///
+  /// In sr, this message translates to:
+  /// **'Najniža'**
+  String get analyticsPriceMin;
+
+  /// No description provided for @analyticsPriceAvg.
+  ///
+  /// In sr, this message translates to:
+  /// **'Prosečna'**
+  String get analyticsPriceAvg;
+
+  /// No description provided for @analyticsPriceMax.
+  ///
+  /// In sr, this message translates to:
+  /// **'Najviša'**
+  String get analyticsPriceMax;
+
+  /// No description provided for @analyticsPriceLatest.
+  ///
+  /// In sr, this message translates to:
+  /// **'Poslednja'**
+  String get analyticsPriceLatest;
+
+  /// No description provided for @analyticsCheapestBadge.
+  ///
+  /// In sr, this message translates to:
+  /// **'Najpovoljnije'**
+  String get analyticsCheapestBadge;
+
+  /// No description provided for @analyticsMerchantAvgPrice.
+  ///
+  /// In sr, this message translates to:
+  /// **'Prosek: {price}'**
+  String analyticsMerchantAvgPrice(String price);
+
+  /// No description provided for @analyticsMerchantMinMaxPrice.
+  ///
+  /// In sr, this message translates to:
+  /// **'Min: {min} • Poslednja: {latest}'**
+  String analyticsMerchantMinMaxPrice(String min, String latest);
+
+  /// No description provided for @analyticsPackageValueTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Isplativost pakovanja (cena po 1L / 1kg)'**
+  String get analyticsPackageValueTitle;
+
+  /// No description provided for @analyticsBestValueBadge.
+  ///
+  /// In sr, this message translates to:
+  /// **'Najisplativije'**
+  String get analyticsBestValueBadge;
+
+  /// No description provided for @analyticsNormalizedPrice.
+  ///
+  /// In sr, this message translates to:
+  /// **'{price} / {unit}'**
+  String analyticsNormalizedPrice(String price, String unit);
+
+  /// No description provided for @analyticsHabitTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Ritam kupovine'**
+  String get analyticsHabitTitle;
+
+  /// No description provided for @analyticsHabitEveryDays.
+  ///
+  /// In sr, this message translates to:
+  /// **'Svakih ~{days} dana • ~{monthly}/mes'**
+  String analyticsHabitEveryDays(int days, String monthly);
+
+  /// No description provided for @analyticsRecentPurchases.
+  ///
+  /// In sr, this message translates to:
+  /// **'Poslednje kupovine'**
+  String get analyticsRecentPurchases;
+
+  /// No description provided for @analyticsUnmergeTooltip.
+  ///
+  /// In sr, this message translates to:
+  /// **'Odvoj u poseban artikal'**
+  String get analyticsUnmergeTooltip;
+
+  /// No description provided for @analyticsUnmergeConfirmTitle.
+  ///
+  /// In sr, this message translates to:
+  /// **'Odvojiti ovu varijantu?'**
+  String get analyticsUnmergeConfirmTitle;
+
+  /// No description provided for @analyticsUnmergeConfirmBody.
+  ///
+  /// In sr, this message translates to:
+  /// **'Stavke sa nazivom „{rawName}“ biće izdvojene u poseban artikal.'**
+  String analyticsUnmergeConfirmBody(String rawName);
+
+  /// No description provided for @analyticsUnmergeAction.
+  ///
+  /// In sr, this message translates to:
+  /// **'Odvoj'**
+  String get analyticsUnmergeAction;
+
+  /// No description provided for @analyticsUnmergeSuccess.
+  ///
+  /// In sr, this message translates to:
+  /// **'Varijanta je izdvojena u poseban artikal.'**
+  String get analyticsUnmergeSuccess;
 }
 
 class _AppLocalizationsDelegate

@@ -20,11 +20,14 @@ class BackgroundRefetch {
   }
 
   /// Zakaži periodični task (min. interval na Androidu je 15 min).
+  /// Odloženi prvi pokretaj (initialDelay) sprečava sudar sa glavnim izolatom
+  /// pri hladnom startu i migraciji baze odmah po ažuriranju aplikacije.
   static Future<void> schedulePeriodic() async {
     await Workmanager().registerPeriodicTask(
       _uniqueName,
       taskName,
       frequency: const Duration(hours: 1),
+      initialDelay: const Duration(minutes: 15),
       constraints: Constraints(networkType: NetworkType.connected),
       existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
     );

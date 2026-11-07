@@ -745,6 +745,133 @@ class AppLocalizationsSr extends AppLocalizations {
   @override
   String get detailDiscrepancyWarning =>
       'Upozorenje: parsirani podaci se ne slažu sa podacima fiskalnog servera. Proverite račun.';
+
+  @override
+  String get analyticsRawVariants => 'Spojeni nazivi sa računa';
+
+  @override
+  String get analyticsMeasureOther => 'Ostalo';
+
+  @override
+  String get analyticsMergeButton => 'Spoji sa drugim artiklom';
+
+  @override
+  String get analyticsMergeTitle => 'Spoji artikle';
+
+  @override
+  String get analyticsMergeSubtitle =>
+      'Izaberite artikle koje želite da spojite u jedan kanonski proizvod i uredite zajednički naziv.';
+
+  @override
+  String get analyticsMergeTargetName => 'Zajednički naziv artikla';
+
+  @override
+  String get analyticsMergeSearchHint => 'Pretraži artikle za spajanje...';
+
+  @override
+  String get analyticsMergeEmpty => 'Nema drugih artikala za spajanje.';
+
+  @override
+  String get analyticsMergeConfirm => 'Spoji izabrane';
+
+  @override
+  String get analyticsMergeSuccess => 'Artikli su uspešno spojeni.';
+
+  @override
+  String analyticsViewAllItems(int count) {
+    return 'Svi artikli ($count)';
+  }
+
+  @override
+  String get analyticsAllItemsTitle => 'Katalog artikala';
+
+  @override
+  String get analyticsSearchItemsHint =>
+      'Pretraži po nazivu ili tekstu sa računa...';
+
+  @override
+  String get analyticsSortSpent => 'Potrošnja';
+
+  @override
+  String get analyticsSortFrequency => 'Učestalost';
+
+  @override
+  String get analyticsSortPriceJump => 'Rast cene';
+
+  @override
+  String get analyticsSortName => 'A–Š';
+
+  @override
+  String get analyticsFilterAllCategories => 'Sve';
+
+  @override
+  String get analyticsPriceRangeTitle => 'Raspon jedinične cene';
+
+  @override
+  String get analyticsPriceMin => 'Najniža';
+
+  @override
+  String get analyticsPriceAvg => 'Prosečna';
+
+  @override
+  String get analyticsPriceMax => 'Najviša';
+
+  @override
+  String get analyticsPriceLatest => 'Poslednja';
+
+  @override
+  String get analyticsCheapestBadge => 'Najpovoljnije';
+
+  @override
+  String analyticsMerchantAvgPrice(String price) {
+    return 'Prosek: $price';
+  }
+
+  @override
+  String analyticsMerchantMinMaxPrice(String min, String latest) {
+    return 'Min: $min • Poslednja: $latest';
+  }
+
+  @override
+  String get analyticsPackageValueTitle =>
+      'Isplativost pakovanja (cena po 1L / 1kg)';
+
+  @override
+  String get analyticsBestValueBadge => 'Najisplativije';
+
+  @override
+  String analyticsNormalizedPrice(String price, String unit) {
+    return '$price / $unit';
+  }
+
+  @override
+  String get analyticsHabitTitle => 'Ritam kupovine';
+
+  @override
+  String analyticsHabitEveryDays(int days, String monthly) {
+    return 'Svakih ~$days dana • ~$monthly/mes';
+  }
+
+  @override
+  String get analyticsRecentPurchases => 'Poslednje kupovine';
+
+  @override
+  String get analyticsUnmergeTooltip => 'Odvoj u poseban artikal';
+
+  @override
+  String get analyticsUnmergeConfirmTitle => 'Odvojiti ovu varijantu?';
+
+  @override
+  String analyticsUnmergeConfirmBody(String rawName) {
+    return 'Stavke sa nazivom „$rawName“ biće izdvojene u poseban artikal.';
+  }
+
+  @override
+  String get analyticsUnmergeAction => 'Odvoj';
+
+  @override
+  String get analyticsUnmergeSuccess =>
+      'Varijanta je izdvojena u poseban artikal.';
 }
 
 /// The translations for Serbian, using the Cyrillic script (`sr_Cyrl`).
@@ -1488,4 +1615,131 @@ class AppLocalizationsSrCyrl extends AppLocalizationsSr {
   @override
   String get detailDiscrepancyWarning =>
       'Упозорење: парсирани подаци се не слажу са подацима фискалног сервера. Проверите рачун.';
+
+  @override
+  String get analyticsRawVariants => 'Спојени називи са рачуна';
+
+  @override
+  String get analyticsMeasureOther => 'Остало';
+
+  @override
+  String get analyticsMergeButton => 'Споји са другим артиклом';
+
+  @override
+  String get analyticsMergeTitle => 'Споји артикле';
+
+  @override
+  String get analyticsMergeSubtitle =>
+      'Изаберите артикле које желите да спојите у један канонски производ и уредите заједнички назив.';
+
+  @override
+  String get analyticsMergeTargetName => 'Заједнички назив артикла';
+
+  @override
+  String get analyticsMergeSearchHint => 'Претражи артикле за спајање...';
+
+  @override
+  String get analyticsMergeEmpty => 'Нема других артикала за спајање.';
+
+  @override
+  String get analyticsMergeConfirm => 'Споји изабране';
+
+  @override
+  String get analyticsMergeSuccess => 'Артикли су успешно спојени.';
+
+  @override
+  String analyticsViewAllItems(int count) {
+    return 'Сви артикли ($count)';
+  }
+
+  @override
+  String get analyticsAllItemsTitle => 'Каталог артикала';
+
+  @override
+  String get analyticsSearchItemsHint =>
+      'Претражи по називу или тексту са рачуна...';
+
+  @override
+  String get analyticsSortSpent => 'Потрошња';
+
+  @override
+  String get analyticsSortFrequency => 'Учесталост';
+
+  @override
+  String get analyticsSortPriceJump => 'Раст цене';
+
+  @override
+  String get analyticsSortName => 'А–Ш';
+
+  @override
+  String get analyticsFilterAllCategories => 'Све';
+
+  @override
+  String get analyticsPriceRangeTitle => 'Распон јединичне цене';
+
+  @override
+  String get analyticsPriceMin => 'Најнижа';
+
+  @override
+  String get analyticsPriceAvg => 'Просечна';
+
+  @override
+  String get analyticsPriceMax => 'Највиша';
+
+  @override
+  String get analyticsPriceLatest => 'Последња';
+
+  @override
+  String get analyticsCheapestBadge => 'Најповољније';
+
+  @override
+  String analyticsMerchantAvgPrice(String price) {
+    return 'Просек: $price';
+  }
+
+  @override
+  String analyticsMerchantMinMaxPrice(String min, String latest) {
+    return 'Мин: $min • Последња: $latest';
+  }
+
+  @override
+  String get analyticsPackageValueTitle =>
+      'Исплативост паковања (цена по 1L / 1kg)';
+
+  @override
+  String get analyticsBestValueBadge => 'Најисплативије';
+
+  @override
+  String analyticsNormalizedPrice(String price, String unit) {
+    return '$price / $unit';
+  }
+
+  @override
+  String get analyticsHabitTitle => 'Ритам куповине';
+
+  @override
+  String analyticsHabitEveryDays(int days, String monthly) {
+    return 'Сваких ~$days дана • ~$monthly/мес';
+  }
+
+  @override
+  String get analyticsRecentPurchases => 'Последње куповине';
+
+  @override
+  String get analyticsUnmergeTooltip => 'Одвој у посебан артикал';
+
+  @override
+  String get analyticsUnmergeConfirmTitle => 'Одвојити ову варијанту?';
+
+  @override
+  String analyticsUnmergeConfirmBody(String rawName) {
+    return 'Ставке са називом „$rawName“ биће издвојене у посебан артикал.';
+  }
+
+  @override
+  String get analyticsUnmergeAction => 'Одвој';
+
+  @override
+  String get analyticsUnmergeSuccess =>
+      'Варијанта је издвојена у посебан артикал.';
 }

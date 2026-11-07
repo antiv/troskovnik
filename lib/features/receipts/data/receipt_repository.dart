@@ -4,6 +4,7 @@ import '../../../core/db/database.dart';
 import '../../../core/db/enums.dart';
 import '../../../core/domain/country.dart';
 import '../../../core/domain/currency.dart';
+import '../../../core/normalization/item_normalization_service.dart';
 import '../../scan/domain/ips_qr.dart';
 import '../../source/domain/receipt_source.dart';
 import '../domain/retry_policy.dart';
@@ -271,12 +272,30 @@ class ReceiptRepository {
 
     // Ubaci nove stavke; zapamti mapu stari_id → novi_id za uparene i skup
     // svih novih id-jeva (da pri brisanju ne diramo nove neuparene stavke).
-    final oldToNew = <int, int>{};
-    final newIds = <int>[];
+    final matchedOld = <LineItemRow?>[];
     for (final it in items) {
       final queue = oldByName[it.name];
       final matched =
           (queue != null && queue.isNotEmpty) ? queue.removeAt(0) : null;
+      matchedOld.add(matched);
+    }
+
+    final normalizer = ItemNormalizationService(_db);
+    final resolved = await normalizer.resolveBatch([
+      for (var i = 0; i < items.length; i++)
+        (
+          name: items[i].name,
+          categoryId: matchedOld[i]?.categoryId,
+          isUnparsed: items[i].isUnparsed,
+        ),
+    ]);
+
+    final oldToNew = <int, int>{};
+    final newIds = <int>[];
+    for (var i = 0; i < items.length; i++) {
+      final it = items[i];
+      final matched = matchedOld[i];
+      final res = resolved[i];
       final newId = await _db.into(_db.lineItems).insert(
             LineItemsCompanion.insert(
               receiptId: receiptId,
@@ -289,7 +308,9 @@ class ReceiptRepository {
               taxRate: Value(it.taxRate),
               source: Value(it.source),
               isUnparsed: Value(it.isUnparsed),
-              categoryId: Value(matched?.categoryId),
+              categoryId: Value(matched?.categoryId ?? res.categoryId),
+              canonicalItemId: Value(res.canonicalItemId),
+              extractedMeasure: Value(res.extractedMeasure),
             ),
           );
       newIds.add(newId);
@@ -314,8 +335,20 @@ class ReceiptRepository {
   }
 
   Future<void> _insertItems(int receiptId, List<ParsedLineItem> items) async {
+    if (items.isEmpty) return;
+    final normalizer = ItemNormalizationService(_db);
+    final resolved = await normalizer.resolveBatch([
+      for (final it in items)
+        (
+          name: it.name,
+          categoryId: null,
+          isUnparsed: it.isUnparsed,
+        ),
+    ]);
     await _db.batch((b) {
-      for (final it in items) {
+      for (var i = 0; i < items.length; i++) {
+        final it = items[i];
+        final res = resolved[i];
         b.insert(
           _db.lineItems,
           LineItemsCompanion.insert(
@@ -329,6 +362,9 @@ class ReceiptRepository {
             taxRate: Value(it.taxRate),
             source: Value(it.source),
             isUnparsed: Value(it.isUnparsed),
+            categoryId: Value(res.categoryId),
+            canonicalItemId: Value(res.canonicalItemId),
+            extractedMeasure: Value(res.extractedMeasure),
           ),
         );
       }
@@ -388,8 +424,19 @@ class ReceiptRepository {
             ),
           );
       if (items.isNotEmpty) {
+        final normalizer = ItemNormalizationService(_db);
+        final resolved = await normalizer.resolveBatch([
+          for (final item in items)
+            (
+              name: item.name,
+              categoryId: null,
+              isUnparsed: false,
+            ),
+        ]);
         await _db.batch((b) {
-          for (final item in items) {
+          for (var i = 0; i < items.length; i++) {
+            final item = items[i];
+            final res = resolved[i];
             b.insert(
               _db.lineItems,
               LineItemsCompanion.insert(
@@ -398,6 +445,9 @@ class ReceiptRepository {
                 total: Value(item.totalMinor),
                 unitPrice: Value(item.totalMinor),
                 source: Value(ItemsSource.none),
+                categoryId: Value(res.categoryId),
+                canonicalItemId: Value(res.canonicalItemId),
+                extractedMeasure: Value(res.extractedMeasure),
               ),
             );
           }

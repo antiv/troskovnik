@@ -261,5 +261,75 @@
   "dbRecoveryReset": "Obriši podatke i počni ispočetka",
   "dbRecoveryConfirmBody": "Svi sačuvani računi i garancije biće trajno obrisani. Ova akcija se ne može poništiti.",
   "dbRecoveryError": "Brisanje nije uspelo. Pokušajte ponovo.",
-  "detailDiscrepancyWarning": "Upozorenje: parsirani podaci se ne slažu sa podacima fiskalnog servera. Proverite račun."
+  "detailDiscrepancyWarning": "Upozorenje: parsirani podaci se ne slažu sa podacima fiskalnog servera. Proverite račun.",
+  "analyticsRawVariants": "Spojeni nazivi sa računa",
+  "analyticsMeasureOther": "Ostalo",
+  "analyticsMergeButton": "Spoji sa drugim artiklom",
+  "analyticsMergeTitle": "Spoji artikle",
+  "analyticsMergeSubtitle": "Izaberite artikle koje želite da spojite u jedan kanonski proizvod i uredite zajednički naziv.",
+  "analyticsMergeTargetName": "Zajednički naziv artikla",
+  "analyticsMergeSearchHint": "Pretraži artikle za spajanje...",
+  "analyticsMergeEmpty": "Nema drugih artikala za spajanje.",
+  "analyticsMergeConfirm": "Spoji izabrane",
+  "analyticsMergeSuccess": "Artikli su uspešno spojeni.",
+  "analyticsViewAllItems": "Svi artikli ({count})",
+  "@analyticsViewAllItems": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "analyticsAllItemsTitle": "Katalog artikala",
+  "analyticsSearchItemsHint": "Pretraži po nazivu ili tekstu sa računa...",
+  "analyticsSortSpent": "Potrošnja",
+  "analyticsSortFrequency": "Učestalost",
+  "analyticsSortPriceJump": "Rast cene",
+  "analyticsSortName": "A–Š",
+  "analyticsFilterAllCategories": "Sve",
+  "analyticsPriceRangeTitle": "Raspon jedinične cene",
+  "analyticsPriceMin": "Najniža",
+  "analyticsPriceAvg": "Prosečna",
+  "analyticsPriceMax": "Najviša",
+  "analyticsPriceLatest": "Poslednja",
+  "analyticsCheapestBadge": "Najpovoljnije",
+  "analyticsMerchantAvgPrice": "Prosek: {price}",
+  "@analyticsMerchantAvgPrice": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "analyticsMerchantMinMaxPrice": "Min: {min} • Poslednja: {latest}",
+  "@analyticsMerchantMinMaxPrice": {
+    "placeholders": {
+      "min": { "type": "String" },
+      "latest": { "type": "String" }
+    }
+  },
+  "analyticsPackageValueTitle": "Isplativost pakovanja (cena po 1L / 1kg)",
+  "analyticsBestValueBadge": "Najisplativije",
+  "analyticsNormalizedPrice": "{price} / {unit}",
+  "@analyticsNormalizedPrice": {
+    "placeholders": {
+      "price": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+  "analyticsHabitTitle": "Ritam kupovine",
+  "analyticsHabitEveryDays": "Svakih ~{days} dana • ~{monthly}/mes",
+  "@analyticsHabitEveryDays": {
+    "placeholders": {
+      "days": { "type": "int" },
+      "monthly": { "type": "String" }
+    }
+  },
+  "analyticsRecentPurchases": "Poslednje kupovine",
+  "analyticsUnmergeTooltip": "Odvoj u poseban artikal",
+  "analyticsUnmergeConfirmTitle": "Odvojiti ovu varijantu?",
+  "analyticsUnmergeConfirmBody": "Stavke sa nazivom „{rawName}“ biće izdvojene u poseban artikal.",
+  "@analyticsUnmergeConfirmBody": {
+    "placeholders": {
+      "rawName": { "type": "String" }
+    }
+  },
+  "analyticsUnmergeAction": "Odvoj",
+  "analyticsUnmergeSuccess": "Varijanta je izdvojena u poseban artikal."
 }

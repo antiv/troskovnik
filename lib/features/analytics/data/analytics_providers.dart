@@ -94,3 +94,13 @@ final categoryItemsProvider =
   final currency = await ref.watch(analyticsCurrencyProvider.future);
   return repo.categoryItems(categoryId, range, currency: currency);
 });
+
+/// Kompletan katalog artikala za izabrani period i valutu (Modul 2).
+final catalogItemsProvider =
+    FutureProvider<List<CatalogItemSummary>>((ref) async {
+  final repo = await ref.watch(analyticsRepositoryProvider.future);
+  final range = ref.watch(analyticsRangeProvider);
+  final currency = await ref.watch(analyticsCurrencyProvider.future);
+  return repo.catalogItems(range, currency: currency);
+});
+

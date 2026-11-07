@@ -171,6 +171,64 @@ class LineItems extends Table {
   /// Kategorija stavke (nullable — nepoznata kategorija).
   IntColumn get categoryId => integer().nullable()
       .references(Categories, #id, onDelete: KeyAction.setNull)();
+
+  /// Kanonski artikal kojem ova stavka pripada (Sloj 2 normalizacije).
+  IntColumn get canonicalItemId => integer().nullable()
+      .references(CanonicalItems, #id, onDelete: KeyAction.setNull)();
+
+  /// Izdvojena jedinica mere/pakovanja iz naziva (npr. "1l", "0.5l", "500g")
+  /// radi odvojenog praćenja cena po gramaži (Sloj 1).
+  TextColumn get extractedMeasure => text().nullable()();
+}
+
+/// Kanonski artikli za grupisanje u analitici (Sloj 2 normalizacije).
+@DataClassName('CanonicalItemRow')
+class CanonicalItems extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  /// Normalizovani skup sortiranih tokena (npr. "imlek kravica mleko moja").
+  TextColumn get canonicalKey => text()();
+
+  /// Čitljiv kanonski naziv za prikaz u analitici (npr. "Mleko Moja Kravica").
+  TextColumn get displayName => text()();
+
+  /// Podrazumevana kategorija kanonskog artikla (nasleđuje se pri novom skeniranju).
+  IntColumn get defaultCategoryId => integer().nullable()
+      .references(Categories, #id, onDelete: KeyAction.setNull)();
+
+  DateTimeColumn get createdAt =>
+      dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+        {canonicalKey},
+      ];
+}
+
+/// Keš tabela alijasa koja mapira očišćeni sirovi naziv sa računa u $O(1)$
+/// na kanonski artikal (Sloj 2 normalizacije).
+@DataClassName('ItemAliasRow')
+class ItemAliases extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  /// Očišćeni normalizovani ključ sirovog naziva sa računa.
+  TextColumn get cleanedRawName => text()();
+
+  /// Referenca na kanonski artikal.
+  IntColumn get canonicalItemId =>
+      integer().references(CanonicalItems, #id, onDelete: KeyAction.cascade)();
+
+  /// Oznaka da je mapiranje nastalo ručnim spajanjem od strane korisnika.
+  BoolColumn get isUserMerged =>
+      boolean().withDefault(const Constant(false))();
+
+  DateTimeColumn get createdAt =>
+      dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+        {cleanedRawName},
+      ];
 }
 
 /// Kategorije stavki (categories).

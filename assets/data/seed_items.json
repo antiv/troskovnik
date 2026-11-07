@@ -1,0 +1,3352 @@
+{
+  "version": 2,
+  "description": "Prošireni kanonski šifarnik artikala za Srbiju (SRB), Crnu Goru (MNE) i BiH / Republiku Srpsku (RS) — kurirani katalog + Open Food Facts (ODbL)",
+  "items": [
+    {
+      "canonicalKey": "imlek kravica mleko moja",
+      "displayName": "Mleko Moja Kravica",
+      "aliases": [
+        "dugotrajno kravica mleko moja",
+        "imlek kravica mleko",
+        "imlek kravica mleko moja",
+        "imlek kravica mleko sveze",
+        "kravica mleko",
+        "kravica mleko moja",
+        "kravica mleko sveze",
+        "kravica mleko uht"
+      ]
+    },
+    {
+      "canonicalKey": "imlek jogurt kravica moja",
+      "displayName": "Jogurt Moja Kravica",
+      "aliases": [
+        "gusti jogurt kravica moja",
+        "imlek jogurt kravica",
+        "imlek jogurt kravica moja",
+        "jogurt kravica",
+        "jogurt kravica moja"
+      ]
+    },
+    {
+      "canonicalKey": "balans imlek jogurt",
+      "displayName": "Jogurt Balans+",
+      "aliases": [
+        "balans imlek",
+        "balans imlek jogurt",
+        "balans jogurt",
+        "balans jogurt plus",
+        "balans jogurt probiotik"
+      ]
+    },
+    {
+      "canonicalKey": "imlek kisela kravica moja pavlaka",
+      "displayName": "Kisela pavlaka Moja Kravica",
+      "aliases": [
+        "imlek kisela kravica moja pavlaka",
+        "imlek kisela pavlaka",
+        "kisela kravica moja pavlaka",
+        "kravica moja pavlaka",
+        "kravica pavlaka"
+      ]
+    },
+    {
+      "canonicalKey": "dukat mleko",
+      "displayName": "Mleko Dukat",
+      "aliases": [
+        "cokoladno dukat mleko",
+        "cokoladno mleko",
+        "dugotrajno dukat mleko",
+        "dukat mleko",
+        "dukat mleko somboled",
+        "dukat mleko sveze",
+        "dukat mleko trajno",
+        "dukat mleko uht"
+      ]
+    },
+    {
+      "canonicalKey": "meggle mleko",
+      "displayName": "Mleko Meggle",
+      "aliases": [
+        "dugotrajno meggle mleko",
+        "meggle mleko",
+        "meggle mleko trajno",
+        "meggle mleko uht"
+      ]
+    },
+    {
+      "canonicalKey": "mleko zbregov",
+      "displayName": "Mleko Z'bregov",
+      "aliases": [
+        "bregov mleko",
+        "dugotrajno mleko zbregov",
+        "mleko vindija zbregov",
+        "mleko zbregov"
+      ]
+    },
+    {
+      "canonicalKey": "imlek maslac",
+      "displayName": "Maslac Imlek",
+      "aliases": [
+        "imlek kravica maslac moja",
+        "imlek maslac",
+        "imlek puter",
+        "kravica maslac moja"
+      ]
+    },
+    {
+      "canonicalKey": "president sir somboled",
+      "displayName": "Sir President",
+      "aliases": [
+        "mladi president sir",
+        "president sir",
+        "president sir sjenicki",
+        "president sir somboled",
+        "president somboled"
+      ]
+    },
+    {
+      "canonicalKey": "mlekara sabacka sir",
+      "displayName": "Sir Šabačka mlekara",
+      "aliases": [
+        "mediteraneo sir",
+        "mlekara sabacka",
+        "mlekara sabacka sir",
+        "sabacka sir"
+      ]
+    },
+    {
+      "canonicalKey": "bela mlekara pavlaka subotica",
+      "displayName": "Kisela pavlaka Mlekara Subotica",
+      "aliases": [
+        "bela mlekara pavlaka subotica",
+        "kisela mlekara pavlaka subotica",
+        "mlekara pavlaka subotica",
+        "pavlaka subotica"
+      ]
+    },
+    {
+      "canonicalKey": "beli hleb sava",
+      "displayName": "Hleb beli Sava",
+      "aliases": [
+        "beli hleb rezani",
+        "beli hleb sava",
+        "beli hleb vekna",
+        "hleb narodni",
+        "hleb sava",
+        "hleb tip500"
+      ]
+    },
+    {
+      "canonicalKey": "dijamant suncokretovo ulje",
+      "displayName": "Ulje Dijamant",
+      "aliases": [
+        "dijamant jestivo ulje",
+        "dijamant suncokretovo ulje",
+        "dijamant ulje"
+      ]
+    },
+    {
+      "canonicalKey": "sunce suncokretovo ulje",
+      "displayName": "Ulje Sunce",
+      "aliases": [
+        "jestivo sunce ulje",
+        "sunce suncokretovo ulje",
+        "sunce ulje"
+      ]
+    },
+    {
+      "canonicalKey": "suncokretovo ulje vital",
+      "displayName": "Ulje Vital",
+      "aliases": [
+        "jestivo ulje vital",
+        "suncokretovo ulje vital",
+        "ulje vital"
+      ]
+    },
+    {
+      "canonicalKey": "iskon suncokretovo ulje",
+      "displayName": "Ulje Iskon",
+      "aliases": [
+        "iskon jestivo ulje",
+        "iskon suncokretovo ulje",
+        "iskon ulje"
+      ]
+    },
+    {
+      "canonicalKey": "bambi keks plazma",
+      "displayName": "Plazma keks Bambi",
+      "aliases": [
+        "bambi keks plazma",
+        "bambi mlevena plazma",
+        "bambi plazma",
+        "keks plazma",
+        "mlevena plazma",
+        "plazma"
+      ]
+    },
+    {
+      "canonicalKey": "flips smoki stark",
+      "displayName": "Smoki Štark",
+      "aliases": [
+        "flips smoki",
+        "flips smoki stark",
+        "smoki",
+        "smoki soko stark",
+        "smoki stark"
+      ]
+    },
+    {
+      "canonicalKey": "bananica cokoladna stark",
+      "displayName": "Čokoladna bananica Štark",
+      "aliases": [
+        "bananica",
+        "bananica coko",
+        "bananica coko stark",
+        "bananica cokolada krem",
+        "bananica cokoladna krem",
+        "bananica cokoladna stark",
+        "bananica krem",
+        "bananica stark"
+      ]
+    },
+    {
+      "canonicalKey": "cokolada najlepse stark zelje",
+      "displayName": "Čokolada Najlepše želje",
+      "aliases": [
+        "cokolada najlepse stark zelje",
+        "cokolada najlepse zelje",
+        "mlecna najlepse stark zelje",
+        "mlecna najlepse zelje",
+        "najlepse stark zelje",
+        "najlepse zelje"
+      ]
+    },
+    {
+      "canonicalKey": "cokolada milka",
+      "displayName": "Čokolada Milka",
+      "aliases": [
+        "cokolada milka",
+        "cokolada milka mlecna",
+        "lesnik milka",
+        "milka",
+        "milka noisette",
+        "milka oreo"
+      ]
+    },
+    {
+      "canonicalKey": "crvenka jaffa keks",
+      "displayName": "Jaffa Cakes Crvenka",
+      "aliases": [
+        "biscuit jaffa",
+        "cakes crvenka jaffa",
+        "crvenka jaffa keks",
+        "jaffa",
+        "jaffa keks"
+      ]
+    },
+    {
+      "canonicalKey": "crvenka jaffa munchmallow",
+      "displayName": "Munchmallow",
+      "aliases": [
+        "crvenka jaffa munchmallow",
+        "crvenka munchmallow",
+        "munchmallow"
+      ]
+    },
+    {
+      "canonicalKey": "eurokrem krem swisslion takovo",
+      "displayName": "Eurokrem Takovo",
+      "aliases": [
+        "eurokrem",
+        "eurokrem krem swisslion takovo",
+        "eurokrem swisslion",
+        "eurokrem takovo"
+      ]
+    },
+    {
+      "canonicalKey": "coca cola",
+      "displayName": "Coca-Cola",
+      "aliases": [
+        "coca cola",
+        "coca cola gazirani pice",
+        "coca cola gazirani sok",
+        "coca cola hvala",
+        "coca cola original",
+        "coca cola original taste",
+        "hvala"
+      ]
+    },
+    {
+      "canonicalKey": "coca cola zero",
+      "displayName": "Coca-Cola Zero",
+      "aliases": [
+        "bez coca cola secera",
+        "coca cola sugar zero",
+        "coca cola zero"
+      ]
+    },
+    {
+      "canonicalKey": "cola pepsi",
+      "displayName": "Pepsi",
+      "aliases": [
+        "cola pepsi",
+        "gazirani pepsi sok",
+        "max pepsi",
+        "pepsi",
+        "pepsi twist"
+      ]
+    },
+    {
+      "canonicalKey": "cockta",
+      "displayName": "Cockta",
+      "aliases": [
+        "cockta",
+        "cockta gazirani sok",
+        "cockta original"
+      ]
+    },
+    {
+      "canonicalKey": "fanta orange",
+      "displayName": "Fanta",
+      "aliases": [
+        "fanta",
+        "fanta gazirani sok",
+        "fanta orange",
+        "fanta pomorandza"
+      ]
+    },
+    {
+      "canonicalKey": "kisela knjaz milos mineralna voda",
+      "displayName": "Kisela voda Knjaz Miloš",
+      "aliases": [
+        "gazirana knjaz milos voda",
+        "kisela knjaz milos mineralna voda",
+        "kisela knjaz milos voda",
+        "kisela knjaz voda",
+        "knjaz milos",
+        "knjaz milos voda"
+      ]
+    },
+    {
+      "canonicalKey": "mineralna negazirana rosa voda",
+      "displayName": "Voda Rosa",
+      "aliases": [
+        "mineralna negazirana rosa voda",
+        "negazirana rosa voda",
+        "prirodna rosa voda",
+        "rosa voda"
+      ]
+    },
+    {
+      "canonicalKey": "aqua mineralna negazirana viva voda",
+      "displayName": "Voda Aqua Viva",
+      "aliases": [
+        "aqua mineralna negazirana viva voda",
+        "aqua negazirana viva voda",
+        "aqua viva",
+        "aqua viva voda"
+      ]
+    },
+    {
+      "canonicalKey": "mineralna negazirana prolom voda",
+      "displayName": "Voda Prolom",
+      "aliases": [
+        "mineralna negazirana prolom voda",
+        "prolom",
+        "prolom voda"
+      ]
+    },
+    {
+      "canonicalKey": "gazirana minaqua mineralna voda",
+      "displayName": "Voda Minaqua",
+      "aliases": [
+        "gazirana minaqua mineralna voda",
+        "kisela minaqua voda",
+        "minaqua",
+        "minaqua voda"
+      ]
+    },
+    {
+      "canonicalKey": "gold grand kafa mlevena",
+      "displayName": "Kafa Grand Gold",
+      "aliases": [
+        "gold grand kafa",
+        "gold grand kafa mlevena",
+        "grand kafa",
+        "grand kafa mlevena",
+        "grand kafa strong"
+      ]
+    },
+    {
+      "canonicalKey": "doncafe kafa minas mlevena",
+      "displayName": "Kafa Doncafé",
+      "aliases": [
+        "doncaf kafa",
+        "doncafe kafa",
+        "doncafe kafa minas mlevena",
+        "doncafe kafa mlevena",
+        "doncafe minas",
+        "doncafe moment"
+      ]
+    },
+    {
+      "canonicalKey": "barcaffe kafa mlevena",
+      "displayName": "Kafa Barcaffè",
+      "aliases": [
+        "barcaff kafa",
+        "barcaffe",
+        "barcaffe kafa",
+        "barcaffe kafa mlevena"
+      ]
+    },
+    {
+      "canonicalKey": "classic instant kafa nescafe",
+      "displayName": "Nescafé Classic",
+      "aliases": [
+        "classic instant kafa nescafe",
+        "classic nescaf",
+        "classic nescafe",
+        "gold nescafe",
+        "instant kafa nescafe",
+        "nescafe"
+      ]
+    },
+    {
+      "canonicalKey": "jelen pivo",
+      "displayName": "Jelen pivo",
+      "aliases": [
+        "apatinsko jelen pivo",
+        "jelen",
+        "jelen pivo",
+        "jelen pivo svetlo"
+      ]
+    },
+    {
+      "canonicalKey": "lav pivo",
+      "displayName": "Lav pivo",
+      "aliases": [
+        "carlsberg lav pivo",
+        "lav pivo",
+        "lav pivo premium"
+      ]
+    },
+    {
+      "canonicalKey": "pivo zajecarsko",
+      "displayName": "Zaječarsko pivo",
+      "aliases": [
+        "pivo svetlo zajecarsko",
+        "pivo zajecarsko",
+        "zajecarsko"
+      ]
+    },
+    {
+      "canonicalKey": "niksicko pivo",
+      "displayName": "Nikšićko pivo",
+      "aliases": [
+        "niksicko",
+        "niksicko pivo",
+        "niksicko pivo svetlo",
+        "niksicko pivo trebjesa"
+      ]
+    },
+    {
+      "canonicalKey": "banjalucko pivo",
+      "displayName": "Banjalučko pivo",
+      "aliases": [
+        "banjalucka nektar pivara pivo",
+        "banjalucko pivo",
+        "nektar pivo"
+      ]
+    },
+    {
+      "canonicalKey": "carnex pasteta",
+      "displayName": "Pašteta Carnex",
+      "aliases": [
+        "cajna carnex pasteta",
+        "carnex jetrena pasteta",
+        "carnex pasteta",
+        "carnex pasteta pileci"
+      ]
+    },
+    {
+      "canonicalKey": "argeta pasteta",
+      "displayName": "Pašteta Argeta",
+      "aliases": [
+        "argeta junior pasteta",
+        "argeta kokosija pasteta",
+        "argeta pasteta",
+        "argeta pasteta pileci",
+        "argeta pasteta tuna"
+      ]
+    },
+    {
+      "canonicalKey": "beli kristal secer sunoko",
+      "displayName": "Šećer kristal",
+      "aliases": [
+        "beli kristal secer sunoko",
+        "beli secer",
+        "crvenka secer",
+        "kristal secer",
+        "secer sunoko"
+      ]
+    },
+    {
+      "canonicalKey": "brasno psenicno tip400",
+      "displayName": "Brašno pšenično T-400",
+      "aliases": [
+        "brasno danubius tip400",
+        "brasno fidelinka tip400",
+        "brasno glatko tip400",
+        "brasno psenicno tip400",
+        "brasno sentella tip400",
+        "brasno tip400"
+      ]
+    },
+    {
+      "canonicalKey": "brasno psenicno tip500",
+      "displayName": "Brašno pšenično T-500",
+      "aliases": [
+        "brasno danubius tip500",
+        "brasno fidelinka tip500",
+        "brasno psenicno tip500",
+        "brasno tip500"
+      ]
+    },
+    {
+      "canonicalKey": "kuhinjska so tuzlanska",
+      "displayName": "Kuhinjska so Tuzlanska",
+      "aliases": [
+        "kuhinjska so tuzlanska",
+        "sitna so tuzlanska",
+        "so tuzlanska"
+      ]
+    },
+    {
+      "canonicalKey": "kecap polimark",
+      "displayName": "Kečap Polimark",
+      "aliases": [
+        "blagi kecap polimark",
+        "kecap ljuti polimark",
+        "kecap pizza polimark",
+        "kecap polimark"
+      ]
+    },
+    {
+      "canonicalKey": "dijamant majonez",
+      "displayName": "Majonez Dijamant",
+      "aliases": [
+        "classic dijamant majonez",
+        "classic majonez",
+        "dijamant majonez"
+      ]
+    },
+    {
+      "canonicalKey": "majonez polimark",
+      "displayName": "Majonez Polimark",
+      "aliases": [
+        "classic majonez polimark",
+        "majonez polimark"
+      ]
+    },
+    {
+      "canonicalKey": "majonez thomy",
+      "displayName": "Majonez Thomy",
+      "aliases": [
+        "delikatess majonez thomy",
+        "majonez thomy"
+      ]
+    },
+    {
+      "canonicalKey": "c dodatak jelima zacin",
+      "displayName": "Začin C",
+      "aliases": [
+        "c dodatak jelima",
+        "c dodatak jelima zacin",
+        "c zacin"
+      ]
+    },
+    {
+      "canonicalKey": "dodatak jelima podravka vegeta",
+      "displayName": "Vegeta Podravka",
+      "aliases": [
+        "dodatak jelima podravka vegeta",
+        "podravka vegeta",
+        "vegeta",
+        "vegeta zacin"
+      ]
+    },
+    {
+      "canonicalKey": "deterdzent fairy sudove",
+      "displayName": "Fairy deterdžent za sudove",
+      "aliases": [
+        "deterdzent fairy",
+        "deterdzent fairy sudove",
+        "fairy",
+        "fairy limun",
+        "fairy sudove tecnost"
+      ]
+    },
+    {
+      "canonicalKey": "ariel deterdzent ves",
+      "displayName": "Ariel deterdžent za veš",
+      "aliases": [
+        "ariel deterdzent",
+        "ariel deterdzent tecni",
+        "ariel deterdzent ves",
+        "ariel kapsule",
+        "ariel prasak"
+      ]
+    },
+    {
+      "canonicalKey": "papir perfex toalet",
+      "displayName": "Toalet papir Perfex",
+      "aliases": [
+        "papir perfex",
+        "papir perfex toalet",
+        "perfex"
+      ]
+    },
+    {
+      "canonicalKey": "papir toalet zewa",
+      "displayName": "Toalet papir Zewa",
+      "aliases": [
+        "deluxe zewa",
+        "papir toalet zewa",
+        "papir zewa",
+        "zewa"
+      ]
+    },
+    {
+      "canonicalKey": "imlek kravica maslac moja",
+      "displayName": "Maslac Moja Kravica",
+      "aliases": [
+        "imlek kravica maslac moja",
+        "imlek maslac",
+        "kravica maslac",
+        "kravica maslac moja",
+        "kravica puter"
+      ]
+    },
+    {
+      "canonicalKey": "imlek kravica moja sir sitni",
+      "displayName": "Sitni sir Moja Kravica",
+      "aliases": [
+        "imlek kravica moja sir sitni",
+        "imlek sir sitni",
+        "kravica moja sir sitni",
+        "kravica sir sitni"
+      ]
+    },
+    {
+      "canonicalKey": "bela imlek kravica moja sir",
+      "displayName": "Beli sir Moja Kravica",
+      "aliases": [
+        "bela imlek kravica moja sir",
+        "beli kravica moja sir",
+        "beli kravica sir",
+        "kravica kriska moja sira"
+      ]
+    },
+    {
+      "canonicalKey": "cokoladno imlek kravica mleko moja",
+      "displayName": "Čokoladno mleko Moja Kravica",
+      "aliases": [
+        "cokoladno imlek kravica mleko moja",
+        "cokoladno imlek mleko",
+        "cokoladno kravica mleko",
+        "cokoladno kravica mleko moja"
+      ]
+    },
+    {
+      "canonicalKey": "imlek kravica kuhinjica moja pavlaka",
+      "displayName": "Pavlaka za kuvanje Moja Kravica",
+      "aliases": [
+        "imlek kravica kuhinjica moja pavlaka",
+        "kravica kuvanje moja pavlaka",
+        "kravica kuvanje pavlaka",
+        "kuhinjica kuvanje pavlaka"
+      ]
+    },
+    {
+      "canonicalKey": "bello imlek jogurt organic",
+      "displayName": "Bello Organic Jogurt",
+      "aliases": [
+        "bello imlek jogurt",
+        "bello imlek jogurt organic",
+        "bello jogurt",
+        "bello jogurt organic"
+      ]
+    },
+    {
+      "canonicalKey": "grekos imlek jogurt",
+      "displayName": "Grekos Grčki jogurt",
+      "aliases": [
+        "grcki grekos jogurt",
+        "grekos imlek",
+        "grekos imlek jogurt",
+        "grekos jogurt"
+      ]
+    },
+    {
+      "canonicalKey": "imlek kefir kravica moja",
+      "displayName": "Kefir Moja Kravica",
+      "aliases": [
+        "imlek kefir",
+        "imlek kefir kravica moja",
+        "kefir kravica",
+        "kefir kravica moja"
+      ]
+    },
+    {
+      "canonicalKey": "flert imlek kafa",
+      "displayName": "Flert Ledena kafa",
+      "aliases": [
+        "flert imlek",
+        "flert imlek kafa",
+        "flert kafa ledena"
+      ]
+    },
+    {
+      "canonicalKey": "dukat jogurt",
+      "displayName": "Dukat Jogurt",
+      "aliases": [
+        "dukat gusti jogurt",
+        "dukat jogurt",
+        "dukat jogurt tekuci"
+      ]
+    },
+    {
+      "canonicalKey": "biser sir trapist",
+      "displayName": "Sir Trapist Biser",
+      "aliases": [
+        "biser sir trapist",
+        "biser trapist"
+      ]
+    },
+    {
+      "canonicalKey": "gauda president sir",
+      "displayName": "President Gauda sir",
+      "aliases": [
+        "gauda president",
+        "gauda president sir"
+      ]
+    },
+    {
+      "canonicalKey": "edamer president sir",
+      "displayName": "President Edamer sir",
+      "aliases": [
+        "edamer president",
+        "edamer president sir"
+      ]
+    },
+    {
+      "canonicalKey": "kajmak mlad zlatarski",
+      "displayName": "Zlatarski sir / kajmak",
+      "aliases": [
+        "kajmak",
+        "kajmak mlad zlatarski",
+        "kajmak sir zlatarski",
+        "kajmak zlatarski",
+        "sir zlatarski"
+      ]
+    },
+    {
+      "canonicalKey": "ella sir",
+      "displayName": "Ella Sir (Subotička mlekara)",
+      "aliases": [
+        "ella mlekara sir subotica",
+        "ella mlekara sir suboticka",
+        "ella posni sir",
+        "ella sir",
+        "ella suboticka"
+      ]
+    },
+    {
+      "canonicalKey": "ab kultura suboticka",
+      "displayName": "AB Kultura Jogurt",
+      "aliases": [
+        "ab jogurt",
+        "ab jogurt kultura",
+        "ab jogurt mlekara subotica",
+        "ab kultura suboticka"
+      ]
+    },
+    {
+      "canonicalKey": "mleko suboticka zdravo",
+      "displayName": "Zdravo! Mleko",
+      "aliases": [
+        "jogurt zdravo",
+        "mleko suboticka zdravo",
+        "mleko zdravo"
+      ]
+    },
+    {
+      "canonicalKey": "granice jogurt mlekara",
+      "displayName": "Mlekara Granice Jogurt",
+      "aliases": [
+        "granice jogurt",
+        "granice jogurt mlekara"
+      ]
+    },
+    {
+      "canonicalKey": "granice mlekara mleko",
+      "displayName": "Mlekara Granice Mleko",
+      "aliases": [
+        "granice mlekara mleko",
+        "granice mleko"
+      ]
+    },
+    {
+      "canonicalKey": "jogurt lazine mlekara",
+      "displayName": "Lazine Jogurt (CG)",
+      "aliases": [
+        "cg jogurt lazine",
+        "jogurt lazine",
+        "jogurt lazine mlekara",
+        "kisela lazine mleko"
+      ]
+    },
+    {
+      "canonicalKey": "lazine mlekara mleko",
+      "displayName": "Lazine Mleko (CG)",
+      "aliases": [
+        "cg lazine mleko",
+        "lazine mlekara mleko",
+        "lazine mleko"
+      ]
+    },
+    {
+      "canonicalKey": "milgor mleko srna",
+      "displayName": "Srna Mleko / Jogurt (CG)",
+      "aliases": [
+        "cg jogurt mleko srna",
+        "jogurt srna",
+        "milgor mleko srna",
+        "mleko srna"
+      ]
+    },
+    {
+      "canonicalKey": "jogurt meggle",
+      "displayName": "Meggle Jogurt",
+      "aliases": [
+        "jogurt meggle",
+        "jogurt meggle tekuci"
+      ]
+    },
+    {
+      "canonicalKey": "meggle pavlaka",
+      "displayName": "Meggle Pavlaka",
+      "aliases": [
+        "kisela meggle pavlaka",
+        "kuvanje meggle pavlaka",
+        "meggle pavlaka"
+      ]
+    },
+    {
+      "canonicalKey": "maslac meggle",
+      "displayName": "Meggle Maslac",
+      "aliases": [
+        "maslac meggle",
+        "meggle puter"
+      ]
+    },
+    {
+      "canonicalKey": "mleko vindija zbregov",
+      "displayName": "'z bregov Mleko",
+      "aliases": [
+        "bregov mleko",
+        "mleko vindija",
+        "mleko vindija zbregov",
+        "mleko zbregov"
+      ]
+    },
+    {
+      "canonicalKey": "jogurt vindija zbregov",
+      "displayName": "'z bregov Jogurt",
+      "aliases": [
+        "bregov jogurt",
+        "jogurt vindija",
+        "jogurt vindija zbregov",
+        "jogurt zbregov"
+      ]
+    },
+    {
+      "canonicalKey": "jogurt vitalis vocni",
+      "displayName": "Vitalis Voćni jogurt",
+      "aliases": [
+        "jogurt vitalis",
+        "jogurt vitalis vocni"
+      ]
+    },
+    {
+      "canonicalKey": "jogood jogurt vocni",
+      "displayName": "Jogood Voćni jogurt",
+      "aliases": [
+        "imlek jogood",
+        "jogood jogurt vocni"
+      ]
+    },
+    {
+      "canonicalKey": "mleko pilos",
+      "displayName": "Pilos Mleko (Lidl)",
+      "aliases": [
+        "dugotrajno mleko pilos",
+        "lidl mleko pilos",
+        "mleko pilos",
+        "mleko pilos sveze"
+      ]
+    },
+    {
+      "canonicalKey": "jogurt pilos",
+      "displayName": "Pilos Jogurt (Lidl)",
+      "aliases": [
+        "grcki jogurt pilos",
+        "jogurt lidl pilos",
+        "jogurt pilos"
+      ]
+    },
+    {
+      "canonicalKey": "pavlaka pilos",
+      "displayName": "Pilos Pavlaka (Lidl)",
+      "aliases": [
+        "kisela pavlaka pilos",
+        "lidl pavlaka pilos",
+        "pavlaka pilos"
+      ]
+    },
+    {
+      "canonicalKey": "pilos sir",
+      "displayName": "Pilos Sir (Lidl)",
+      "aliases": [
+        "beli pilos sir",
+        "edamer pilos",
+        "gauda pilos",
+        "lidl pilos sir",
+        "pilos sir",
+        "pilos sir sitni"
+      ]
+    },
+    {
+      "canonicalKey": "mleko premia",
+      "displayName": "Premia Mleko (Maxi)",
+      "aliases": [
+        "dugotrajno mleko premia",
+        "maxi mleko premia",
+        "mleko premia"
+      ]
+    },
+    {
+      "canonicalKey": "jogurt premia",
+      "displayName": "Premia Jogurt (Maxi)",
+      "aliases": [
+        "jogurt maxi premia",
+        "jogurt premia"
+      ]
+    },
+    {
+      "canonicalKey": "mleko plus",
+      "displayName": "K Plus Mleko (Idea)",
+      "aliases": [
+        "idea mleko plus",
+        "kplus mleko",
+        "mleko plus"
+      ]
+    },
+    {
+      "canonicalKey": "beli hleb rezani",
+      "displayName": "Beli rezani hleb",
+      "aliases": [
+        "beli hleb rezani"
+      ]
+    },
+    {
+      "canonicalKey": "hleb polubeli",
+      "displayName": "Polubeli hleb",
+      "aliases": [
+        "hleb polubeli"
+      ]
+    },
+    {
+      "canonicalKey": "hleb integralni",
+      "displayName": "Integralni hleb",
+      "aliases": [
+        "crni hleb",
+        "hleb integralni"
+      ]
+    },
+    {
+      "canonicalKey": "hleb kukuruzni",
+      "displayName": "Kukuruzni hleb",
+      "aliases": [
+        "hleb kukuruzni"
+      ]
+    },
+    {
+      "canonicalKey": "baget francuski hleb",
+      "displayName": "Francuski baget",
+      "aliases": [
+        "baget",
+        "baget francuski",
+        "baget francuski hleb",
+        "baget hleb",
+        "francuski hleb"
+      ]
+    },
+    {
+      "canonicalKey": "lepinja somun",
+      "displayName": "Somun / Lepinja",
+      "aliases": [
+        "domaca lepinja",
+        "lepinja",
+        "lepinja somun",
+        "lepinja vruca",
+        "somun"
+      ]
+    },
+    {
+      "canonicalKey": "kifla pecivo",
+      "displayName": "Kifla",
+      "aliases": [
+        "kifla",
+        "kifla pecivo",
+        "kifla pekarska",
+        "kifla slana",
+        "kifle"
+      ]
+    },
+    {
+      "canonicalKey": "burek meso sa",
+      "displayName": "Burek sa mesom",
+      "aliases": [
+        "burek meso",
+        "burek meso sa",
+        "burek mesom",
+        "burek mesom sa"
+      ]
+    },
+    {
+      "canonicalKey": "burek sa sirom",
+      "displayName": "Burek sa sirom",
+      "aliases": [
+        "burek sa sirom",
+        "burek sir",
+        "burek sirom",
+        "pita sa sirom",
+        "sirnica"
+      ]
+    },
+    {
+      "canonicalKey": "kroasan pecivo",
+      "displayName": "Kroasan",
+      "aliases": [
+        "cokolada kroasan",
+        "croissant",
+        "kroasan",
+        "kroasan pecivo",
+        "kroasan sir sunka"
+      ]
+    },
+    {
+      "canonicalKey": "7days kroasan",
+      "displayName": "7Days Kroasan",
+      "aliases": [
+        "7days double",
+        "7days kakao",
+        "7days kroasan",
+        "days kroasan"
+      ]
+    },
+    {
+      "canonicalKey": "djevrek pecivo",
+      "displayName": "Đevrek",
+      "aliases": [
+        "djevrek",
+        "djevrek pecivo",
+        "djevrek pekarski"
+      ]
+    },
+    {
+      "canonicalKey": "cvarci pogacica",
+      "displayName": "Pogačica / Žu-Žu",
+      "aliases": [
+        "cvarci pogacica",
+        "lisnato pecivo",
+        "pecivo zuzu",
+        "pogacica",
+        "pogacica zu",
+        "zu"
+      ]
+    },
+    {
+      "canonicalKey": "tortilja",
+      "displayName": "Tortilja",
+      "aliases": [
+        "mexican tortilja",
+        "psenicna tortilja",
+        "tortilja",
+        "tortilje"
+      ]
+    },
+    {
+      "canonicalKey": "jetrena pasteta",
+      "displayName": "Jetrena pašteta",
+      "aliases": [
+        "jetrena pasteta"
+      ]
+    },
+    {
+      "canonicalKey": "cajna carnex kobasica",
+      "displayName": "Carnex Čajna kobasica",
+      "aliases": [
+        "cajna carnex",
+        "cajna carnex kobasica"
+      ]
+    },
+    {
+      "canonicalKey": "carnex virsle",
+      "displayName": "Carnex Viršle",
+      "aliases": [
+        "carnex delikates virsle",
+        "carnex virsle"
+      ]
+    },
+    {
+      "canonicalKey": "carnex gotova jela pasulj",
+      "displayName": "Carnex Gotovo jelo",
+      "aliases": [
+        "carnex cufte",
+        "carnex gotova jela pasulj",
+        "carnex gotovo jelo",
+        "carnex gulas",
+        "carnex pasulj",
+        "carnex sarma"
+      ]
+    },
+    {
+      "canonicalKey": "matijevic parizer",
+      "displayName": "Matijević Parizer / Salamura",
+      "aliases": [
+        "matijevic parizer",
+        "matijevic parizer salamura",
+        "matijevic posebna",
+        "matijevic sunkarica",
+        "matijevic virsle"
+      ]
+    },
+    {
+      "canonicalKey": "cajna kobasica yuhor",
+      "displayName": "Yuhor Delikates / Kobasica",
+      "aliases": [
+        "budimska yuhor",
+        "cajna kobasica yuhor",
+        "cajna yuhor",
+        "delikates kobasica yuhor",
+        "kulen yuhor",
+        "sunka yuhor"
+      ]
+    },
+    {
+      "canonicalKey": "pasteta yuhor",
+      "displayName": "Yuhor Pašteta",
+      "aliases": [
+        "jetrena pasteta yuhor",
+        "kokosija pasteta yuhor",
+        "pasteta yuhor"
+      ]
+    },
+    {
+      "canonicalKey": "neoplanta pasteta patelina",
+      "displayName": "Patelina Pašteta (Neoplanta)",
+      "aliases": [
+        "kokosija patelina",
+        "neoplanta pasteta",
+        "neoplanta pasteta patelina",
+        "pasteta patelina"
+      ]
+    },
+    {
+      "canonicalKey": "delikates neoplanta sunka",
+      "displayName": "Neoplanta Delikates",
+      "aliases": [
+        "cajna neoplanta",
+        "delikates neoplanta",
+        "delikates neoplanta sunka",
+        "kobasica neoplanta",
+        "kulen neoplanta",
+        "neoplanta sunka"
+      ]
+    },
+    {
+      "canonicalKey": "cajna gavrilovic pasteta",
+      "displayName": "Gavrilović Pašteta / Zimska",
+      "aliases": [
+        "cajna gavrilovic",
+        "cajna gavrilovic pasteta",
+        "gavrilovic hrenovke",
+        "gavrilovic pasteta",
+        "gavrilovic pasteta zimska",
+        "gavrilovic zimska"
+      ]
+    },
+    {
+      "canonicalKey": "ovako parizer piletina",
+      "displayName": "Ovako Piletina / Parizer (BiH)",
+      "aliases": [
+        "bih ovako parizer piletina",
+        "ovako parizer pileci",
+        "ovako parizer piletina",
+        "ovako pasteta",
+        "ovako piletina",
+        "ovako virsle"
+      ]
+    },
+    {
+      "canonicalKey": "goranovic kobasica sunka",
+      "displayName": "Goranović Delikates (CG)",
+      "aliases": [
+        "cajna goranovic",
+        "cg delikates goranovic",
+        "goranovic kobasica sunka",
+        "goranovic parizer",
+        "goranovic prsuta",
+        "goranovic slanina"
+      ]
+    },
+    {
+      "canonicalKey": "martex prsuta",
+      "displayName": "Martex Njeguška pršuta (CG)",
+      "aliases": [
+        "cg martex njeguska prsuta",
+        "delikates martex",
+        "martex prsuta",
+        "njeguska prsuta"
+      ]
+    },
+    {
+      "canonicalKey": "dimljena panceta slanina",
+      "displayName": "Slanina / Pančeta",
+      "aliases": [
+        "dimljena panceta slanina",
+        "dimljena slanina",
+        "mesnata slanina",
+        "panceta",
+        "panceta slanina",
+        "slanina"
+      ]
+    },
+    {
+      "canonicalKey": "govedja prsuta svinjski",
+      "displayName": "Pršuta / Pečenica",
+      "aliases": [
+        "dimljena pecenica",
+        "govedja prsuta",
+        "govedja prsuta svinjski",
+        "pecenica",
+        "pecenica prsuta",
+        "prsuta svinjski",
+        "suvi vrat"
+      ]
+    },
+    {
+      "canonicalKey": "kobasica kulen",
+      "displayName": "Kulen",
+      "aliases": [
+        "domaci kulen",
+        "kobasica kulen",
+        "kulen",
+        "kulen sremski"
+      ]
+    },
+    {
+      "canonicalKey": "cajna kobasica",
+      "displayName": "Čajna kobasica",
+      "aliases": [
+        "cajna kobasica"
+      ]
+    },
+    {
+      "canonicalKey": "pizza stisnjena sunka",
+      "displayName": "Šunka u omotu / Pizza šunka",
+      "aliases": [
+        "cureca prsa",
+        "omotu pileci prsa",
+        "omotu pizza sunka",
+        "omotu sunka",
+        "pizza stisnjena sunka",
+        "pizza sunka",
+        "stisnjena sunka"
+      ]
+    },
+    {
+      "canonicalKey": "hrenovke virsle",
+      "displayName": "Viršle / Hrenovke",
+      "aliases": [
+        "hrenovke virsle",
+        "perutnina ptuj virsle",
+        "pileci virsle",
+        "poli virsle",
+        "virsle",
+        "virsle wudy"
+      ]
+    },
+    {
+      "canonicalKey": "parizer perutnina poli",
+      "displayName": "Poli Pileći parizer",
+      "aliases": [
+        "parizer perutnina poli",
+        "parizer pileci poli",
+        "parizer poli",
+        "perutnina poli",
+        "poli salama"
+      ]
+    },
+    {
+      "canonicalKey": "batak karabatak pileci",
+      "displayName": "Pileći batak / karabatak",
+      "aliases": [
+        "batak karabatak pileci",
+        "batak karabatakom sa",
+        "batak otkosteni",
+        "batak pileci",
+        "karabatak pileci"
+      ]
+    },
+    {
+      "canonicalKey": "krilca pileci",
+      "displayName": "Pileća krilca",
+      "aliases": [
+        "krilca pileci",
+        "krilca pileci sveza"
+      ]
+    },
+    {
+      "canonicalKey": "celo pile sveze",
+      "displayName": "Sveže pile (celo)",
+      "aliases": [
+        "celo pile sveze",
+        "gril pile",
+        "pile sveze"
+      ]
+    },
+    {
+      "canonicalKey": "krmenadla svinjski vrat",
+      "displayName": "Svinjski vrat / Krmenadla",
+      "aliases": [
+        "krmenadla svinjski",
+        "krmenadla svinjski vrat",
+        "plecka svinjski",
+        "rebra svinjski",
+        "svinjski vrat"
+      ]
+    },
+    {
+      "canonicalKey": "cevapi leskovacki sarajevski",
+      "displayName": "Ćevapi / Pljeskavica",
+      "aliases": [
+        "cevapcici",
+        "cevapi",
+        "cevapi leskovacki sarajevski",
+        "cevapi pljeskavica",
+        "meso rostilj",
+        "pljeskavica"
+      ]
+    },
+    {
+      "canonicalKey": "eva sardina tunjevina",
+      "displayName": "Eva Sardina / Tunjevina",
+      "aliases": [
+        "eva podravka",
+        "eva sardina tunjevina",
+        "eva sardine",
+        "eva tunjevina"
+      ]
+    },
+    {
+      "canonicalKey": "calvo mare rio tunjevina",
+      "displayName": "Rio Mare / Calvo Tunjevina",
+      "aliases": [
+        "calvo mare rio tunjevina",
+        "calvo tunjevina",
+        "capitano il tunjevina",
+        "la perla tunjevina",
+        "mare rio tunjevina",
+        "salamuri tunjevina",
+        "tunjevina ulju"
+      ]
+    },
+    {
+      "canonicalKey": "oslic riba smrznuti",
+      "displayName": "Smrznuti oslić / Fileti ribe",
+      "aliases": [
+        "bez glave oslic",
+        "fileti oslic ribe smrznuti",
+        "fileti oslica",
+        "hoki oslic",
+        "oslic riba smrznuti"
+      ]
+    },
+    {
+      "canonicalKey": "banana voce",
+      "displayName": "Banane",
+      "aliases": [
+        "banana",
+        "banana voce",
+        "banane"
+      ]
+    },
+    {
+      "canonicalKey": "jabuka voce",
+      "displayName": "Jabuke",
+      "aliases": [
+        "ajdared jabuka",
+        "delises jabuka zlatni",
+        "gala jabuka",
+        "grenismit jabuka",
+        "jabuka",
+        "jabuka voce",
+        "jabuke"
+      ]
+    },
+    {
+      "canonicalKey": "limun voce",
+      "displayName": "Limun",
+      "aliases": [
+        "limun",
+        "limun voce"
+      ]
+    },
+    {
+      "canonicalKey": "narandza pomorandza",
+      "displayName": "Pomorandže / Mandarine",
+      "aliases": [
+        "klementina",
+        "mandarina",
+        "mandarine",
+        "mandarine pomorandze",
+        "narandza",
+        "narandza pomorandza",
+        "pomorandza",
+        "pomorandze"
+      ]
+    },
+    {
+      "canonicalKey": "krompir povrce",
+      "displayName": "Krompir",
+      "aliases": [
+        "beli krompir",
+        "crveni krompir",
+        "krompir",
+        "krompir mladi",
+        "krompir povrce"
+      ]
+    },
+    {
+      "canonicalKey": "crni luk povrce",
+      "displayName": "Crni / Beli luk",
+      "aliases": [
+        "beli crni luk",
+        "beli luk",
+        "crni luk",
+        "crni luk povrce",
+        "crveni luk",
+        "luk mladi"
+      ]
+    },
+    {
+      "canonicalKey": "paradajz povrce",
+      "displayName": "Paradajz",
+      "aliases": [
+        "ceri paradajz",
+        "cherry paradajz",
+        "paradajz",
+        "paradajz pink",
+        "paradajz povrce"
+      ]
+    },
+    {
+      "canonicalKey": "krastavac povrce",
+      "displayName": "Krastavac",
+      "aliases": [
+        "kornisoni",
+        "krastavac",
+        "krastavac povrce",
+        "krastavac salatni",
+        "krastavci"
+      ]
+    },
+    {
+      "canonicalKey": "paprika povrce",
+      "displayName": "Paprika",
+      "aliases": [
+        "babura paprika",
+        "crvena paprika",
+        "ljuta paprika",
+        "paprika",
+        "paprika povrce",
+        "paprika silja"
+      ]
+    },
+    {
+      "canonicalKey": "mrkva sargarepa",
+      "displayName": "Šargarepa",
+      "aliases": [
+        "mrkva",
+        "mrkva sargarepa",
+        "sargarepa"
+      ]
+    },
+    {
+      "canonicalKey": "kupus salata zelena",
+      "displayName": "Kupus / Zelena salata",
+      "aliases": [
+        "iceberg salata",
+        "kiseli kupus",
+        "kupus",
+        "kupus mladi",
+        "kupus salata zelena",
+        "salata zelena"
+      ]
+    },
+    {
+      "canonicalKey": "pecurke sampinjoni",
+      "displayName": "Šampinjoni",
+      "aliases": [
+        "pecurke sampinjoni",
+        "sampinjoni"
+      ]
+    },
+    {
+      "canonicalKey": "danubius makarone testenina",
+      "displayName": "Danubius Testenina",
+      "aliases": [
+        "danubius makarone",
+        "danubius makarone testenina",
+        "danubius rezanci",
+        "danubius spagete",
+        "danubius testenina"
+      ]
+    },
+    {
+      "canonicalKey": "barilla spagete testenina",
+      "displayName": "Barilla Testenina / Špagete",
+      "aliases": [
+        "barilla fusilli",
+        "barilla penne",
+        "barilla spagete",
+        "barilla spagete testenina",
+        "barilla testenina"
+      ]
+    },
+    {
+      "canonicalKey": "brasno klas puder zlatni",
+      "displayName": "Klas Brašno / Zlatni puder (BiH)",
+      "aliases": [
+        "bih brasno klas puder zlatni",
+        "brasno klas",
+        "brasno klas puder zlatni",
+        "brasno puder zlatni",
+        "klas tip400",
+        "klas tip500"
+      ]
+    },
+    {
+      "canonicalKey": "bimal suncokretovo ulje",
+      "displayName": "Bimal Ulje (BiH)",
+      "aliases": [
+        "bih bimal ulje",
+        "bimal suncokretovo ulje",
+        "bimal ulje"
+      ]
+    },
+    {
+      "canonicalKey": "maslinovo ulje",
+      "displayName": "Maslinovo ulje",
+      "aliases": [
+        "devicansko extra maslinovo ulje",
+        "maslinovo monini ulje",
+        "maslinovo ulje"
+      ]
+    },
+    {
+      "canonicalKey": "pirinac riza",
+      "displayName": "Pirinač / Riža",
+      "aliases": [
+        "benlian pirinac",
+        "dugo pirinac zrno",
+        "okruglo pirinac zrno",
+        "pirinac",
+        "pirinac riza",
+        "riza"
+      ]
+    },
+    {
+      "canonicalKey": "gradistanac pasulj tetovac",
+      "displayName": "Pasulj",
+      "aliases": [
+        "beli pasulj",
+        "gradistanac pasulj tetovac",
+        "pasulj",
+        "pasulj tetovac"
+      ]
+    },
+    {
+      "canonicalKey": "aleva crvena paprika",
+      "displayName": "Aleva Paprika / Začin",
+      "aliases": [
+        "aleva crvena paprika",
+        "aleva kulinat",
+        "aleva paprika",
+        "aleva paprika slatka",
+        "aleva paprika zacin"
+      ]
+    },
+    {
+      "canonicalKey": "govedja kokosija podravka supa",
+      "displayName": "Podravka / Maggi Supa iz kesice",
+      "aliases": [
+        "alpska supa",
+        "c supa",
+        "govedja kokosija podravka supa",
+        "govedja supa",
+        "kesice maggi podravka supa",
+        "kokosija supa",
+        "maggi supa",
+        "podravka supa",
+        "supa yumis"
+      ]
+    },
+    {
+      "canonicalKey": "c pecivo prasak secer vanilin",
+      "displayName": "C Prašak za pecivo / Vanilin šećer / Puding",
+      "aliases": [
+        "c pecivo prasak puding secer vanilin",
+        "c pecivo prasak secer vanilin",
+        "c puding",
+        "dr oetker pecivo prasak",
+        "dr oetker puding",
+        "kvasac suvi",
+        "pecivo prasak",
+        "secer vanilin"
+      ]
+    },
+    {
+      "canonicalKey": "c dijamant polimark senf",
+      "displayName": "Senf",
+      "aliases": [
+        "c dijamant polimark senf",
+        "c senf",
+        "dijamant senf",
+        "polimark senf",
+        "senf",
+        "senf thommy"
+      ]
+    },
+    {
+      "canonicalKey": "paradajz pasirani pelat tomatino",
+      "displayName": "Pasirani paradajz / Tomatino",
+      "aliases": [
+        "paradajz pasirani",
+        "paradajz pasirani pelat tomatino",
+        "paradajz pasirani tomatino",
+        "paradajz pelat",
+        "paradajz pire",
+        "tomatello",
+        "tomatino"
+      ]
+    },
+    {
+      "canonicalKey": "ajvar bakina dijamant tajna",
+      "displayName": "Ajvar",
+      "aliases": [
+        "ajvar",
+        "ajvar bakina dijamant tajna",
+        "ajvar bakina tajna",
+        "ajvar blagi",
+        "ajvar dijamant",
+        "ajvar domaci",
+        "ajvar ljuti",
+        "ajvar podravka"
+      ]
+    },
+    {
+      "canonicalKey": "frikom grasak kukuruz povrce",
+      "displayName": "Frikom Smrznuto povrće / Pomfrit",
+      "aliases": [
+        "frikom grasak",
+        "frikom grasak kukuruz povrce",
+        "frikom kukuruz",
+        "frikom lisnato testo",
+        "frikom mesavina zlatna",
+        "frikom pomfrit",
+        "frikom pomfrit povrce smrznuto",
+        "frikom ruska salata"
+      ]
+    },
+    {
+      "canonicalKey": "frikom king macho sladoled",
+      "displayName": "Frikom Sladoled",
+      "aliases": [
+        "frikom king macho sladoled",
+        "frikom sladoled",
+        "kapri sladoled",
+        "king sladoled",
+        "macho sladoled",
+        "quattro sladoled",
+        "rumenko sladoled",
+        "sladoled snesko"
+      ]
+    },
+    {
+      "canonicalKey": "prima slani stapici stark",
+      "displayName": "Prima Slani štapići",
+      "aliases": [
+        "kikirikijem sa stapici",
+        "prima slani stapici",
+        "prima slani stapici stark",
+        "prima stapici",
+        "prima stark"
+      ]
+    },
+    {
+      "canonicalKey": "bambi josh krekere ribice",
+      "displayName": "Bambi Josh! Ribice / Krekeri",
+      "aliases": [
+        "bambi josh",
+        "bambi josh krekere ribice",
+        "bambi josh krekeri ribice",
+        "josh ribice",
+        "krekeri tak",
+        "ribice slane"
+      ]
+    },
+    {
+      "canonicalKey": "bambi keks wellness",
+      "displayName": "Bambi Wellness Keks",
+      "aliases": [
+        "bambi keks wellness",
+        "bambi wellness",
+        "keks wellness"
+      ]
+    },
+    {
+      "canonicalKey": "bambi keks pek zlatni",
+      "displayName": "Zlatni Pek Keks",
+      "aliases": [
+        "bambi keks pek zlatni",
+        "bambi pek zlatni",
+        "keks pek zlatni",
+        "pek zlatni"
+      ]
+    },
+    {
+      "canonicalKey": "medeno pionir srce",
+      "displayName": "Pionir Medeno Srce",
+      "aliases": [
+        "medeno pionir srce",
+        "medeno srce"
+      ]
+    },
+    {
+      "canonicalKey": "cokolada galeb pionir",
+      "displayName": "Galeb Čokolada (Pionir)",
+      "aliases": [
+        "bombona negro",
+        "cokolada galeb",
+        "cokolada galeb pionir",
+        "galeb pionir",
+        "negro pionir"
+      ]
+    },
+    {
+      "canonicalKey": "cipiripi eurokrem krem",
+      "displayName": "Eurokrem / Cipiripi",
+      "aliases": [
+        "cipiripi",
+        "cipiripi eurokrem",
+        "cipiripi eurokrem krem",
+        "euroblok",
+        "eurokrem",
+        "eurokrem swisslion",
+        "linolada"
+      ]
+    },
+    {
+      "canonicalKey": "krem nutella",
+      "displayName": "Nutella Krem",
+      "aliases": [
+        "ferrero nutella",
+        "krem nutella",
+        "nutella"
+      ]
+    },
+    {
+      "canonicalKey": "bueno cokolada jaje kinder",
+      "displayName": "Kinder Surprise / Bueno / Čokolada",
+      "aliases": [
+        "bueno cokolada jaje kinder",
+        "bueno cokolada kinder surprise",
+        "bueno kinder",
+        "chocolate kinder",
+        "jaje kinder",
+        "kinder maxi",
+        "kinder pingui",
+        "kinder surprise"
+      ]
+    },
+    {
+      "canonicalKey": "bounty mars snickers twix",
+      "displayName": "Snickers / Mars / Twix / Bounty",
+      "aliases": [
+        "bounty",
+        "bounty mars snickers twix",
+        "cokoladica lion",
+        "cokoladica mars",
+        "kat kit",
+        "snickers",
+        "twix"
+      ]
+    },
+    {
+      "canonicalKey": "cokolada dorina kras",
+      "displayName": "Kraš Dorina / Bajadera / Domaćica",
+      "aliases": [
+        "bajadera domacica dorina kras",
+        "bombone ki",
+        "bronhi",
+        "cokolada dorina",
+        "cokolada dorina kras",
+        "domacica keks",
+        "domacica kras",
+        "dorina kras",
+        "kras napolitanke"
+      ]
+    },
+    {
+      "canonicalKey": "medela smokva strudla",
+      "displayName": "Medela Štrudla",
+      "aliases": [
+        "medela smokva strudla",
+        "medela strudla",
+        "medela strudle",
+        "sa smokvom strudla"
+      ]
+    },
+    {
+      "canonicalKey": "fun gudmark kikiriki",
+      "displayName": "Pečeni kikiriki / Semenke",
+      "aliases": [
+        "badem",
+        "dietaplus kikiriki",
+        "fun gudmark kikiriki",
+        "gud kikiriki",
+        "kikiriki",
+        "kikiriki peceni",
+        "kikiriki peceni semenke",
+        "kikiriki slani",
+        "lesnik",
+        "orah",
+        "semenke suncokretovo"
+      ]
+    },
+    {
+      "canonicalKey": "orbit zvake",
+      "displayName": "Orbit / Airwaves Žvake",
+      "aliases": [
+        "airwaves orbit zvake",
+        "airwaves zvake",
+        "five zvake",
+        "orbit",
+        "orbit zvake"
+      ]
+    },
+    {
+      "canonicalKey": "mineralna voda vrnjci",
+      "displayName": "Voda Vrnjci",
+      "aliases": [
+        "gazirana vrnjci",
+        "mineralna voda vrnjci",
+        "negazirana vrnjci",
+        "voda vrnjci"
+      ]
+    },
+    {
+      "canonicalKey": "heba mineralna voda",
+      "displayName": "Heba Voda",
+      "aliases": [
+        "heba mineralna voda",
+        "heba voda"
+      ]
+    },
+    {
+      "canonicalKey": "jazak voda",
+      "displayName": "Jazak Voda",
+      "aliases": [
+        "jazak voda"
+      ]
+    },
+    {
+      "canonicalKey": "gorska suza voda",
+      "displayName": "Suza / Rada Voda (CG)",
+      "aliases": [
+        "aqua bianca",
+        "cg rada suza voda",
+        "gorska suza voda",
+        "gorska voda",
+        "rada voda",
+        "suza voda"
+      ]
+    },
+    {
+      "canonicalKey": "kiseljak sarajevski voda",
+      "displayName": "Sarajevski Kiseljak / Vitinka (BiH)",
+      "aliases": [
+        "bih kiseljak sarajevski vitinka",
+        "kiseljak sarajevski",
+        "kiseljak sarajevski voda",
+        "kiseljak tesanjski",
+        "oaza voda",
+        "vitinka voda",
+        "vivia voda"
+      ]
+    },
+    {
+      "canonicalKey": "fanta sok",
+      "displayName": "Fanta",
+      "aliases": [
+        "fanta",
+        "fanta orange",
+        "fanta shokata",
+        "fanta sok"
+      ]
+    },
+    {
+      "canonicalKey": "sok sprite",
+      "displayName": "Sprite",
+      "aliases": [
+        "gazirani sprite",
+        "sok sprite",
+        "sprite"
+      ]
+    },
+    {
+      "canonicalKey": "bitter lemon schweppes tonic",
+      "displayName": "Schweppes",
+      "aliases": [
+        "bitter lemon schweppes",
+        "bitter lemon schweppes tonic",
+        "schweppes",
+        "schweppes tangerine",
+        "schweppes tonic"
+      ]
+    },
+    {
+      "canonicalKey": "cockta sok",
+      "displayName": "Cockta",
+      "aliases": [
+        "cockta",
+        "cockta original",
+        "cockta sok",
+        "kokta"
+      ]
+    },
+    {
+      "canonicalKey": "guarana knjaz milos remix",
+      "displayName": "Guarana / Remix Knjaz",
+      "aliases": [
+        "bull red",
+        "energetsko guarana pice",
+        "energy hell",
+        "energy monster",
+        "energy ultra",
+        "guarana",
+        "guarana knjaz milos remix",
+        "guarana knjaz remix",
+        "knjaz remix"
+      ]
+    },
+    {
+      "canonicalKey": "cedevita napitak",
+      "displayName": "Cedevita",
+      "aliases": [
+        "cedevita",
+        "cedevita limun",
+        "cedevita napitak",
+        "cedevita narandza"
+      ]
+    },
+    {
+      "canonicalKey": "fruvita sok",
+      "displayName": "Fruvita / Rauch / Bravo Sok",
+      "aliases": [
+        "bravo fruvita rauch sok",
+        "bravo sok",
+        "day happy rauch",
+        "fruvita",
+        "fruvita sok",
+        "sok takovo",
+        "sok vita",
+        "sok zupski"
+      ]
+    },
+    {
+      "canonicalKey": "heineken pivo",
+      "displayName": "Heineken Pivo",
+      "aliases": [
+        "heineken pivo"
+      ]
+    },
+    {
+      "canonicalKey": "pivo tuborg",
+      "displayName": "Tuborg Pivo",
+      "aliases": [
+        "carlsberg pivo",
+        "pivo tuborg"
+      ]
+    },
+    {
+      "canonicalKey": "pivo staropramen",
+      "displayName": "Staropramen / Stella Artois Pivo",
+      "aliases": [
+        "amstel pivo",
+        "artois pivo staropramen stella",
+        "artois stella",
+        "bavaria pivo",
+        "birra moretti",
+        "pivo staropramen"
+      ]
+    },
+    {
+      "canonicalKey": "jagodinsko nisko pivo valjevsko",
+      "displayName": "Valjevsko / Niško Pivo",
+      "aliases": [
+        "banjalucko pivo",
+        "jagodinsko nisko pivo valjevsko",
+        "nisko pivo",
+        "nisko pivo valjevsko",
+        "pivo tuzlansko",
+        "pivo valjevsko"
+      ]
+    },
+    {
+      "canonicalKey": "bonito kafa",
+      "displayName": "Bonito / C Kafa",
+      "aliases": [
+        "bonito c kafa",
+        "bonito kafa",
+        "c kafa"
+      ]
+    },
+    {
+      "canonicalKey": "dzezva kafa vispak zlatna",
+      "displayName": "Zlatna Džezva Kafa (BiH)",
+      "aliases": [
+        "bih dzezva kafa zlatna",
+        "dzezva kafa vispak zlatna",
+        "dzezva kafa zlatna",
+        "dzezva zlatna",
+        "kafa vispak"
+      ]
+    },
+    {
+      "canonicalKey": "caj fruktonal milford",
+      "displayName": "Fructus / Milford Čaj",
+      "aliases": [
+        "caj fructus",
+        "caj fructus milford",
+        "caj fruktonal milford",
+        "caj hibiskus",
+        "caj kamilica",
+        "caj milford",
+        "caj nana",
+        "caj podravka",
+        "caj zeleni"
+      ]
+    },
+    {
+      "canonicalKey": "ariel deterdzent kapsule tecni",
+      "displayName": "Ariel Deterdžent za veš",
+      "aliases": [
+        "ariel deterdzent kapsule tecni",
+        "ariel deterdzent tecni",
+        "ariel deterdzent ves",
+        "ariel kapsule",
+        "ariel pods",
+        "ariel prasak"
+      ]
+    },
+    {
+      "canonicalKey": "deterdzent persil",
+      "displayName": "Persil / Perwoll Deterdžent",
+      "aliases": [
+        "bonux deterdzent",
+        "deterdzent persil",
+        "deterdzent persil perwoll",
+        "deterdzent perwoll",
+        "deterdzent rubel",
+        "deterdzent tide",
+        "gel persil",
+        "kapsule persil",
+        "persil prasak"
+      ]
+    },
+    {
+      "canonicalKey": "lenor omeksivac silan",
+      "displayName": "Lenor / Silan / Ornel Omekšivač",
+      "aliases": [
+        "bohor omeksivac",
+        "lenor omeksivac",
+        "lenor omeksivac ornel silan",
+        "lenor omeksivac silan",
+        "omeksivac ornel",
+        "omeksivac silan",
+        "omeksivac violeta"
+      ]
+    },
+    {
+      "canonicalKey": "finish masinu somat tablete",
+      "displayName": "Finish / Somat Tablete za sudomašinu",
+      "aliases": [
+        "finish masinu somat tablete",
+        "finish quantum",
+        "finish somat sudomasinu tablete",
+        "finish tablete",
+        "gold somat",
+        "sjaj sudomasinu",
+        "so sudomasinu",
+        "somat tablete"
+      ]
+    },
+    {
+      "canonicalKey": "bref cif domestos sredstvo",
+      "displayName": "Domestos / Cif / Bref Hemija",
+      "aliases": [
+        "ajax sredstvo",
+        "bref cif domestos hemija",
+        "bref cif domestos sredstvo",
+        "bref wc",
+        "cif krem",
+        "clin",
+        "domestos",
+        "mr proper",
+        "pronto",
+        "sanitar wc"
+      ]
+    },
+    {
+      "canonicalKey": "paloma papir toalet violeta zewa",
+      "displayName": "Zewa / Paloma / Violeta Toalet papir",
+      "aliases": [
+        "becutan maramice vlazne",
+        "kuhinjski ubrusi",
+        "maramice papirne",
+        "maramice vlazne",
+        "paloma papir toalet",
+        "paloma papir toalet violeta zewa",
+        "papir toalet violeta",
+        "papir toalet zewa"
+      ]
+    },
+    {
+      "canonicalKey": "aquafresh colgate pasta sensodyne zube",
+      "displayName": "Colgate / Sensodyne Pasta za zube",
+      "aliases": [
+        "aquafresh colgate pasta sensodyne zube",
+        "aquafresh pasta",
+        "blend med",
+        "cetkica zube",
+        "colgate pasta",
+        "colgate pasta sensodyne zube",
+        "parodontax",
+        "pasta sensodyne",
+        "pasta zube"
+      ]
+    },
+    {
+      "canonicalKey": "dove kupka nivea palmolive sapun",
+      "displayName": "Nivea / Dove / Palmolive Higijena",
+      "aliases": [
+        "dezodorans nivea",
+        "dezodorans rexona",
+        "dove higijena nivea palmolive",
+        "dove kupka",
+        "dove kupka nivea palmolive sapun",
+        "dove sapun",
+        "fa kupka",
+        "gel nivea tusiranje",
+        "kosili kupka",
+        "krema nivea",
+        "kupka palmolive",
+        "old spice",
+        "palmolive sapun"
+      ]
+    },
+    {
+      "canonicalKey": "head pantene sampon shoulders",
+      "displayName": "Šampon za kosu (H&S / Pantene / Wash&Go)",
+      "aliases": [
+        "afrodita sampon",
+        "gliss sampon",
+        "go kosu pantene sampon wash",
+        "go sampon wash",
+        "head pantene sampon shoulders",
+        "head sampon shoulders",
+        "koprive sampon",
+        "pantene sampon",
+        "sampon schauma",
+        "sampon syoss"
+      ]
+    },
+    {
+      "canonicalKey": "always libero pampers pelene ulosci",
+      "displayName": "Always Ulošci / Pampers Pelene",
+      "aliases": [
+        "always libero pampers pelene ulosci",
+        "always pampers pelene ulosci",
+        "always ulosci",
+        "babylove pelene",
+        "libresse ulosci",
+        "pampers pelene",
+        "pelene violeta"
+      ]
+    },
+    {
+      "canonicalKey": "biorazgradiva tregerica",
+      "displayName": "Kesa (plastična / biorazgradiva)",
+      "aliases": [
+        "alu",
+        "biorazgradiva",
+        "biorazgradiva kesa plasticna",
+        "biorazgradiva plasticna",
+        "biorazgradiva tregerica",
+        "kesa",
+        "papir pecenje",
+        "providna",
+        "smece",
+        "tregerica",
+        "velika"
+      ]
+    },
+    {
+      "canonicalKey": "dizel evro gorivo",
+      "displayName": "Evro dizel (Gorivo)",
+      "aliases": [
+        "diesel drive",
+        "diesel euro",
+        "diesel max",
+        "diesel maxmotion",
+        "dizel drive",
+        "dizel evro",
+        "dizel evro gorivo",
+        "ectodiesel",
+        "eurodizel",
+        "ultra"
+      ]
+    },
+    {
+      "canonicalKey": "benzin bmb evro premijum",
+      "displayName": "Evro Premijum BMB 95 / 100 (Benzin)",
+      "aliases": [
+        "benzin bmb evro premijum",
+        "benzin bmb95 evro premijum",
+        "bmb",
+        "bmb evro premijum",
+        "bmb95",
+        "drive",
+        "eurosuper",
+        "maxmotion"
+      ]
+    },
+    {
+      "canonicalKey": "auto gas lpg tng",
+      "displayName": "TNG / Auto-gas (LPG)",
+      "aliases": [
+        "auto gas",
+        "auto gas lpg tng",
+        "autogas",
+        "gas naftni tecni",
+        "lpg",
+        "tng"
+      ]
+    },
+    {
+      "canonicalKey": "stakla tecnost vetrobran",
+      "displayName": "Tečnost za vetrobransko staklo",
+      "aliases": [
+        "adblue",
+        "adeblue",
+        "letnja stakla tecnost",
+        "stakla tecnost",
+        "stakla tecnost vetrobran",
+        "stakla tecnost zimska",
+        "tecnost vetrobransko"
+      ]
+    },
+    {
+      "canonicalKey": "nutela sokolad tecen",
+      "displayName": "Tecen Sokolad Nutela",
+      "aliases": [
+        "nutela sokolad tecen"
+      ]
+    },
+    {
+      "canonicalKey": "barilla basilico",
+      "displayName": "Barilla Basilico",
+      "aliases": [
+        "barilla basilico",
+        "barilla classico",
+        "basilico",
+        "classico"
+      ]
+    },
+    {
+      "canonicalKey": "all barilla lasagne uovo",
+      "displayName": "Barilla Lasagne All Uovo",
+      "aliases": [
+        "all barilla lasagne uovo",
+        "all lasagne uovo"
+      ]
+    },
+    {
+      "canonicalKey": "original wasa",
+      "displayName": "Wasa Original",
+      "aliases": [
+        "original",
+        "original wasa"
+      ]
+    },
+    {
+      "canonicalKey": "kinder pingui",
+      "displayName": "Kinder Pingui",
+      "aliases": [
+        "kinder pingui"
+      ]
+    },
+    {
+      "canonicalKey": "cookies cream drink protein zott",
+      "displayName": "Zott Protein Drink Cream Cookies",
+      "aliases": [
+        "cookies cream drink protein",
+        "cookies cream drink protein zott"
+      ]
+    },
+    {
+      "canonicalKey": "ferrero rocher",
+      "displayName": "Ferrero Rocher",
+      "aliases": [
+        "ferrero rocher"
+      ]
+    },
+    {
+      "canonicalKey": "nesquik nestl",
+      "displayName": "Nestl Nesquik",
+      "aliases": [
+        "nesquik",
+        "nesquik nestl"
+      ]
+    },
+    {
+      "canonicalKey": "and cake choc milka",
+      "displayName": "Milka Cake And Choc",
+      "aliases": [
+        "and cake choc milka"
+      ]
+    },
+    {
+      "canonicalKey": "alpro badem kokos napitak",
+      "displayName": "Alpro Napitak Kokos Badem",
+      "aliases": [
+        "alpro badem kokos napitak",
+        "badem kokos napitak"
+      ]
+    },
+    {
+      "canonicalKey": "protein pudding zott",
+      "displayName": "Zott Protein Pudding",
+      "aliases": [
+        "protein pudding",
+        "protein pudding zott"
+      ]
+    },
+    {
+      "canonicalKey": "ab barilla sesam sverige",
+      "displayName": "Barilla Sverige Ab Sesam",
+      "aliases": [
+        "ab barilla sesam sverige",
+        "sesam"
+      ]
+    },
+    {
+      "canonicalKey": "milka strawberry",
+      "displayName": "Milka Strawberry",
+      "aliases": [
+        "milka strawberry",
+        "strawberry"
+      ]
+    },
+    {
+      "canonicalKey": "integrale riso venere",
+      "displayName": "Riso Integrale Venere",
+      "aliases": [
+        "integrale riso venere"
+      ]
+    },
+    {
+      "canonicalKey": "blagi kecap polimark",
+      "displayName": "Polimark Kečap Blagi",
+      "aliases": [
+        "blagi kecap",
+        "blagi kecap polimark"
+      ]
+    },
+    {
+      "canonicalKey": "jamnica mineralna voda",
+      "displayName": "Jamnica Mineralna Voda",
+      "aliases": [
+        "jamnica mineralna voda"
+      ]
+    },
+    {
+      "canonicalKey": "divella ristorante spaghetti",
+      "displayName": "Divella Spaghetti Ristorante",
+      "aliases": [
+        "divella ristorante spaghetti",
+        "ristorante spaghetti"
+      ]
+    },
+    {
+      "canonicalKey": "bambi cokolada wellness",
+      "displayName": "Bambi Wellness Čokolada",
+      "aliases": [
+        "bambi cokolada wellness",
+        "cokolada wellness"
+      ]
+    },
+    {
+      "canonicalKey": "divella penne rigate ziti",
+      "displayName": "Divella Penne Ziti Rigate",
+      "aliases": [
+        "divella penne rigate ziti",
+        "penne rigate ziti"
+      ]
+    },
+    {
+      "canonicalKey": "fresh milk oreo snack",
+      "displayName": "Oreo Fresh Milk Snack",
+      "aliases": [
+        "fresh milk oreo snack",
+        "fresh milk snack"
+      ]
+    },
+    {
+      "canonicalKey": "sitna so solana tuzla tuzlanska",
+      "displayName": "Solana Tuzla Tuzlanska So Sitna",
+      "aliases": [
+        "sitna so solana tuzla tuzlanska",
+        "sitna so tuzlanska"
+      ]
+    },
+    {
+      "canonicalKey": "can sprite",
+      "displayName": "Sprite Can",
+      "aliases": [
+        "can sprite"
+      ]
+    },
+    {
+      "canonicalKey": "cerealitalia corn flakes",
+      "displayName": "Cerealitalia Corn Flakes",
+      "aliases": [
+        "cerealitalia corn flakes",
+        "corn flakes"
+      ]
+    },
+    {
+      "canonicalKey": "crvenka jaffa nutri ocake",
+      "displayName": "Jaffa Crvenka Nutri Ocake",
+      "aliases": [
+        "crvenka jaffa nutri ocake",
+        "nutri ocake"
+      ]
+    },
+    {
+      "canonicalKey": "divella fusilli",
+      "displayName": "Divella Fusilli",
+      "aliases": [
+        "divella fusilli",
+        "fusilli"
+      ]
+    },
+    {
+      "canonicalKey": "duo lada lino",
+      "displayName": "Lino Lada Duo",
+      "aliases": [
+        "duo lada lino"
+      ]
+    },
+    {
+      "canonicalKey": "kajmak mlekara namaz sabac",
+      "displayName": "Mlekara Sabac Kajmak Namaz",
+      "aliases": [
+        "kajmak mlekara namaz sabac",
+        "kajmak namaz"
+      ]
+    },
+    {
+      "canonicalKey": "fitnesa lab nutrino snack",
+      "displayName": "Nutrino Lab Fitnesa Snack",
+      "aliases": [
+        "fitnesa lab nutrino snack",
+        "fitnesa snack",
+        "fruit lab nutrino snack",
+        "fruit snack",
+        "lab nutrino power snack",
+        "power snack"
+      ]
+    },
+    {
+      "canonicalKey": "divella linguine",
+      "displayName": "Divella Linguine",
+      "aliases": [
+        "divella linguine",
+        "linguine"
+      ]
+    },
+    {
+      "canonicalKey": "bakes belvita soft",
+      "displayName": "Belvita Soft Bakes",
+      "aliases": [
+        "bakes belvita soft",
+        "bakes soft"
+      ]
+    },
+    {
+      "canonicalKey": "bar chocolate milk protein proteini si",
+      "displayName": "Proteini Si Protein Bar Milk Chocolate",
+      "aliases": [
+        "bar chocolate milk protein",
+        "bar chocolate milk protein proteini si"
+      ]
+    },
+    {
+      "canonicalKey": "alpro poj zov",
+      "displayName": "Alpro Zov Poj",
+      "aliases": [
+        "alpro poj zov",
+        "poj zov"
+      ]
+    },
+    {
+      "canonicalKey": "flips stobi vitaminka",
+      "displayName": "Vitaminka Stobi Flips",
+      "aliases": [
+        "flips stobi",
+        "flips stobi vitaminka"
+      ]
+    },
+    {
+      "canonicalKey": "choc milk protein zbregov",
+      "displayName": "Zbregov Protein Choc Milk",
+      "aliases": [
+        "choc milk protein",
+        "choc milk protein zbregov"
+      ]
+    },
+    {
+      "canonicalKey": "cocoa croissant days filling with",
+      "displayName": "Days Croissant With Cocoa Filling",
+      "aliases": [
+        "cocoa croissant days filling with",
+        "cocoa croissant filling with"
+      ]
+    },
+    {
+      "canonicalKey": "coffee ice landessa latte macchiato",
+      "displayName": "Landessa Latte Macchiato Ice Coffee",
+      "aliases": [
+        "coffee ice landessa latte macchiato",
+        "coffee ice latte macchiato"
+      ]
+    },
+    {
+      "canonicalKey": "delight fat less thomy",
+      "displayName": "Thomy Delight Less Fat",
+      "aliases": [
+        "delight fat less",
+        "delight fat less thomy"
+      ]
+    },
+    {
+      "canonicalKey": "chipsy domacinski kajmak",
+      "displayName": "Chipsy Domacinski Kajmak",
+      "aliases": [
+        "chipsy domacinski kajmak"
+      ]
+    },
+    {
+      "canonicalKey": "chocolate dark kandit mix nuts",
+      "displayName": "Kandit Dark Chocolate Mix Nuts",
+      "aliases": [
+        "chocolate dark kandit mix nuts",
+        "chocolate dark mix nuts"
+      ]
+    },
+    {
+      "canonicalKey": "feta president somborska",
+      "displayName": "President Somborska Feta",
+      "aliases": [
+        "feta president somborska",
+        "feta somborska"
+      ]
+    },
+    {
+      "canonicalKey": "divella rigatoni",
+      "displayName": "Divella Rigatoni",
+      "aliases": [
+        "divella rigatoni",
+        "rigatoni"
+      ]
+    },
+    {
+      "canonicalKey": "aia frankfurt hrenovke",
+      "displayName": "Aia Hrenovke Frankfurt",
+      "aliases": [
+        "aia frankfurt hrenovke",
+        "frankfurt hrenovke"
+      ]
+    },
+    {
+      "canonicalKey": "divella pastina stelline",
+      "displayName": "Pastina Divella Stelline",
+      "aliases": [
+        "divella pastina stelline",
+        "stelline"
+      ]
+    },
+    {
+      "canonicalKey": "cokolino fit podravka",
+      "displayName": "Podravka Cokolino Fit",
+      "aliases": [
+        "cokolino fit",
+        "cokolino fit podravka"
+      ]
+    },
+    {
+      "canonicalKey": "istarska passata podravka rajcica",
+      "displayName": "Podravka Passata Istarska Rajcica",
+      "aliases": [
+        "istarska passata podravka rajcica",
+        "istarska passata rajcica"
+      ]
+    },
+    {
+      "canonicalKey": "nutribella",
+      "displayName": "Nutribella",
+      "aliases": [
+        "nutribella"
+      ]
+    },
+    {
+      "canonicalKey": "cips doritos doritps nacho",
+      "displayName": "Doritos Cips Doritps Nacho",
+      "aliases": [
+        "cips doritos doritps nacho",
+        "cips doritps nacho"
+      ]
+    },
+    {
+      "canonicalKey": "doritos taco",
+      "displayName": "Doritos Taco",
+      "aliases": [
+        "doritos taco"
+      ]
+    },
+    {
+      "canonicalKey": "orangina original",
+      "displayName": "Orangina Original",
+      "aliases": [
+        "orangina original",
+        "original"
+      ]
+    },
+    {
+      "canonicalKey": "canelloni divella",
+      "displayName": "Divella Canelloni",
+      "aliases": [
+        "canelloni",
+        "canelloni divella"
+      ]
+    },
+    {
+      "canonicalKey": "in musli tekmar yoghurt",
+      "displayName": "Tekmar Musli In Yoghurt",
+      "aliases": [
+        "in musli tekmar yoghurt",
+        "in musli yoghurt"
+      ]
+    },
+    {
+      "canonicalKey": "divella vermicelli",
+      "displayName": "Divella Vermicelli",
+      "aliases": [
+        "divella vermicelli",
+        "vermicelli"
+      ]
+    },
+    {
+      "canonicalKey": "indomie noodles",
+      "displayName": "Indomie Noodles",
+      "aliases": [
+        "indomie noodles",
+        "noodles"
+      ]
+    },
+    {
+      "canonicalKey": "fit flakes fun oat",
+      "displayName": "Fun Fit Oat Flakes",
+      "aliases": [
+        "fit flakes fun oat",
+        "flakes oat"
+      ]
+    },
+    {
+      "canonicalKey": "carobnjaci takovo",
+      "displayName": "Takovo Carobnjaci",
+      "aliases": [
+        "carobnjaci",
+        "carobnjaci takovo"
+      ]
+    },
+    {
+      "canonicalKey": "bambi plus protein yes",
+      "displayName": "Bambi Yes Protein Plus",
+      "aliases": [
+        "bambi plus protein yes",
+        "plus protein yes"
+      ]
+    },
+    {
+      "canonicalKey": "mousse protein zott",
+      "displayName": "Zott Protein Mousse",
+      "aliases": [
+        "mousse protein",
+        "mousse protein zott"
+      ]
+    },
+    {
+      "canonicalKey": "argeta posna tuna",
+      "displayName": "Argeta Posna Tuna",
+      "aliases": [
+        "argeta posna tuna"
+      ]
+    },
+    {
+      "canonicalKey": "fit mix mogyi",
+      "displayName": "Mogyi Fit Mix",
+      "aliases": [
+        "fit mix",
+        "fit mix mogyi"
+      ]
+    },
+    {
+      "canonicalKey": "delicatess mayonnaise nestl",
+      "displayName": "Nestl Mayonnaise Delicatess",
+      "aliases": [
+        "delicatess mayonnaise",
+        "delicatess mayonnaise nestl"
+      ]
+    },
+    {
+      "canonicalKey": "benedetto san still",
+      "displayName": "San Benedetto Still",
+      "aliases": [
+        "benedetto san still"
+      ]
+    },
+    {
+      "canonicalKey": "butter go on peanut",
+      "displayName": "Go On Peanut Butter",
+      "aliases": [
+        "butter go on peanut"
+      ]
+    },
+    {
+      "canonicalKey": "kokos napitak proteinski zbregov",
+      "displayName": "Zbregov Proteinski Napitak Kokos",
+      "aliases": [
+        "kokos napitak proteinski",
+        "kokos napitak proteinski zbregov"
+      ]
+    },
+    {
+      "canonicalKey": "citrate magnesium now",
+      "displayName": "Now Magnesium Citrate",
+      "aliases": [
+        "citrate magnesium",
+        "citrate magnesium now"
+      ]
+    },
+    {
+      "canonicalKey": "humus",
+      "displayName": "Humus",
+      "aliases": [
+        "humus"
+      ]
+    },
+    {
+      "canonicalKey": "chilli chipsy rebrasty",
+      "displayName": "Chipsy Rebrasty Chilli",
+      "aliases": [
+        "chilli chipsy rebrasty",
+        "chilli rebrasty"
+      ]
+    },
+    {
+      "canonicalKey": "ceasar roleski sauce",
+      "displayName": "Roleski Ceasar Sauce",
+      "aliases": [
+        "ceasar roleski sauce",
+        "ceasar sauce"
+      ]
+    },
+    {
+      "canonicalKey": "lanom plocice sa tonus",
+      "displayName": "Tonus Plocice sa Lanom",
+      "aliases": [
+        "lanom plocice sa",
+        "lanom plocice sa tonus"
+      ]
+    },
+    {
+      "canonicalKey": "albeni bar cake lker",
+      "displayName": "Lker Albeni Bar Cake",
+      "aliases": [
+        "albeni bar cake",
+        "albeni bar cake lker"
+      ]
+    },
+    {
+      "canonicalKey": "heinz italian sauce",
+      "displayName": "Heinz Italian Sauce",
+      "aliases": [
+        "heinz italian sauce",
+        "italian sauce"
+      ]
+    },
+    {
+      "canonicalKey": "magnesium protein tekmar",
+      "displayName": "Tekmar Protein Magnesium",
+      "aliases": [
+        "magnesium protein",
+        "magnesium protein tekmar"
+      ]
+    },
+    {
+      "canonicalKey": "biorazgradiva kesa tregerica",
+      "displayName": "Kesa (plastična / biorazgradiva)",
+      "aliases": [
+        "alu",
+        "biorazgradiva kesa",
+        "biorazgradiva kesa plasticna",
+        "biorazgradiva kesa tregerica",
+        "kesa",
+        "kesa smece",
+        "kesa tregerica",
+        "kesa velika",
+        "papir pecenje",
+        "providna"
+      ]
+    },
+    {
+      "canonicalKey": "benzin bmb95 evro premijum",
+      "displayName": "Evro Premijum BMB 95 (Benzin)",
+      "aliases": [
+        "benzin bmb95 evro premijum",
+        "bmb100",
+        "bmb95",
+        "bmb95 ep evo",
+        "bmb95 ep omv",
+        "bmb95 evro premijum",
+        "drive",
+        "eurosuper",
+        "maxmotion"
+      ]
+    },
+    {
+      "canonicalKey": "dostava usluga",
+      "displayName": "Dostava (Usluga dostave)",
+      "aliases": [
+        "delivery item",
+        "doplata dostava",
+        "dostava",
+        "dostava mp robe usluga",
+        "dostava troskovi",
+        "dostava usluga"
+      ]
+    },
+    {
+      "canonicalKey": "parkiranje usluga",
+      "displayName": "Usluga parkiranja",
+      "aliases": [
+        "karta parking",
+        "parkiranje",
+        "parkiranje usluga"
+      ]
+    },
+    {
+      "canonicalKey": "alesto cerneaux de noix",
+      "displayName": "Alesto Cerneaux De Noix",
+      "aliases": [
+        "alesto cerneaux de noix",
+        "cerneaux de noix"
+      ]
+    },
+    {
+      "canonicalKey": "alesto mjesavina orasastog voca",
+      "displayName": "Alesto Mjesavina Orasastog Voca",
+      "aliases": [
+        "alesto mjesavina orasastog voca",
+        "mjesavina orasastog voca"
+      ]
+    },
+    {
+      "canonicalKey": "cocoa dark excellence intense lindt",
+      "displayName": "Lindt Excellence Cocoa Intense Dark",
+      "aliases": [
+        "cocoa dark excellence intense",
+        "cocoa dark excellence intense lindt"
+      ]
+    },
+    {
+      "canonicalKey": "buo cioccolato fondente",
+      "displayName": "Buo Cioccolato Fondente",
+      "aliases": [
+        "buo cioccolato fondente"
+      ]
+    },
+    {
+      "canonicalKey": "crispbread grain rye whole",
+      "displayName": "Rye Crispbread Whole Grain",
+      "aliases": [
+        "crispbread grain rye whole"
+      ]
+    },
+    {
+      "canonicalKey": "chip choco galletas gullon zero",
+      "displayName": "Galletas Gullon Zero Chip Choco",
+      "aliases": [
+        "chip choco galletas gullon zero",
+        "chip choco zero"
+      ]
+    },
+    {
+      "canonicalKey": "bueno kinder white",
+      "displayName": "Kinder Bueno White",
+      "aliases": [
+        "bueno kinder white"
+      ]
+    },
+    {
+      "canonicalKey": "barilla penne rigate rigatoni",
+      "displayName": "Barilla Rigatoni Penne Rigate",
+      "aliases": [
+        "barilla penne rigate rigatoni",
+        "penne rigate rigatoni"
+      ]
+    },
+    {
+      "canonicalKey": "ketchup tomato",
+      "displayName": "Tomato Ketchup",
+      "aliases": [
+        "ketchup tomato"
+      ]
+    },
+    {
+      "canonicalKey": "originale pringles",
+      "displayName": "Pringles Originale",
+      "aliases": [
+        "originale pringles"
+      ]
+    },
+    {
+      "canonicalKey": "crownfield knusper schoko sli",
+      "displayName": "Crownfield Knusper Sli Schoko",
+      "aliases": [
+        "crownfield knusper schoko sli",
+        "knusper schoko sli"
+      ]
+    },
+    {
+      "canonicalKey": "deluxe pistaziencreme",
+      "displayName": "Deluxe Pistaziencreme",
+      "aliases": [
+        "deluxe pistaziencreme",
+        "pistaziencreme"
+      ]
+    },
+    {
+      "canonicalKey": "cocoa dark extra lidl",
+      "displayName": "Lidl Extra Dark Cocoa",
+      "aliases": [
+        "cocoa dark extra",
+        "cocoa dark extra lidl"
+      ]
+    },
+    {
+      "canonicalKey": "cioccolato gusto lidl mousse proteica",
+      "displayName": "Lidl Mousse Proteica Gusto Cioccolato",
+      "aliases": [
+        "cioccolato gusto lidl mousse proteica",
+        "cioccolato gusto mousse proteica"
+      ]
+    },
+    {
+      "canonicalKey": "crownfield pahuljice zobene",
+      "displayName": "Crownfield Zobene Pahuljice",
+      "aliases": [
+        "crownfield pahuljice zobene",
+        "pahuljice zobene"
+      ]
+    },
+    {
+      "canonicalKey": "grafschafter tortilla wraps",
+      "displayName": "Grafschafter Tortilla Wraps",
+      "aliases": [
+        "grafschafter tortilla wraps",
+        "tortilla wraps"
+      ]
+    },
+    {
+      "canonicalKey": "high lidl protein wraps",
+      "displayName": "Lidl High Protein Wraps",
+      "aliases": [
+        "high lidl protein wraps",
+        "high protein wraps"
+      ]
+    },
+    {
+      "canonicalKey": "bianco galletas galletti mulino",
+      "displayName": "Galletas Mulino Bianco Galletti",
+      "aliases": [
+        "bianco galletas galletti mulino"
+      ]
+    },
+    {
+      "canonicalKey": "bio crownfield dki oveseni",
+      "displayName": "Crownfield Bio Oveseni Dki",
+      "aliases": [
+        "bio crownfield dki oveseni",
+        "bio dki oveseni"
+      ]
+    },
+    {
+      "canonicalKey": "classic pilos protein skyr",
+      "displayName": "Pilos Skyr Classic Protein",
+      "aliases": [
+        "classic pilos protein skyr",
+        "classic protein skyr"
+      ]
+    },
+    {
+      "canonicalKey": "tofu vemondo",
+      "displayName": "Tofu Vemondo",
+      "aliases": [
+        "tofu vemondo"
+      ]
+    },
+    {
+      "canonicalKey": "chocolate kinder",
+      "displayName": "Kinder Chocolate",
+      "aliases": [
+        "chocolate",
+        "chocolate kinder"
+      ]
+    },
+    {
+      "canonicalKey": "original tuc",
+      "displayName": "Tuc Original",
+      "aliases": [
+        "original tuc"
+      ]
+    },
+    {
+      "canonicalKey": "bruschette chips mandel",
+      "displayName": "Mandel Bruschette Chips",
+      "aliases": [
+        "bruschette chips",
+        "bruschette chips mandel"
+      ]
+    },
+    {
+      "canonicalKey": "alesto classic fruit mix nut",
+      "displayName": "Alesto Nut Fruit Mix Classic",
+      "aliases": [
+        "alesto classic fruit mix nut",
+        "classic fruit mix nut"
+      ]
+    },
+    {
+      "canonicalKey": "caprice papadopoulos puricki",
+      "displayName": "Papadopoulos Puricki Caprice",
+      "aliases": [
+        "caprice papadopoulos puricki",
+        "caprice puricki"
+      ]
+    },
+    {
+      "canonicalKey": "dmbio kokos",
+      "displayName": "Dmbio Kokos",
+      "aliases": [
+        "dmbio kokos",
+        "kokos"
+      ]
+    },
+    {
+      "canonicalKey": "premium sli",
+      "displayName": "Premium Sli",
+      "aliases": [
+        "premium sli"
+      ]
+    },
+    {
+      "canonicalKey": "chocolate dark schogetten",
+      "displayName": "Schogetten Dark Chocolate",
+      "aliases": [
+        "chocolate dark schogetten"
+      ]
+    },
+    {
+      "canonicalKey": "chocolate cocoa dark heidi",
+      "displayName": "Heidi Dark Chocolate Cocoa",
+      "aliases": [
+        "chocolate cocoa dark",
+        "chocolate cocoa dark heidi"
+      ]
+    },
+    {
+      "canonicalKey": "butter pilos",
+      "displayName": "Pilos Butter",
+      "aliases": [
+        "butter",
+        "butter pilos"
+      ]
+    },
+    {
+      "canonicalKey": "crownfield flakes oat rolled",
+      "displayName": "Crownfield Rolled Oat Flakes",
+      "aliases": [
+        "crownfield flakes oat rolled",
+        "flakes oat rolled"
+      ]
+    },
+    {
+      "canonicalKey": "berio classic filippo pesto",
+      "displayName": "Filippo Berio Classic Pesto",
+      "aliases": [
+        "berio classic filippo pesto",
+        "classic pesto"
+      ]
+    },
+    {
+      "canonicalKey": "ricotta zanetti",
+      "displayName": "Zanetti Ricotta",
+      "aliases": [
+        "ricotta",
+        "ricotta zanetti"
+      ]
+    },
+    {
+      "canonicalKey": "noodles soba vitasia",
+      "displayName": "Vitasia Soba Noodles",
+      "aliases": [
+        "noodles soba",
+        "noodles soba vitasia"
+      ]
+    },
+    {
+      "canonicalKey": "coconut freshona milk",
+      "displayName": "Freshona Coconut Milk",
+      "aliases": [
+        "coconut freshona milk",
+        "coconut milk"
+      ]
+    },
+    {
+      "canonicalKey": "bevanda cocco riso vemondo",
+      "displayName": "Vemondo Bevanda Cocco Riso",
+      "aliases": [
+        "bevanda cocco riso",
+        "bevanda cocco riso vemondo"
+      ]
+    },
+    {
+      "canonicalKey": "butter nature peanut promise",
+      "displayName": "Nature Promise Peanut Butter",
+      "aliases": [
+        "butter nature peanut promise",
+        "butter peanut"
+      ]
+    },
+    {
+      "canonicalKey": "bites bruschette cheese maretti mixed",
+      "displayName": "Maretti Bruschette Bites Mixed Cheese",
+      "aliases": [
+        "bites bruschette cheese maretti mixed",
+        "bites bruschette cheese mixed"
+      ]
+    },
+    {
+      "canonicalKey": "cokoladice kinder",
+      "displayName": "Kinder Cokoladice",
+      "aliases": [
+        "cokoladice kinder"
+      ]
+    },
+    {
+      "canonicalKey": "coated crispy peanuts vitasia wasabi",
+      "displayName": "Vitasia Wasabi Crispy Coated Peanuts",
+      "aliases": [
+        "coated crispy peanuts vitasia wasabi",
+        "coated crispy peanuts wasabi"
+      ]
+    },
+    {
+      "canonicalKey": "crownfield crunchy",
+      "displayName": "Crownfield Crunchy",
+      "aliases": [
+        "crownfield crunchy",
+        "crunchy"
+      ]
+    },
+    {
+      "canonicalKey": "alpine chocolate milk schogetten",
+      "displayName": "Schogetten Alpine Milk Chocolate",
+      "aliases": [
+        "alpine chocolate milk schogetten"
+      ]
+    },
+    {
+      "canonicalKey": "ar maggi mes",
+      "displayName": "Maggi Ar Mes",
+      "aliases": [
+        "ar maggi mes",
+        "ar mes"
+      ]
+    },
+    {
+      "canonicalKey": "nature promise",
+      "displayName": "Nature Promise",
+      "aliases": [
+        "100",
+        "nature promise"
+      ]
+    },
+    {
+      "canonicalKey": "free ikea kafferep oat sugar",
+      "displayName": "Ikea Kafferep Oat Sugar Free",
+      "aliases": [
+        "free ikea kafferep oat sugar",
+        "free kafferep oat sugar"
+      ]
+    },
+    {
+      "canonicalKey": "kakaovou lidl pln susenky",
+      "displayName": "Lidl Susenky Pln Kakaovou",
+      "aliases": [
+        "kakaovou lidl pln susenky",
+        "kakaovou pln susenky"
+      ]
+    },
+    {
+      "canonicalKey": "alpsko ljubljanske mlekarne mleko",
+      "displayName": "Ljubljanske Mlekarne Alpsko Mleko",
+      "aliases": [
+        "alpsko ljubljanske mlekarne mleko",
+        "alpsko mleko"
+      ]
+    },
+    {
+      "canonicalKey": "chio stickletti",
+      "displayName": "Chio Stickletti",
+      "aliases": [
+        "chio stickletti"
+      ]
+    },
+    {
+      "canonicalKey": "el teqquito tortilla wraps",
+      "displayName": "El Teqquito Tortilla Wraps",
+      "aliases": [
+        "el teqquito tortilla wraps",
+        "tortilla wraps"
+      ]
+    },
+    {
+      "canonicalKey": "bonduelle crveni pasulj",
+      "displayName": "Bonduelle Crveni Pasulj",
+      "aliases": [
+        "bonduelle crveni pasulj",
+        "crveni pasulj"
+      ]
+    },
+    {
+      "canonicalKey": "cacao dark supreme valor",
+      "displayName": "Valor Cacao Supreme Dark",
+      "aliases": [
+        "cacao dark supreme",
+        "cacao dark supreme valor"
+      ]
+    },
+    {
+      "canonicalKey": "arla cheese cream natural",
+      "displayName": "Arla Natural Cream Cheese",
+      "aliases": [
+        "arla cheese cream natural",
+        "cheese cream natural"
+      ]
+    },
+    {
+      "canonicalKey": "juha kokosja podravka tjesteninom",
+      "displayName": "Podravka Kokosja Juha Tjesteninom",
+      "aliases": [
+        "juha kokosja podravka tjesteninom",
+        "juha kokosja tjesteninom"
+      ]
+    },
+    {
+      "canonicalKey": "krem mlek sir sveze",
+      "displayName": "Mlek Sveže Krem Sir",
+      "aliases": [
+        "krem mlek sir sveze",
+        "krem sir sveze"
+      ]
+    },
+    {
+      "canonicalKey": "smoki",
+      "displayName": "Smoki",
+      "aliases": [
+        "smoki"
+      ]
+    },
+    {
+      "canonicalKey": "guarana",
+      "displayName": "Guarana",
+      "aliases": [
+        "guarana"
+      ]
+    },
+    {
+      "canonicalKey": "cokoladno dukat mleko",
+      "displayName": "Dukat Cokoladno Mleko",
+      "aliases": [
+        "cokoladno dukat mleko",
+        "cokoladno mleko"
+      ]
+    },
+    {
+      "canonicalKey": "kajmak",
+      "displayName": "Kajmak",
+      "aliases": [
+        "kajmak"
+      ]
+    }
+  ]
+}

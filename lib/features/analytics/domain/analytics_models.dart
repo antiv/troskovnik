@@ -68,17 +68,19 @@ class BusinessSplit {
   int get totalMinor => businessMinor + personalMinor;
 }
 
-/// Najčešći/najskuplji artikal (po nazivu, bez kategorija — MVP).
+/// Najčešći/najskuplji artikal (po kanonskom nazivu).
 class TopItem {
   const TopItem({
     required this.name,
     required this.totalMinor,
     required this.count,
+    this.canonicalItemId,
   });
 
   final String name;
   final int totalMinor;
   final int count;
+  final int? canonicalItemId;
 }
 
 /// Zbirni pregled analitike za izabrani period.
@@ -93,6 +95,7 @@ class AnalyticsSummary {
     required this.byPaymentMethod,
     required this.topItems,
     required this.byCategory,
+    this.totalUniqueItemsCount = 0,
   });
 
   /// Ukupan iznos po valuti — nikad se ne sabiraju različite valute.
@@ -109,6 +112,9 @@ class AnalyticsSummary {
   final List<PaymentMethodSpending> byPaymentMethod;
   final List<TopItem> topItems;
   final List<CategorySpending> byCategory;
+
+  /// Ukupan broj jedinstvenih kanonskih artikala u izabranom periodu i valuti.
+  final int totalUniqueItemsCount;
 
   bool get isEmpty => receiptCount == 0;
 }
@@ -142,7 +148,103 @@ class PricePoint {
   final int unitPriceMinor;
 }
 
-/// Detalji za jedan artikal (po nazivu) — drill-down iz analitike.
+/// Statistika cena jednog artikla kod konkretnog prodavca ("Gde je najjeftinije").
+class ItemMerchantStats {
+  const ItemMerchantStats({
+    required this.merchantId,
+    required this.merchantName,
+    required this.totalMinor,
+    required this.purchaseCount,
+    required this.minUnitPriceMinor,
+    required this.avgUnitPriceMinor,
+    required this.maxUnitPriceMinor,
+    required this.latestUnitPriceMinor,
+    this.isCheapest = false,
+  });
+
+  final int merchantId;
+  final String merchantName;
+  final int totalMinor;
+  final int purchaseCount;
+  final int minUnitPriceMinor;
+  final int avgUnitPriceMinor;
+  final int maxUnitPriceMinor;
+  final int latestUnitPriceMinor;
+  final bool isCheapest;
+}
+
+/// Poređenje isplativosti različitih pakovanja istog artikla (cena po 1L ili 1kg).
+class ItemMeasureComparison {
+  const ItemMeasureComparison({
+    required this.measureLabel,
+    required this.baseUnitLabel,
+    required this.avgUnitPriceMinor,
+    required this.normalizedPricePerBaseMinor,
+    required this.purchaseCount,
+    this.isBestValue = false,
+  });
+
+  final String measureLabel;
+  final String baseUnitLabel; // "1L" ili "1kg"
+  final int avgUnitPriceMinor;
+  final int normalizedPricePerBaseMinor;
+  final int purchaseCount;
+  final bool isBestValue;
+}
+
+/// Pojedinačna kupovina artikla (za prikaz poslednjih kupovina i otvaranje računa).
+class ItemPurchaseRecord {
+  const ItemPurchaseRecord({
+    required this.receiptId,
+    required this.date,
+    required this.merchantName,
+    required this.rawItemName,
+    required this.quantity,
+    required this.unitPriceMinor,
+    required this.totalMinor,
+    this.extractedMeasure,
+  });
+
+  final int receiptId;
+  final DateTime? date;
+  final String merchantName;
+  final String rawItemName;
+  final double quantity;
+  final int unitPriceMinor;
+  final int totalMinor;
+  final String? extractedMeasure;
+}
+
+/// Stavka u punom katalogu artikala (Modul 2: pretraga, sortiranje, kategorije).
+class CatalogItemSummary {
+  const CatalogItemSummary({
+    required this.name,
+    required this.totalMinor,
+    required this.purchaseCount,
+    required this.totalQuantity,
+    this.canonicalItemId,
+    this.rawVariants = const [],
+    this.categoryId,
+    this.categoryName,
+    this.categoryColor,
+    this.latestUnitPriceMinor,
+    this.priceChangePercent,
+  });
+
+  final String name;
+  final int? canonicalItemId;
+  final int totalMinor;
+  final int purchaseCount;
+  final double totalQuantity;
+  final List<String> rawVariants;
+  final int? categoryId;
+  final String? categoryName;
+  final String? categoryColor;
+  final int? latestUnitPriceMinor;
+  final double? priceChangePercent;
+}
+
+/// Detalji za jedan artikal (po kanonskom nazivu) — drill-down iz analitike.
 class ItemDetail {
   const ItemDetail({
     required this.name,
@@ -151,6 +253,18 @@ class ItemDetail {
     required this.totalQuantity,
     required this.priceHistory,
     required this.byMerchant,
+    this.canonicalItemId,
+    this.rawVariants = const [],
+    this.priceHistoryByMeasure = const {},
+    this.merchantStatsByMeasure = const {},
+    this.overallMerchantStats = const [],
+    this.measureComparisons = const [],
+    this.recentPurchases = const [],
+    this.averageDaysBetweenPurchases,
+    this.estimatedMonthlyMinor,
+    this.categoryId,
+    this.categoryName,
+    this.categoryColor,
   });
 
   final String name;
@@ -159,6 +273,36 @@ class ItemDetail {
   final double totalQuantity;
   final List<PricePoint> priceHistory;
   final List<MerchantSpending> byMerchant;
+  final int? canonicalItemId;
+
+  /// Različiti sirovi nazivi sa fiskalnih računa koji su spojeni u ovaj kanonski artikal.
+  final List<String> rawVariants;
+
+  /// Istorija jedinične cene odvojena po pakovanju/jedinici mere (npr. "1L", "0.5L"),
+  /// kako se ne bi mešale cene različitih gramaža istog proizvoda.
+  final Map<String, List<PricePoint>> priceHistoryByMeasure;
+
+  /// Statistika cena po prodavcima za svaku pojedinačnu veličinu pakovanja (ključ = mera).
+  final Map<String, List<ItemMerchantStats>> merchantStatsByMeasure;
+
+  /// Zbirna statistika cena po prodavcima (preko svih kupovina ili dominantne mere).
+  final List<ItemMerchantStats> overallMerchantStats;
+
+  /// Poređenje isplativosti pakovanja (cena svedena na 1L ili 1kg).
+  final List<ItemMeasureComparison> measureComparisons;
+
+  /// Poslednje kupovine ovog artikla (sortirano od najnovije).
+  final List<ItemPurchaseRecord> recentPurchases;
+
+  /// Prosečan broj dana između kupovina (ako postoje bar 2 kupovine u rasponu >= 3 dana).
+  final int? averageDaysBetweenPurchases;
+
+  /// Procenjena mesečna potrošnja na ovaj artikal (u minor jedinicama).
+  final int? estimatedMonthlyMinor;
+
+  final int? categoryId;
+  final String? categoryName;
+  final String? categoryColor;
 }
 
 /// Opseg perioda za filtriranje analitike.
@@ -167,3 +311,4 @@ enum AnalyticsRange {
   last12Months,
   all,
 }
+

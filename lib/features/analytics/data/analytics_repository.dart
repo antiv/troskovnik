@@ -6,6 +6,7 @@ import 'package:drift/drift.dart';
 import '../../../core/db/database.dart';
 import '../../../core/db/enums.dart';
 import '../../../core/domain/currency.dart';
+import '../../../core/normalization/item_normalization_service.dart';
 import '../../categories/domain/category_models.dart';
 import '../domain/advanced_analytics_models.dart';
 import '../domain/analytics_models.dart';
@@ -19,6 +20,8 @@ class AnalyticsRepository {
   AnalyticsRepository(this._db);
 
   final AppDatabase _db;
+  late final ItemNormalizationService _normalizer =
+      ItemNormalizationService(_db);
 
   /// Donja granica perioda na osnovu opsega (null = sve).
   DateTime? _since(AnalyticsRange range, DateTime now) {
@@ -38,12 +41,19 @@ class AnalyticsRepository {
     DateTime? now,
     Currency? currency,
   }) {
-    // Bilo koja izmena receipts/line_items/merchants pokreće preračun.
+    // Bilo koja izmena receipts/line_items/merchants/canonical_items pokreće preračun.
     final trigger = _db
         .customSelect(
           'SELECT (SELECT count(*) FROM receipts) AS r, '
-          '(SELECT count(*) FROM line_items) AS i',
-          readsFrom: {_db.receipts, _db.lineItems, _db.merchants},
+          '(SELECT count(*) FROM line_items) AS i, '
+          '(SELECT count(*) FROM canonical_items) AS ci',
+          readsFrom: {
+            _db.receipts,
+            _db.lineItems,
+            _db.merchants,
+            _db.canonicalItems,
+            _db.itemAliases,
+          },
         )
         .watch();
     return trigger.asyncMap((_) => loadSummary(range, now: now, currency: currency));
@@ -54,6 +64,7 @@ class AnalyticsRepository {
     DateTime? now,
     Currency? currency,
   }) async {
+    await _normalizer.ensureNormalized();
     final ts = now ?? DateTime.now();
     final since = _since(range, ts);
 
@@ -63,7 +74,10 @@ class AnalyticsRepository {
     final byMerchant = await _byMerchant(since);
     final split = await _businessSplit(since, currency: currency);
     final byPayment = await _byPaymentMethod(since, currency: currency);
-    final topItems = await _topItems(since, currency: currency);
+    final allTopItems = await _topItems(since, currency: currency, limit: null);
+    final topItems = allTopItems.take(10).toList();
+    final totalUniqueItemsCount =
+        allTopItems.where((it) => it.totalMinor > 0).length;
     final vat = await _estimatedVat(since, currency: currency);
     final byCategory = await _byCategory(since, currency: currency);
 
@@ -91,6 +105,7 @@ class AnalyticsRepository {
       byPaymentMethod: byPayment,
       topItems: topItems,
       byCategory: byCategory,
+      totalUniqueItemsCount: totalUniqueItemsCount,
     );
   }
 
@@ -100,6 +115,7 @@ class AnalyticsRepository {
     AnalyticsRange range, {
     DateTime? now,
   }) async {
+    await _normalizer.ensureNormalized();
     final since = _since(range, now ?? DateTime.now());
     final r = _db.receipts;
     final m = _db.merchants;
@@ -125,19 +141,47 @@ class AnalyticsRepository {
     );
   }
 
-  /// Detalji za jedan artikal (po nazivu): zbir/količina/broj, istorija cene i
-  /// raspodela po prodavcima.
+  /// Detalji za jedan artikal (po kanonskom ili sirovom nazivu): zbir/količina/broj,
+  /// istorija cene (razdvojena po jedinici mere), poređenje cena po prodavcima,
+  /// isplativost pakovanja (1L / 1kg), ritam kupovine i poslednje kupovine.
   Future<ItemDetail> itemDetail(
     String name,
     AnalyticsRange range, {
     DateTime? now,
   }) async {
+    await _normalizer.ensureNormalized();
     final since = _since(range, now ?? DateTime.now());
     final r = _db.receipts;
     final li = _db.lineItems;
     final m = _db.merchants;
+    final ci = _db.canonicalItems;
+    final cat = _db.categories;
+
+    // Pokušaj pronalaska kanonskog artikla po displayName ili preko postojećeg line_item-a.
+    var canonicalRow = await (_db.select(ci)
+          ..where((t) => t.displayName.equals(name))
+          ..limit(1))
+        .getSingleOrNull();
+    if (canonicalRow == null) {
+      final sampleLi = await (_db.select(li)
+            ..where((t) => t.name.equals(name) & t.canonicalItemId.isNotNull())
+            ..limit(1))
+          .getSingleOrNull();
+      if (sampleLi?.canonicalItemId != null) {
+        canonicalRow = await (_db.select(ci)
+              ..where((t) => t.id.equals(sampleLi!.canonicalItemId!))
+              ..limit(1))
+            .getSingleOrNull();
+      }
+    }
+
+    final canonicalId = canonicalRow?.id;
+    final resolvedDisplayName = canonicalRow?.displayName ?? name;
+    final nameOrCanonicalMatch = canonicalId != null
+        ? (li.canonicalItemId.equals(canonicalId) | li.name.equals(name))
+        : li.name.equals(name);
     final itemFilter =
-        _validAnd(since) & li.isUnparsed.equals(false) & li.name.equals(name);
+        _validAnd(since) & li.isUnparsed.equals(false) & nameOrCanonicalMatch;
 
     // Agregat: ukupan iznos, broj kupovina (stavki), ukupna količina.
     final total = li.total.sum();
@@ -149,22 +193,181 @@ class AnalyticsRepository {
       ..addColumns([total, cnt, qty])
       ..where(itemFilter);
     final aggRow = await aggQ.getSingleOrNull();
+    final totalMinorVal = aggRow?.read(total) ?? 0;
+    final purchaseCountVal = aggRow?.read(cnt) ?? 0;
+    final totalQtyVal = aggRow?.read(qty) ?? 0;
 
-    // Istorija jedinične cene po vremenu računa.
-    final historyQ = _db.selectOnly(li).join([
+    // Sve pojedinačne kupovine ovog artikla (sa prodavcem i kategorijom),
+    // sortirane hronološki.
+    final detailQ = _db.selectOnly(li).join([
       innerJoin(r, r.id.equalsExp(li.receiptId)),
+      leftOuterJoin(m, m.id.equalsExp(r.merchantId)),
+      leftOuterJoin(cat, cat.id.equalsExp(li.categoryId)),
     ])
-      ..addColumns([r.pfrTime, li.unitPrice])
-      ..where(itemFilter & r.pfrTime.isNotNull())
-      ..orderBy([OrderingTerm(expression: r.pfrTime)]);
-    final history = (await historyQ.get())
-        .map((row) => PricePoint(
-              date: row.read(r.pfrTime)!,
-              unitPriceMinor: row.read(li.unitPrice) ?? 0,
-            ))
-        .toList();
+      ..addColumns([
+        r.id,
+        r.pfrTime,
+        r.createdAt,
+        m.id,
+        m.name,
+        li.name,
+        li.quantity,
+        li.unitPrice,
+        li.total,
+        li.extractedMeasure,
+        cat.id,
+        cat.name,
+        cat.color,
+      ])
+      ..where(itemFilter)
+      ..orderBy([
+        OrderingTerm(expression: r.pfrTime),
+        OrderingTerm(expression: r.createdAt),
+      ]);
+    final detailRows = await detailQ.get();
 
-    // Raspodela po prodavcima.
+    final rawVariantsSet = <String>{};
+    final priceHistoryByMeasure = <String, List<PricePoint>>{};
+    final allHistory = <PricePoint>[];
+    final purchaseDates = <DateTime>[];
+    final allPurchasesChronological = <ItemPurchaseRecord>[];
+
+    // Sakupljanje statistike po prodavcima (ukupno i po meri).
+    final merchantAccOverall = <int, _MerchantPriceAcc>{};
+    final merchantAccByMeasure = <String, Map<int, _MerchantPriceAcc>>{};
+
+    int? resolvedCategoryId = canonicalRow?.defaultCategoryId;
+    String? resolvedCategoryName;
+    String? resolvedCategoryColor;
+
+    for (final row in detailRows) {
+      final rawName = row.read(li.name) ?? '';
+      if (rawName.isNotEmpty) rawVariantsSet.add(rawName);
+
+      final pfrTime = row.read(r.pfrTime);
+      final effectiveDate = pfrTime ?? row.read(r.createdAt);
+      final unitPrice = row.read(li.unitPrice) ?? 0;
+      final lineTotal = row.read(li.total) ?? 0;
+      final lineQty = row.read(li.quantity) ?? 1.0;
+      final measureRaw = row.read(li.extractedMeasure);
+      final measureKey = (measureRaw ?? '').trim().toUpperCase();
+      final mId = row.read(m.id);
+      final mName = row.read(m.name) ?? '';
+      final receiptId = row.read(r.id) ?? 0;
+
+      final rowCatId = row.read(cat.id);
+      if (rowCatId != null) {
+        resolvedCategoryId = rowCatId;
+        resolvedCategoryName = row.read(cat.name);
+        resolvedCategoryColor = row.read(cat.color);
+      }
+
+      if (pfrTime != null) {
+        final pt = PricePoint(date: pfrTime, unitPriceMinor: unitPrice);
+        allHistory.add(pt);
+        priceHistoryByMeasure.putIfAbsent(measureKey, () => []).add(pt);
+        purchaseDates.add(pfrTime);
+      } else if (effectiveDate != null) {
+        purchaseDates.add(effectiveDate);
+      }
+
+      if (mId != null && unitPrice > 0) {
+        merchantAccOverall
+            .putIfAbsent(mId, () => _MerchantPriceAcc(mId, mName))
+            .add(unitPrice: unitPrice, lineTotal: lineTotal);
+        final byM = merchantAccByMeasure.putIfAbsent(measureKey, () => {});
+        byM
+            .putIfAbsent(mId, () => _MerchantPriceAcc(mId, mName))
+            .add(unitPrice: unitPrice, lineTotal: lineTotal);
+      }
+
+      allPurchasesChronological.add(
+        ItemPurchaseRecord(
+          receiptId: receiptId,
+          date: effectiveDate,
+          merchantName: mName,
+          rawItemName: rawName,
+          quantity: lineQty,
+          unitPriceMinor: unitPrice,
+          totalMinor: lineTotal,
+          extractedMeasure: measureKey.isEmpty ? null : measureKey,
+        ),
+      );
+    }
+
+    // Ako kanonski artikal ima defaultCategoryId a nismo našli naziv iz stavki,
+    // pročitaj iz tabele categories.
+    if (resolvedCategoryId != null && resolvedCategoryName == null) {
+      final catRow = await (_db.select(cat)
+            ..where((t) => t.id.equals(resolvedCategoryId!))
+            ..limit(1))
+          .getSingleOrNull();
+      if (catRow != null) {
+        resolvedCategoryName = catRow.name;
+        resolvedCategoryColor = catRow.color;
+      }
+    }
+
+    final rawVariants = rawVariantsSet.toList()..sort();
+
+    // Sortiraj mere po zastupljenosti (najčešća prva, ne-prazna pre prazne).
+    final sortedMeasureKeys = priceHistoryByMeasure.keys.toList()
+      ..sort((a, b) {
+        final lenA = priceHistoryByMeasure[a]?.length ?? 0;
+        final lenB = priceHistoryByMeasure[b]?.length ?? 0;
+        final byLen = lenB.compareTo(lenA);
+        if (byLen != 0) return byLen;
+        if (a.isNotEmpty && b.isEmpty) return -1;
+        if (a.isEmpty && b.isNotEmpty) return 1;
+        return a.compareTo(b);
+      });
+
+    // Rekonstruiši mapu u redosledu zastupljenosti kako bi UI čipovi imali
+    // najčešću meru na prvom mestu.
+    final orderedHistoryByMeasure = <String, List<PricePoint>>{
+      for (final k in sortedMeasureKeys) k: priceHistoryByMeasure[k]!,
+    };
+
+    final List<PricePoint> primaryHistory = sortedMeasureKeys.isNotEmpty
+        ? orderedHistoryByMeasure[sortedMeasureKeys.first]!
+        : allHistory;
+
+    // Izgradi statistiku po prodavcima za svaku meru i ukupno.
+    final merchantStatsByMeasure = <String, List<ItemMerchantStats>>{};
+    for (final entry in merchantAccByMeasure.entries) {
+      merchantStatsByMeasure[entry.key] =
+          _finalizeMerchantStats(entry.value.values);
+    }
+    final primaryMeasureKey =
+        sortedMeasureKeys.isNotEmpty ? sortedMeasureKeys.first : null;
+    final overallMerchantStats = (primaryMeasureKey != null &&
+            merchantStatsByMeasure.containsKey(primaryMeasureKey))
+        ? merchantStatsByMeasure[primaryMeasureKey]!
+        : _finalizeMerchantStats(merchantAccOverall.values);
+
+    // Poređenje isplativosti pakovanja (cena po 1L / 1kg).
+    final measureComparisons =
+        _buildMeasureComparisons(orderedHistoryByMeasure);
+
+    // Ritam kupovine (prosečan broj dana između kupovina i mesečna procena).
+    int? averageDaysBetweenPurchases;
+    int? estimatedMonthlyMinor;
+    if (purchaseDates.length >= 2) {
+      purchaseDates.sort();
+      final spanDays =
+          purchaseDates.last.difference(purchaseDates.first).inDays;
+      if (spanDays >= 3) {
+        averageDaysBetweenPurchases =
+            (spanDays / (purchaseDates.length - 1)).round().clamp(1, 365);
+        estimatedMonthlyMinor = ((totalMinorVal / spanDays) * 30).round();
+      }
+    }
+
+    // Poslednje kupovine (najnovije prve, do 15 stavki).
+    final recentPurchases =
+        allPurchasesChronological.reversed.take(15).toList();
+
+    // Raspodela po prodavcima (za postojeće polje byMerchant).
     final mTotal = li.total.sum();
     final mCnt = li.id.count();
     final byMerchantQ = _db.selectOnly(li).join([
@@ -185,13 +388,139 @@ class AnalyticsRepository {
         .toList();
 
     return ItemDetail(
-      name: name,
-      totalMinor: aggRow?.read(total) ?? 0,
-      purchaseCount: aggRow?.read(cnt) ?? 0,
-      totalQuantity: aggRow?.read(qty) ?? 0,
-      priceHistory: history,
+      name: resolvedDisplayName,
+      totalMinor: totalMinorVal,
+      purchaseCount: purchaseCountVal,
+      totalQuantity: totalQtyVal,
+      priceHistory: primaryHistory,
       byMerchant: byMerchant,
+      canonicalItemId: canonicalId,
+      rawVariants: rawVariants,
+      priceHistoryByMeasure: orderedHistoryByMeasure,
+      merchantStatsByMeasure: merchantStatsByMeasure,
+      overallMerchantStats: overallMerchantStats,
+      measureComparisons: measureComparisons,
+      recentPurchases: recentPurchases,
+      averageDaysBetweenPurchases: averageDaysBetweenPurchases,
+      estimatedMonthlyMinor: estimatedMonthlyMinor,
+      categoryId: resolvedCategoryId,
+      categoryName: resolvedCategoryName,
+      categoryColor: resolvedCategoryColor,
     );
+  }
+
+  static List<ItemMerchantStats> _finalizeMerchantStats(
+    Iterable<_MerchantPriceAcc> accs,
+  ) {
+    final list = accs.toList();
+    if (list.isEmpty) return const [];
+    // Sortiraj po prosečnoj jediničnoj ceni rastuće (najpovoljniji prvi).
+    list.sort((a, b) {
+      final byAvg = a.avgUnitPriceMinor.compareTo(b.avgUnitPriceMinor);
+      if (byAvg != 0) return byAvg;
+      return b.totalMinor.compareTo(a.totalMinor);
+    });
+    final cheapestAvg = list.first.avgUnitPriceMinor;
+    final markCheapest = list.length >= 2 && cheapestAvg > 0;
+    return [
+      for (final a in list)
+        ItemMerchantStats(
+          merchantId: a.merchantId,
+          merchantName: a.merchantName,
+          totalMinor: a.totalMinor,
+          purchaseCount: a.purchaseCount,
+          minUnitPriceMinor: a.minUnitPriceMinor,
+          avgUnitPriceMinor: a.avgUnitPriceMinor,
+          maxUnitPriceMinor: a.maxUnitPriceMinor,
+          latestUnitPriceMinor: a.latestUnitPriceMinor,
+          isCheapest: markCheapest && a.avgUnitPriceMinor == cheapestAvg,
+        ),
+    ];
+  }
+
+  static final RegExp _measureRegex =
+      RegExp(r'^(\d+(?:\.\d+)?)\s*(L|ML|KG|G)$', caseSensitive: false);
+
+  /// Parsira oznaku mere (npr. "0.5L", "1.5L", "200G", "1KG") u osnovnu
+  /// jedinicu ("1L" ili "1kg") i koeficijent.
+  static (double amountInBase, String baseUnitLabel)? _parseMeasureToBaseUnit(
+    String measureKey,
+  ) {
+    final match = _measureRegex.firstMatch(measureKey.trim());
+    if (match == null) return null;
+    final val = double.tryParse(match.group(1)!);
+    if (val == null || val <= 0) return null;
+    final unit = match.group(2)!.toUpperCase();
+    switch (unit) {
+      case 'L':
+        return (val, '1L');
+      case 'ML':
+        return (val / 1000.0, '1L');
+      case 'KG':
+        return (val, '1kg');
+      case 'G':
+        return (val / 1000.0, '1kg');
+      default:
+        return null;
+    }
+  }
+
+  static List<ItemMeasureComparison> _buildMeasureComparisons(
+    Map<String, List<PricePoint>> priceHistoryByMeasure,
+  ) {
+    final raw = <ItemMeasureComparison>[];
+    for (final entry in priceHistoryByMeasure.entries) {
+      final mKey = entry.key;
+      final points = entry.value;
+      if (mKey.isEmpty || points.isEmpty) continue;
+      final parsed = _parseMeasureToBaseUnit(mKey);
+      if (parsed == null) continue;
+      final (baseAmount, baseUnitLabel) = parsed;
+      final sumUnit =
+          points.fold<int>(0, (acc, p) => acc + p.unitPriceMinor);
+      final avgUnit = (sumUnit / points.length).round();
+      if (avgUnit <= 0) continue;
+      final normalized = (avgUnit / baseAmount).round();
+      raw.add(
+        ItemMeasureComparison(
+          measureLabel: mKey,
+          baseUnitLabel: baseUnitLabel,
+          avgUnitPriceMinor: avgUnit,
+          normalizedPricePerBaseMinor: normalized,
+          purchaseCount: points.length,
+        ),
+      );
+    }
+    if (raw.isEmpty) return const [];
+
+    // Pronađi najnižu normalizovanu cenu po svakoj osnovnoj jedinici ("1L" / "1kg").
+    final minByBase = <String, int>{};
+    final countByBase = <String, int>{};
+    for (final item in raw) {
+      countByBase[item.baseUnitLabel] =
+          (countByBase[item.baseUnitLabel] ?? 0) + 1;
+      final currentMin = minByBase[item.baseUnitLabel];
+      if (currentMin == null || item.normalizedPricePerBaseMinor < currentMin) {
+        minByBase[item.baseUnitLabel] = item.normalizedPricePerBaseMinor;
+      }
+    }
+
+    raw.sort((a, b) => a.normalizedPricePerBaseMinor
+        .compareTo(b.normalizedPricePerBaseMinor));
+
+    return [
+      for (final item in raw)
+        ItemMeasureComparison(
+          measureLabel: item.measureLabel,
+          baseUnitLabel: item.baseUnitLabel,
+          avgUnitPriceMinor: item.avgUnitPriceMinor,
+          normalizedPricePerBaseMinor: item.normalizedPricePerBaseMinor,
+          purchaseCount: item.purchaseCount,
+          isBestValue: (countByBase[item.baseUnitLabel] ?? 0) >= 2 &&
+              item.normalizedPricePerBaseMinor ==
+                  minByBase[item.baseUnitLabel],
+        ),
+    ];
   }
 
   Future<List<Currency>> _distinctCurrencies() async {
@@ -371,7 +700,7 @@ class AnalyticsRepository {
   static const paymentUnknownKey = _paymentUnknownKey;
   static const _paymentUnknownKey = '__unknown__';
 
-  /// Artikli jedne kategorije (grupisano po nazivu), za drill-down iz
+  /// Artikli jedne kategorije (grupisano po kanonskom nazivu), za drill-down iz
   /// analitike. `categoryId = 0` znači „bez kategorije" (NULL u bazi) —
   /// isti sentinel kao u [_byCategory].
   Future<List<TopItem>> categoryItems(
@@ -379,7 +708,8 @@ class AnalyticsRepository {
     AnalyticsRange range, {
     DateTime? now,
     Currency? currency,
-  }) {
+  }) async {
+    await _normalizer.ensureNormalized();
     final since = _since(range, now ?? DateTime.now());
     return _topItems(since,
         categoryId: categoryId, currency: currency, limit: null);
@@ -392,8 +722,10 @@ class AnalyticsRepository {
       Currency? currency}) async {
     final r = _db.receipts;
     final li = _db.lineItems;
+    final ci = _db.canonicalItems;
     final total = li.total.sum();
     final cnt = li.id.count();
+    final canonicalNameExpr = coalesce<String>([ci.displayName, li.name]);
 
     var filter = _validAnd(since, currency: currency) & li.isUnparsed.equals(false);
     if (merchantId != null) filter = filter & r.merchantId.equals(merchantId);
@@ -406,19 +738,21 @@ class AnalyticsRepository {
 
     final q = _db.selectOnly(li).join([
       innerJoin(r, r.id.equalsExp(li.receiptId)),
+      leftOuterJoin(ci, ci.id.equalsExp(li.canonicalItemId)),
     ])
-      ..addColumns([li.name, total, cnt])
+      ..addColumns([canonicalNameExpr, ci.id, total, cnt])
       ..where(filter)
-      ..groupBy([li.name])
+      ..groupBy([canonicalNameExpr])
       ..orderBy([OrderingTerm(expression: total, mode: OrderingMode.desc)]);
     if (limit != null) q.limit(limit);
 
     final rows = await q.get();
     return rows
         .map((row) => TopItem(
-              name: row.read(li.name) ?? '',
+              name: row.read(canonicalNameExpr) ?? '',
               totalMinor: row.read(total) ?? 0,
               count: row.read(cnt) ?? 0,
+              canonicalItemId: row.read(ci.id),
             ))
         .toList();
   }
@@ -490,8 +824,16 @@ class AnalyticsRepository {
         .customSelect(
           'SELECT (SELECT count(*) FROM receipts) AS r, '
           '(SELECT count(*) FROM line_items) AS i, '
-          '(SELECT count(*) FROM categories) AS c',
-          readsFrom: {_db.receipts, _db.lineItems, _db.merchants, _db.categories},
+          '(SELECT count(*) FROM categories) AS c, '
+          '(SELECT count(*) FROM canonical_items) AS ci',
+          readsFrom: {
+            _db.receipts,
+            _db.lineItems,
+            _db.merchants,
+            _db.categories,
+            _db.canonicalItems,
+            _db.itemAliases,
+          },
         )
         .watch();
     return trigger.asyncMap((_) => loadAdvancedSummary(filter, now: now));
@@ -502,6 +844,7 @@ class AnalyticsRepository {
     AdvancedAnalyticsFilter filter, {
     DateTime? now,
   }) async {
+    await _normalizer.ensureNormalized();
     final ts = now ?? DateTime.now();
     final (from, to) = _advancedRangeBounds(filter, ts);
 
@@ -1033,6 +1376,8 @@ class AnalyticsRepository {
   Future<List<ItemPriceInflation>> _loadPriceInflation(Currency currency) async {
     final r = _db.receipts;
     final li = _db.lineItems;
+    final ci = _db.canonicalItems;
+    final canonicalNameExpr = coalesce<String>([ci.displayName, li.name]);
 
     final filter = r.fetchStatus.equalsValue(FetchStatus.invalid).not() &
         _currencyFilter(currency) &
@@ -1042,22 +1387,30 @@ class AnalyticsRepository {
 
     final q = _db.selectOnly(li).join([
       innerJoin(r, r.id.equalsExp(li.receiptId)),
+      leftOuterJoin(ci, ci.id.equalsExp(li.canonicalItemId)),
     ])
-      ..addColumns([li.name, r.pfrTime, li.unitPrice])
+      ..addColumns([canonicalNameExpr, li.extractedMeasure, r.pfrTime, li.unitPrice])
       ..where(filter)
       ..orderBy([
-        OrderingTerm(expression: li.name),
+        OrderingTerm(expression: canonicalNameExpr),
         OrderingTerm(expression: r.pfrTime),
       ]);
 
     final rows = await q.get();
+    // Grupisanje po (kanonskiNaziv, ekstrahovanaMera) kako ne bismo poredili
+    // jediničnu cenu pakovanja od 0.5L i 1L kao lažnu inflaciju.
     final itemMap = <String, List<PricePoint>>{};
     for (final row in rows) {
-      final name = row.read(li.name);
+      final baseName = row.read(canonicalNameExpr);
+      final measure = (row.read(li.extractedMeasure) ?? '').trim().toUpperCase();
       final date = row.read(r.pfrTime);
       final price = row.read(li.unitPrice);
-      if (name != null && date != null && price != null && price > 0) {
-        itemMap.putIfAbsent(name, () => []).add(
+      if (baseName != null && date != null && price != null && price > 0) {
+        final key = measure.isNotEmpty &&
+                !baseName.toUpperCase().contains(measure)
+            ? '$baseName ($measure)'
+            : baseName;
+        itemMap.putIfAbsent(key, () => []).add(
               PricePoint(date: date, unitPriceMinor: price),
             );
       }
@@ -1183,4 +1536,246 @@ class AnalyticsRepository {
     }
     return BusinessSplit(businessMinor: business, personalMinor: personal);
   }
+
+  // ==========================================
+  // RUČNO SPAJANJE ARTIKALA (HUMAN-IN-THE-LOOP)
+  // ==========================================
+
+  /// Vraća sve kanonske artikle koji imaju makar jednu stavku na računima
+  /// (osim [excludeCanonicalId]), sortirane po broju kupovina ili nazivu.
+  Future<List<CanonicalItemRow>> canonicalItemsForMerge({
+    int? excludeCanonicalId,
+  }) async {
+    await _normalizer.ensureNormalized();
+    final ci = _db.canonicalItems;
+    final li = _db.lineItems;
+
+    final cnt = li.id.count();
+    final q = _db.select(ci).join([
+      innerJoin(li, li.canonicalItemId.equalsExp(ci.id)),
+    ])
+      ..addColumns([cnt])
+      ..where(
+        excludeCanonicalId != null
+            ? ci.id.equals(excludeCanonicalId).not()
+            : const Constant(true),
+      )
+      ..groupBy([ci.id])
+      ..orderBy([
+        OrderingTerm(expression: cnt, mode: OrderingMode.desc),
+        OrderingTerm(expression: ci.displayName),
+      ]);
+
+    final rows = await q.get();
+    return rows.map((r) => r.readTable(ci)).toList();
+  }
+
+  /// Ručno spaja [sourceCanonicalIds] u [targetCanonicalId] (opciono uz promenu
+  /// prikaza kanonskog naziva [customDisplayName]) i trajno pamti alijase.
+  Future<void> mergeCanonicalItems({
+    required int targetCanonicalId,
+    required List<int> sourceCanonicalIds,
+    String? customDisplayName,
+  }) {
+    return _normalizer.mergeCanonicalItems(
+      targetCanonicalId: targetCanonicalId,
+      sourceCanonicalIds: sourceCanonicalIds,
+      customDisplayName: customDisplayName,
+    );
+  }
+
+  /// Izdvaja jednu sirovu varijantu ([rawName]) iz kanonskog artikla
+  /// [canonicalItemId] u novi zaseban kanonski artikal.
+  Future<String> unmergeRawVariant({
+    required int canonicalItemId,
+    required String rawName,
+  }) {
+    return _normalizer.unmergeRawVariant(
+      canonicalItemId: canonicalItemId,
+      rawName: rawName,
+    );
+  }
+
+  // ==========================================
+  // KATALOG ARTIKALA (MODUL 2)
+  // ==========================================
+
+  /// Vraća kompletan katalog svih kanonskih artikala u zadatom periodu i valuti,
+  /// sa spojenim sirovim varijantama, kategorijama i procentom promene cene.
+  Future<List<CatalogItemSummary>> catalogItems(
+    AnalyticsRange range, {
+    DateTime? now,
+    Currency? currency,
+  }) async {
+    await _normalizer.ensureNormalized();
+    final since = _since(range, now ?? DateTime.now());
+    final r = _db.receipts;
+    final li = _db.lineItems;
+    final ci = _db.canonicalItems;
+    final cat = _db.categories;
+
+    final filter =
+        _validAnd(since, currency: currency) & li.isUnparsed.equals(false);
+
+    final q = _db.selectOnly(li).join([
+      innerJoin(r, r.id.equalsExp(li.receiptId)),
+      leftOuterJoin(ci, ci.id.equalsExp(li.canonicalItemId)),
+      leftOuterJoin(cat, cat.id.equalsExp(li.categoryId)),
+    ])
+      ..addColumns([
+        ci.id,
+        ci.displayName,
+        li.name,
+        li.quantity,
+        li.unitPrice,
+        li.total,
+        li.extractedMeasure,
+        r.pfrTime,
+        r.createdAt,
+        cat.id,
+        cat.name,
+        cat.color,
+      ])
+      ..where(filter)
+      ..orderBy([
+        OrderingTerm(expression: r.pfrTime),
+        OrderingTerm(expression: r.createdAt),
+      ]);
+
+    final rows = await q.get();
+    final byCanonicalName = <String, _CatalogItemAcc>{};
+
+    for (final row in rows) {
+      final rawName = row.read(li.name) ?? '';
+      final canonicalName = row.read(ci.displayName) ?? rawName;
+      if (canonicalName.isEmpty) continue;
+
+      final acc = byCanonicalName.putIfAbsent(
+        canonicalName,
+        () => _CatalogItemAcc(
+          name: canonicalName,
+          canonicalItemId: row.read(ci.id),
+        ),
+      );
+      acc.canonicalItemId ??= row.read(ci.id);
+
+      final lineTotal = row.read(li.total) ?? 0;
+      final lineQty = row.read(li.quantity) ?? 1.0;
+      final unitPrice = row.read(li.unitPrice) ?? 0;
+      final measureKey =
+          (row.read(li.extractedMeasure) ?? '').trim().toUpperCase();
+
+      acc.totalMinor += lineTotal;
+      acc.purchaseCount += 1;
+      acc.totalQuantity += lineQty;
+      if (rawName.isNotEmpty) acc.rawVariants.add(rawName);
+
+      final catId = row.read(cat.id);
+      if (catId != null) {
+        acc.categoryId = catId;
+        acc.categoryName = row.read(cat.name);
+        acc.categoryColor = row.read(cat.color);
+      }
+
+      if (unitPrice > 0) {
+        acc.pricesByMeasure.putIfAbsent(measureKey, () => []).add(unitPrice);
+        acc.latestUnitPriceMinor = unitPrice;
+      }
+    }
+
+    final result = <CatalogItemSummary>[];
+    for (final acc in byCanonicalName.values) {
+      if (acc.totalMinor <= 0) continue;
+
+      // Izračunaj promenu cene unutar najzastupljenije jedinice mere (kako ne
+      // bismo poredili 0.5L i 1.5L kao poskupljenje).
+      double? priceChangePct;
+      int? latestUnitPrice = acc.latestUnitPriceMinor;
+      if (acc.pricesByMeasure.isNotEmpty) {
+        final sortedMeasures = acc.pricesByMeasure.entries.toList()
+          ..sort((a, b) {
+            final byLen = b.value.length.compareTo(a.value.length);
+            if (byLen != 0) return byLen;
+            if (a.key.isNotEmpty && b.key.isEmpty) return -1;
+            if (a.key.isEmpty && b.key.isNotEmpty) return 1;
+            return a.key.compareTo(b.key);
+          });
+        final dominantPrices = sortedMeasures.first.value;
+        if (dominantPrices.isNotEmpty) {
+          latestUnitPrice = dominantPrices.last;
+          if (dominantPrices.length >= 2 && dominantPrices.first > 0) {
+            final firstP = dominantPrices.first;
+            final lastP = dominantPrices.last;
+            priceChangePct = ((lastP - firstP) / firstP) * 100.0;
+          }
+        }
+      }
+
+      final sortedVariants = acc.rawVariants.toList()..sort();
+      result.add(
+        CatalogItemSummary(
+          name: acc.name,
+          canonicalItemId: acc.canonicalItemId,
+          totalMinor: acc.totalMinor,
+          purchaseCount: acc.purchaseCount,
+          totalQuantity: acc.totalQuantity,
+          rawVariants: sortedVariants,
+          categoryId: acc.categoryId,
+          categoryName: acc.categoryName,
+          categoryColor: acc.categoryColor,
+          latestUnitPriceMinor: latestUnitPrice,
+          priceChangePercent: priceChangePct,
+        ),
+      );
+    }
+
+    result.sort((a, b) => b.totalMinor.compareTo(a.totalMinor));
+    return result;
+  }
 }
+
+class _MerchantPriceAcc {
+  _MerchantPriceAcc(this.merchantId, this.merchantName);
+
+  final int merchantId;
+  final String merchantName;
+  int totalMinor = 0;
+  int purchaseCount = 0;
+  int minUnitPriceMinor = 0;
+  int maxUnitPriceMinor = 0;
+  int latestUnitPriceMinor = 0;
+  int _sumUnitPrices = 0;
+
+  void add({required int unitPrice, required int lineTotal}) {
+    totalMinor += lineTotal;
+    purchaseCount += 1;
+    _sumUnitPrices += unitPrice;
+    if (minUnitPriceMinor == 0 || unitPrice < minUnitPriceMinor) {
+      minUnitPriceMinor = unitPrice;
+    }
+    if (unitPrice > maxUnitPriceMinor) {
+      maxUnitPriceMinor = unitPrice;
+    }
+    latestUnitPriceMinor = unitPrice;
+  }
+
+  int get avgUnitPriceMinor =>
+      purchaseCount == 0 ? 0 : (_sumUnitPrices / purchaseCount).round();
+}
+
+class _CatalogItemAcc {
+  _CatalogItemAcc({required this.name, this.canonicalItemId});
+
+  final String name;
+  int? canonicalItemId;
+  int totalMinor = 0;
+  int purchaseCount = 0;
+  double totalQuantity = 0;
+  final Set<String> rawVariants = <String>{};
+  int? categoryId;
+  String? categoryName;
+  String? categoryColor;
+  int? latestUnitPriceMinor;
+  final Map<String, List<int>> pricesByMeasure = <String, List<int>>{};
+}
+
